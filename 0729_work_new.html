@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dateng 野菜探險家 · 台東縣長濱鄉Salimpo阿美山海文化實驗小學</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+/* ══════════════════════════════════════════════
+   RESET & TOKENS
+══════════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --ink:   #16161e;
+  --ink2:  #1e1e2e;
+  --ink3:  #2a2a3a;
+  --neon:  #DFFF00;
+  --beige: #EDE5D0;
+  --warm:  #D4C9A8;
+  --rust:  #C1440E;
+  --sage:  #6B8F6B;
+  --lavender: #9B8EC4;
+  --teal:  #4ECDC4;
+  --gold:  #F5A623;
+  --pink:  #E88EA0;
+  --white: #F8F4EC;
+  --mono: 'Courier New', monospace;
+  --serif: Georgia, 'Times New Roman', serif;
+  --sans: system-ui, -apple-system, sans-serif;
+  --transition: 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--mono);
+}
+
+/* ══════════════════════════════════════════════
+   VIEWS
+══════════════════════════════════════════════ */
+.view { position: fixed; inset: 0; transition: opacity var(--transition), transform var(--transition); }
+.view.hidden { opacity: 0; pointer-events: none; transform: translateY(24px); }
+.view.visible { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+/* ══════════════════════════════════════════════
+   TOP NAV BAR (shows on all views except graph)
+══════════════════════════════════════════════ */
+#topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: rgba(22,22,30,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--ink3);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  z-index: 1000;
+  transition: opacity var(--transition);
+}
+#topnav.hidden { opacity: 0; pointer-events: none; }
+#topnav .nav-back {
+  display: flex; align-items: center; gap: 6px;
+  color: var(--neon); font-size: 12px; letter-spacing: 2px;
+  cursor: pointer; border: 1px solid var(--neon);
+  padding: 6px 12px;
+  background: transparent;
+  transition: background 0.15s;
+}
+#topnav .nav-back:hover { background: rgba(223,255,0,0.1); }
+#topnav .nav-title { font-size: 11px; color: #888; letter-spacing: 1px; }
+#topnav .nav-plants {
+  display: flex; gap: 6px; margin-left: auto;
+  flex-wrap: nowrap;
+}
+#topnav .nav-plant-btn {
+  font-size: 10px; letter-spacing: 1px;
+  padding: 4px 10px;
+  border: 1px solid var(--ink3);
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  font-family: var(--mono);
+}
+#topnav .nav-plant-btn:hover,
+#topnav .nav-plant-btn.active {
+  border-color: var(--neon);
+  color: var(--neon);
+}
+
+/* ══════════════════════════════════════════════
+   GRAPH VIEW
+══════════════════════════════════════════════ */
+#view-graph {
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+#graph-header {
+  position: absolute;
+  top: 24px; left: 32px;
+  z-index: 10;
+}
+#graph-header .tag {
+  font-size: 9px; letter-spacing: 4px; color: var(--neon);
+  margin-bottom: 4px;
+}
+#graph-header h1 {
+  font-size: 28px; font-weight: bold;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  font-family: var(--serif);
+}
+#graph-header .sub {
+  font-size: 10px; color: #555; margin-top: 6px; letter-spacing: 2px;
+}
+
+#graph-svg {
+  width: 100%; height: 100%;
+}
+
+#graph-hint {
+  position: absolute;
+  bottom: 24px; right: 24px;
+  font-size: 9px; color: #444; letter-spacing: 2px;
+  text-align: right;
+}
+
+/* Graph legend */
+#graph-legend {
+  position: absolute;
+  bottom: 24px; left: 24px;
+  display: flex; flex-direction: column; gap: 5px;
+  z-index: 10;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 9px; color: #666; letter-spacing: 1px;
+}
+.legend-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* node tooltip */
+#graph-tooltip {
+  position: absolute;
+  background: rgba(22,22,30,0.95);
+  border: 1px solid var(--ink3);
+  padding: 6px 10px;
+  font-size: 10px; color: #ccc;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  max-width: 180px;
+  line-height: 1.5;
+}
+
+/* Award entry button on graph */
+#award-entry-btn {
+  position: absolute;
+  top: 24px; right: 24px;
+  background: rgba(212,160,23,.15);
+  border: 1px solid #D4A017;
+  color: #D4A017;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 10px 20px;
+  cursor: pointer;
+  z-index: 20;
+  transition: background 0.15s, transform 0.15s;
+  display: flex; align-items: center; gap: 8px;
+  font-weight: bold;
+}
+#award-entry-btn:hover { 
+  background: rgba(212,160,23,.3); 
+  transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════════════
+   PLANT DETAIL VIEW & SHARED LAYOUTS
+══════════════════════════════════════════════ */
+#view-plant, #view-section, #view-award, #view-about, #view-idtool {
+  background: var(--beige);
+  overflow-y: auto;
+  padding-top: 56px;
+  font-family: var(--serif);
+  color: var(--ink);
+}
+/* ── Identification Tool Views ── */
+#view-idtool { background: var(--ink2) !important; color: var(--white) !important; font-family: var(--sans) !important; }
+.idt-hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 60px 48px 40px; border-bottom: 1px solid rgba(56,189,248,0.4); }
+.idt-tag  { font-family: var(--mono); font-size: 9px; letter-spacing: 4px; color: #38BDF8; margin-bottom: 12px; display: block; }
+.idt-title{ font-family: var(--serif); font-size: 36px; color: #f8fafc; margin-bottom: 12px; line-height: 1.2; }
+.idt-sub  { font-size: 14px; color: #94a3b8; font-family: var(--sans); line-height: 1.9; max-width: 640px; }
+.idt-body { max-width: 900px; margin: 0 auto; padding: 48px 48px 80px; }
+.idt-section { margin-bottom: 48px; }
+.idt-section-title { font-family: var(--serif); font-size: 22px; color: #38BDF8; margin-bottom: 8px; }
+.idt-section-label { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: #475569; margin-bottom: 12px; display: block; }
+.idt-card { background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.18); padding: 24px 28px; margin-bottom: 16px; }
+.idt-card h4 { font-family: var(--serif); font-size: 15px; color: #e2e8f0; margin-bottom: 8px; }
+.idt-card p  { font-size: 14px; color: #94a3b8; line-height: 1.9; font-family: var(--sans); }
+.idt-steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 12px; }
+.idt-step  { background: rgba(255,255,255,0.03); border: 1px solid #1e3a5f; padding: 20px 14px; text-align: center; }
+.idt-step .step-num  { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: #38BDF8; margin-bottom: 8px; display: block; }
+.idt-step .step-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+.idt-step .step-txt  { font-size: 12px; color: #cbd5e1; font-family: var(--sans); line-height: 1.6; }
+.radar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 18px; margin-top: 16px; }
+.radar-card { background: rgba(255,255,255,0.03); border: 1px solid #1e293b; padding: 18px; text-align: center; }
+.radar-card h5 { font-family: var(--serif); font-size: 14px; color: #e2e8f0; margin-bottom: 4px; }
+.radar-card .amis-label { font-family: var(--mono); font-size: 10px; color: #475569; margin-bottom: 10px; display: block; }
+.idt-tool-nav { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+.idt-tool-btn { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.35); color: #38BDF8;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px; padding: 10px 18px; cursor: pointer; transition: all 0.2s; }
+.idt-tool-btn:hover { background: rgba(56,189,248,0.22); }
+
+
+/* ── Hero ── */
+.plant-hero {
+  background: var(--ink);
+  padding: 48px 60px 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: end;
+  position: relative;
+  overflow: hidden;
+}
+.plant-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px);
+  pointer-events: none;
+}
+.plant-names { position: relative; }
+.plant-names .amis-name {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 3px;
+  color: var(--neon);
+  margin-bottom: 8px;
+  display: block;
+}
+.plant-names h2 {
+  font-size: 64px;
+  font-family: var(--serif);
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.plant-names .scientific {
+  font-size: 13px;
+  color: #555;
+  font-style: italic;
+  font-family: var(--mono);
+}
+.plant-tagline {
+  position: relative;
+  text-align: right;
+}
+.plant-tagline .tagline-text {
+  font-size: 18px;
+  color: #888;
+  font-family: var(--serif);
+  font-style: italic;
+  line-height: 1.4;
+}
+.plant-tagline .accent-bar {
+  width: 40px; height: 3px;
+  background: var(--neon);
+  margin-left: auto;
+  margin-top: 12px;
+}
+.plant-color-bar { height: 4px; width: 100%; }
+
+.plant-content {
+  padding: 0 60px 60px;
+  background: var(--beige);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.plant-section { padding: 40px 0 0; }
+.plant-section + .plant-section { border-top: 1px solid var(--warm); margin-top: 40px; }
+.section-label { font-family: var(--mono); font-size: 10px; letter-spacing: 4px; color: #999; margin-bottom: 6px; display: block; }
+.section-title { font-size: 24px; font-family: var(--serif); color: var(--ink); font-weight: bold; margin-bottom: 24px; }
+.story-text { font-size: 16px; line-height: 1.9; color: #333; font-family: var(--serif); max-width: 680px; }
+.story-text .highlight { background: rgba(223,255,0,0.25); padding: 1px 3px; font-style: italic; }
+
+.info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
+.info-card { background: var(--white); border: 1px solid var(--warm); padding: 24px; position: relative; }
+.info-card .card-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: #aaa; margin-bottom: 8px; display: block; }
+.info-card .card-emoji { font-size: 24px; margin-bottom: 8px; display: block; }
+.info-card h4 { font-size: 15px; font-family: var(--serif); color: var(--ink); margin-bottom: 8px; font-weight: bold; }
+.info-card p { font-size: 14px; line-height: 1.7; color: #555; font-family: var(--sans); }
+
+.nutrition-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.nutrient-tag { background: var(--white); border: 1px solid var(--warm); padding: 8px 14px; font-size: 12px; font-family: var(--mono); color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.nutrient-tag .nt-icon { font-size: 14px; }
+.nutrient-tag .nt-label { font-size: 11px; color: #888; }
+
+.amis-quote { background: var(--ink); padding: 24px 32px; margin: 32px 0; border-left: 3px solid var(--neon); position: relative; }
+.amis-quote .quote-text { font-size: 18px; color: var(--white); font-family: var(--serif); font-style: italic; line-height: 1.6; }
+.amis-quote .quote-attr { font-size: 10px; color: #666; font-family: var(--mono); letter-spacing: 2px; margin-top: 10px; }
+
+/* ══════════════════════════════════════════════
+   SECTION VIEW
+══════════════════════════════════════════════ */
+.section-hero { background: var(--ink); padding: 48px 60px 40px; position: relative; overflow: hidden; }
+.section-hero::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px); pointer-events: none; }
+.section-hero .tag { font-size:9px; letter-spacing:4px; color:var(--neon); margin-bottom:8px; display:block; position:relative; }
+.section-hero h2 { font-size:48px; font-family:var(--serif); color:var(--white); line-height:1.1; position:relative; }
+.section-hero .desc { font-size:15px; color:#aaa; margin-top:12px; line-height:1.6; max-width:600px; position:relative; font-family:var(--sans); }
+.section-body { padding: 40px 60px 60px; max-width: 1200px; margin: 0 auto; }
+.disc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+.disc-card { background: var(--white); border: 1px solid var(--warm); padding: 24px; }
+.disc-card .disc-icon { font-size: 32px; margin-bottom: 12px; }
+.disc-card h3 { font-size: 18px; font-family: var(--serif); color: var(--ink); margin-bottom: 6px; font-weight: bold; }
+.disc-card .disc-en { font-size: 10px; color: #aaa; letter-spacing: 2px; font-family: var(--mono); margin-bottom: 12px; }
+.disc-card p { font-size: 14px; line-height: 1.7; color: #555; font-family: var(--sans);}
+
+/* ══════════════════════════════════════════════
+   AWARD & ABOUT PAGES
+══════════════════════════════════════════════ */
+.award-hero {
+  background: linear-gradient(160deg,#1a130a 0%,#2c1d06 60%,#1a130a 100%);
+  padding: 60px 60px 48px; position: relative; overflow: hidden;
+  border-bottom: 3px solid #D4A017;
+}
+.award-hero.about-hero {
+  background: linear-gradient(160deg,#1a1b26 0%,#24283b 60%,#1a1b26 100%);
+  border-bottom: 3px solid var(--teal);
+}
+.award-hero::before {
+  content:''; position:absolute; inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px);
+  pointer-events:none;
+}
+.award-badge {
+  position:relative; display:inline-flex; align-items:center; gap:12px;
+  background:rgba(212,160,23,.12); border:1px solid #D4A017;
+  padding:8px 20px; margin-bottom:24px;
+}
+.award-badge .badge-text { font-size:11px; letter-spacing:3px; color:#D4A017; font-family:var(--mono); font-weight:bold; }
+.award-hero h2 {
+  font-size:52px; font-family:var(--serif); color:var(--white);
+  line-height:1.2; position:relative; margin-bottom:12px;
+}
+.award-hero h2 em { color:#D4A017; font-style:normal; }
+.award-hero.about-hero h2 em { color:var(--teal); }
+.award-hero .aw-sub { font-size:16px; color:#aaa; font-family:var(--sans); letter-spacing:1px; position:relative; }
+.award-meta-row {
+  display:flex; flex-wrap:wrap; gap:32px; margin-top:24px; position:relative;
+}
+.award-meta-item { font-size:12px; font-family:var(--mono); color:#888; letter-spacing:1px; }
+.award-meta-item b { color:#eee; font-weight:normal; font-size: 14px; margin-left:4px; }
+
+.award-video-wrap { 
+  position:relative; padding-bottom:56.25%; height:0; overflow:hidden; 
+  background:#000; border-radius: 12px; border: 1px solid var(--warm); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.presentation-slide {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border: 1px solid var(--warm);
+  display: block;
+}
+.video-link {
+  position:absolute; top:0; left:0; width:100%; height:100%; display:block; text-decoration:none;
+}
+.video-link img {
+  width:100%; height:100%; object-fit:cover; opacity:0.75; transition:opacity 0.3s;
+}
+.video-link:hover img { opacity: 0.95; }
+.play-btn {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:72px; height:50px; background:rgba(255,0,0,0.85); border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 15px rgba(0,0,0,0.4); transition:transform 0.2s, background 0.2s;
+}
+.video-link:hover .play-btn { transform:translate(-50%,-50%) scale(1.05); background:#ff0000; }
+.play-triangle {
+  width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent;
+  border-left:22px solid white; margin-left:6px;
+}
+.play-hint {
+  position:absolute; bottom:20px; left:0; width:100%; text-align:center;
+  color:#fff; font-family:var(--sans); font-size:14px; font-weight:bold; letter-spacing:1px;
+  text-shadow:0 2px 6px rgba(0,0,0,0.9);
+}
+
+.jury-quote {
+  background:linear-gradient(135deg,#241f18,#3a2c18);
+  border-left:6px solid #D4A017; padding:32px 40px; position:relative;
+  border-radius: 0 12px 12px 0;
+}
+.jury-quote::before {
+  content:'❝'; position:absolute; top:10px; left:14px;
+  font-size:54px; color:rgba(212,160,23,.2); font-family:Georgia,serif; line-height:1;
+}
+.jury-quote .jq-label { font-size:10px; letter-spacing:4px; color:#D4A017; font-family:var(--mono); margin-bottom:16px; display:block; font-weight:bold; }
+.jury-quote .jq-text { font-size:18px; line-height:1.9; color:#eee; font-family:var(--serif); }
+.jq-em { background:rgba(212,160,23,.25); padding:2px 6px; font-weight:bold; color:#F5C842; font-style:normal; }
+
+.award-2col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.award-card { background:var(--white); border:1px solid var(--warm); padding:28px; }
+.award-card .ac-label { font-size:10px; letter-spacing:3px; color:#888; font-family:var(--mono); margin-bottom:12px; display:block; font-weight:bold;}
+.award-card p { font-size:15px; line-height:1.8; color:#333; font-family:var(--sans); }
+.award-card ul { padding-left:20px; margin: 0; }
+.award-card ul li { font-size:15px; line-height:1.8; color:#333; font-family:var(--sans); margin-bottom:8px; }
+.award-card ul li strong { color: var(--ink); font-weight: bold; }
+.award-card.full { grid-column:span 2; }
+
+/* Science Fair Timeline / Courses */
+.course-map { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:16px; }
+.ch-block { background:var(--white); border:1px solid var(--warm); overflow:hidden; display:flex; flex-direction:column; }
+.ch-header { padding:12px 16px; font-size:12px; letter-spacing:1px; font-family:var(--mono); color:var(--white); font-weight: bold; }
+.ch-body { padding:16px; display:flex; flex-direction:column; gap:12px; flex-grow:1; justify-content:space-between; }
+.ch-mission { font-size:13px; color:var(--ink); font-family:var(--sans); border-bottom:1px dotted #ddd; padding-bottom:12px; line-height:1.6; }
+.ch-mission:last-child { border-bottom:none; padding-bottom:0; }
+.ch-nodes { font-size:11px; color:#666; font-family:var(--mono); text-align:center; font-weight:bold; padding:6px; border-radius:4px; background:#f5f5f5;}
+
+.sdg-chips { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;}
+.sdg-chip { padding:8px 16px; font-size:12px; font-family:var(--sans); font-weight:bold; border:2px solid; border-radius:20px; display:flex; align-items:center; gap:6px; background:var(--white); }
+
+.comp-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+.comp-tag { background:var(--ink3); color:var(--white); font-size:11px; font-family:var(--mono); letter-spacing:1px; padding:6px 12px; border-radius:4px;}
+
+.plant-strip { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.plant-strip-btn {
+  background: var(--white); color: var(--ink); border: 1px solid var(--warm);
+  padding: 10px 16px; font-size: 13px; font-family: var(--sans); font-weight:bold;
+  cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px; border-radius: 6px;
+}
+.plant-strip-btn:hover { border-color: var(--neon); box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-2px); }
+.plant-strip-btn .psb-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* ══════════════════════════════════════════════
+   NODE FOCUS PANEL (bottom drawer)
+══════════════════════════════════════════════ */
+#node-panel {
+  position: fixed;
+  bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+  width: min(680px, 92vw);
+  background: rgba(22,22,30,0.97);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--ink3);
+  border-bottom: none;
+  padding: 24px 32px 32px;
+  z-index: 500;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column; gap: 14px;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+}
+#node-panel.open { transform: translateX(-50%) translateY(0); }
+#node-panel .np-tag { font-size: 9px; letter-spacing: 4px; color: #888; font-family: var(--mono); }
+#node-panel .np-name { font-size: 32px; font-family: var(--serif); color: var(--white); line-height: 1; font-weight: bold; }
+#node-panel .np-amis { font-size: 12px; font-family: var(--mono); letter-spacing: 2px; color: var(--neon); margin-top: 4px; }
+#node-panel .np-tagline { font-size: 15px; color: #aaa; font-family: var(--serif); font-style: italic; line-height: 1.6; margin-top: 8px; }
+#node-panel .np-connections { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+#node-panel .np-conn-chip { font-size: 10px; font-family: var(--mono); letter-spacing: 1px; padding: 6px 10px; border: 1px solid var(--ink3); color: #ccc; display: flex; align-items: center; gap: 6px; border-radius: 4px; background: rgba(255,255,255,0.02);}
+#node-panel .np-conn-chip .chip-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+#node-panel .np-actions { display: flex; gap: 12px; align-items: center; margin-top: 12px; }
+#node-panel .np-btn-primary { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; background: var(--neon); color: var(--ink); border: none; padding: 12px 24px; cursor: pointer; font-weight: bold; transition: opacity 0.15s; border-radius: 6px;}
+#node-panel .np-btn-primary:hover { opacity: 0.85; }
+#node-panel .np-btn-close { font-family: var(--mono); font-size: 11px; color: #888; background: none; border: 1px solid #444; padding: 11px 18px; cursor: pointer; transition: all 0.15s; letter-spacing: 1px; border-radius: 6px;}
+#node-panel .np-btn-close:hover { color: #fff; border-color: #888; background: rgba(255,255,255,0.05); }
+#node-panel .np-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 16px 16px 0 0; }
+
+/* ══════════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ─── NODE FOCUS PANEL ──────────────────────────── -->
+<div id="node-panel">
+  <div class="np-accent" id="np-accent"></div>
+  <div class="np-tag" id="np-tag">SPECIES · 植物物種</div>
+  <div>
+    <div class="np-name" id="np-name">構樹</div>
+    <div class="np-amis" id="np-amis">rorang · Broussonetia papyrifera</div>
+  </div>
+  <div class="np-tagline" id="np-tagline">文化之神的植物，神靈釀酒的見證者</div>
+  <div>
+    <div style="font-size:9px;letter-spacing:3px;color:#777;font-family:var(--mono);margin-bottom:8px;">CONNECTED NODES · 關聯節點</div>
+    <div class="np-connections" id="np-connections"></div>
+  </div>
+  <div class="np-actions">
+    <button class="np-btn-primary" id="np-btn-go">查看詳情 →</button>
+    <button class="np-btn-close" onclick="resetFocus()">✕ 關閉</button>
+  </div>
+</div>
+
+<!-- ─── TOP NAV ─────────────────────────────────── -->
+<nav id="topnav" class="hidden">
+  <button class="nav-back" onclick="showGraph()">← 圖譜</button>
+  <span class="nav-title" id="nav-title-text">·</span>
+  <div class="nav-plants" id="nav-plants-strip"></div>
+  <button class="nav-plant-btn" onclick="showAbout()" style="border-color:var(--teal);color:var(--teal);margin-left:12px;">👩‍🏫 關於分享人</button>
+  <button class="nav-plant-btn" onclick="showAward()" style="border-color:#D4A017;color:#D4A017;margin-left:8px;">🏆 首獎介紹</button>
+</nav>
+
+<!-- ─── GRAPH VIEW ─────────────────────────────── -->
+<div id="view-graph" class="view visible">
+  <div id="graph-header">
+    <div class="tag">KNOWLEDGE GRAPH · 知識連動圖譜</div>
+    <h1>DATENG<br>阿美族野菜知識系統</h1>
+    <div class="sub">台東縣長濱鄉Salimpo阿美山海文化實驗小學 · 探究課程知識架構 · 2026</div>
+  </div>
+  <svg id="graph-svg"></svg>
+  <div id="graph-tooltip"></div>
+  <div id="graph-hint">CLICK NODE TO HIGHLIGHT · CLICK AGAIN TO RESET · DRAG TO MOVE</div>
+  <div id="graph-legend"></div>
+  <button id="award-entry-btn" onclick="showAward()">🏆 天下雜誌 永續教案首獎</button>
+</div>
+
+<!-- ─── PLANT DETAIL VIEW ──────────────────────── -->
+<div id="view-plant" class="view hidden">
+  <div id="plant-content"></div>
+</div>
+
+<!-- ─── SECTION VIEW ───────────────────────────── -->
+<div id="view-section" class="view hidden">
+  <div id="section-content"></div>
+</div>
+
+<!-- ─── AWARD VIEW (首獎介紹) ────────────────────────────── -->
+<div id="view-award" class="view hidden">
+  <div id="award-content"></div>
+</div>
+
+<!-- ─── ABOUT VIEW (分享人經歷) ────────────────────────────── -->
+<div id="view-about" class="view hidden">
+  <div id="about-content"></div>
+</div>
+
+<div id="view-idtool" class="view hidden">
+  <div id="idtool-content"></div>
+</div>
+
+<script>
+/* ╔═══════════════════════════════════════════════════╗
+   ║  📸  照片設定區塊 — 上線前在此填入網址即可       ║
+   ║  Photo Config — fill in URLs before publishing    ║
+   ╚═══════════════════════════════════════════════════╝ */
+const PHOTO_CONFIG = {
+  speaker: [
+    { url: '', caption: '賴奕芸老師' },
+    { url: '', caption: '課程現場' }
+  ]
+};
+/* ── 注意事項 ───────────────────────────────────────
+   · Google Drive 請改用：
+     https://drive.google.com/thumbnail?id=檔案ID&sz=w1000
+   · 或上傳至 Imgur / Cloudinary 取得直連網址
+   · 網址留空時，版面會顯示「照片預留位置」佔位格
+   ─────────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════ */
+
+const PLANT_COLOR = {
+  rorang:     '#7CB87C',
+  tatokem:    '#4a9a6b',
+  kadawangay: '#c47fb8',
+  tana:       '#c8923a',
+  lengac:     '#e6c84a',
+  kafotolay:  '#5aacb8',
+  lokot:      '#89b87c',
+};
+
+const plants = {
+  rorang: {
+    id: 'rorang',
+    chinese: '構樹',
+    amis: "rorang",
+    scientific: 'Broussonetia papyrifera',
+    color: PLANT_COLOR.rorang,
+    tagline: '文化之神的植物\n神靈釀酒的見證者',
+    identification: '葉片掌狀分裂，上表面粗糙、下表面有細毛；雌雄異株，雄花穗圓柱形，雌花球形，成熟果實為橘紅色桑葚狀聚合果，甜美多汁。樹皮具有長纖維，傳統製作成樹皮布（tapa）。',
+    personality: '🌳 構樹型 · 智慧的謀士\n你是低調的智者，默默承載著文化記憶。你不輕易張揚，卻在需要的時刻提供最紮實的支撐。',
+    story: `阿美族的文化之神 <span class="highlight">Tatakosan Sapatrok</span>（文化之神與構樹）特別指點構樹為神靈賜予人類的植物。在神話中，文化之神教導人們釀造小米酒時，指示要以構樹的嫩葉鋪墊在釀酒的藤蓆上——唯有如此，神靈的訊息才能透過酒液，從神界傳遞到人間，一切歲時祭儀才得以進行。<br><br>
+    在長濱沿海山地，<span class="highlight">lolang（構樹）</span>的名字常見於部落地名，顯示它與阿美族生活空間的深刻連結。構樹的果實甜美可口，自古就是採集文化中重要的野外食物；樹皮則可以製成堅韌的布料，是台灣原住民傳統服飾的古老材料。構樹的生命力極強，在荒廢地、二次林中迅速繁衍，正如阿美族的傳統知識，即使在被遺忘的歲月中，仍能重新萌發生長。`,
+    quote: { text: '「讓神靈值量現身，讓日常語言自身發聲，一起體會神靈如何預植物生命，以及植物又如何透過它們的名字和人類對話。」', attr: '─ 阿美族植物文化田野調查' },
+    season: { icon: '🌱', title: '採集季節', content: '<b>春夏：</b>採摘頂端嫩葉（葉片展開前最嫩）<br><b>夏秋：</b>採摘成熟橘紅色果實（桑葚狀），果熟期約 6–8 月<br><b>全年：</b>樹皮（傳統布料製作）<br><b>採集部位：</b>嫩葉、果實、樹皮各有用途' },
+    cooking: { icon: '🍳', title: '烹飪方法', content: '<b>構樹茶泡飯：</b>將構樹嫩葉汆燙後，搭配白飯與柴魚高湯製成茶泡飯，清淡爽口<br><b>嫩葉炒食：</b>汆燙後拌蒜頭醬油；或大火快炒<br><b>果實生食：</b>直接食用（甜中帶微酸），或搗汁飲用<br><b>傳統用途：</b>構樹嫩葉鋪墊釀酒藤蓆' },
+    nutrition: [
+      { icon: '💊', label: '維生素C', name: '抗氧化' },
+      { icon: '🔩', label: '鐵質', name: '造血' },
+      { icon: '🦴', label: '鈣質', name: '強骨' },
+      { icon: '🫐', label: '花青素（果實）', name: '抗發炎' },
+      { icon: '🌿', label: '膳食纖維', name: '助消化' },
+    ]
+  },
+  tatokem: {
+    id: 'tatokem',
+    chinese: '龍葵',
+    amis: 'tatokem',
+    scientific: 'Solanum americanum',
+    color: PLANT_COLOR.tatokem,
+    tagline: '最日常的野菜\n祭儀的靈魂食物',
+    identification: '植株高 20–80 cm，葉片卵形、邊緣略呈波狀。白色小花 4–6 朵簇生，花瓣反卷；果實球形，成熟後黑紫色。⚠️ 注意：未成熟的綠色果實含龍葵鹼（solanine），不可生食，需充分煮熟方可食用。',
+    personality: '🍇 龍葵型 · 溫柔的守界者\n你是家常滋味的守護者，外表低調卻滋養深遠。你懂得在苦與甘之間找到平衡，給身邊的人最真實的陪伴。',
+    story: `馬太鞍部落的阿美族人直接將龍葵稱為 <span class="highlight">dateng（青菜）</span>，這個名字本身就說明了它在日常飲食中無可取代的地位——它不只是一株野菜，它就是野菜的代名詞，是阿美族最為常用的野菜之一。<br><br>
+    每年小米播種前一天夜晚，長者會在半夜穿戴整齊，煮好美味的龍葵湯來祭拜神靈與祖靈，這個儀式稱為 <span class="highlight">miacas</span>（禁食之夜）。這個詞也衍生為日常語言：「<em>cacay sa a miacas</em>」意指「個人專屬、獨自享用」的行為，提醒著族人分享的重要性。<br><br>
+    長者也常以龍葵的果實訓勉孩子：<em>「心地不可像龍葵成熟果實那般黑、那般紫喔！」</em>——一株小小的野菜，承載了世代傳承的品格教育。`,
+    quote: { text: '「心地不可像光果龍葵的成熟果實那般黑、那般紫喔！」', attr: '─ 阿美族長者訓勉 · Chapter 5-73' },
+    season: { icon: '🌱', title: '採集季節', content: '<b>全年可採</b>，以春秋嫩葉最佳<br><b>採集訣竅：</b>選取頂端嫩芽，避免採摘結果後的老葉<br><b>辨識：</b>全株含根莖可使用，花白色小花，果實熟透為黑紫色<br><b>⚠️ 安全提醒：</b>未熟果實勿食，需充分烹煮' },
+    cooking: { icon: '🍲', title: '烹飪方法', content: '<b>龍葵泡麵：</b>新鮮嫩葉加入煮好的泡麵，起鍋前放入燙熟，補充蔬菜營養又增添野趣<br><b>清炒龍葵：</b>加薑絲、蒜頭，大火快炒（保留清甜）<br><b>龍葵排骨湯：</b>與豬骨同燉，入口微苦後甘<br><b>嫩尖炒小魚乾：</b>最經典阿美族家常做法<br><b>傳統醫療：</b>全株含根莖熬煮湯汁，飲用治中暑（malom\'）' },
+    nutrition: [
+      { icon: '🩸', label: '鐵質（高含量）', name: '造血' },
+      { icon: '🌿', label: '葉酸', name: '細胞修復' },
+      { icon: '🟠', label: '維生素A', name: '護眼' },
+      { icon: '🍊', label: '維生素C', name: '免疫力' },
+      { icon: '❄️', label: '清熱解毒成分', name: '傳統醫療' },
+    ]
+  },
+  kadawangay: {
+    id: 'kadawangay',
+    chinese: '紫背草',
+    amis: 'kadawangay',
+    scientific: 'Emilia sonchifolia',
+    color: PLANT_COLOR.kadawangay,
+    tagline: '與蚊同名的野菜\n阿美族命名智慧的展現',
+    identification: '植株高 20–50 cm，葉片橢圓形至琴狀羽裂，葉正面綠色，背面呈顯著的紫紅色（這是最易辨認的特徵）。折斷莖葉會滲出白色乳汁。花為粉紅至紅紫色頭狀花序，種子具白色冠毛，隨風傳播。',
+    personality: '🟣 紫背草型 · 神秘的觀察者\n你有著外人不易察覺的深度——正面看似普通，翻到背面才發現驚艷的紫色。你擅長靜靜觀察，在不顯眼處積累力量。',
+    story: `阿美族植物命名有一個獨特的傳統——外型相似、顏色相近的動植物會共用同一個名字。<span class="highlight">紫背草與長腳蚊都稱為 kadawangay</span>，這並非巧合，而是深思熟慮的命名智慧。<br><br>
+    前綴詞根 <em>ka-...ay</em> 是阿美族用來指稱事物特性的命名框架，<em>kad</em> 指向顏色與形態的相似性。紫背草葉片背面的紫紅色，與長腳蚊細長、帶有紫紅色澤的身體如出一轍；這種跨越物種的命名，反映了阿美族對自然生態的細膩觀察——他們不以科學分類看世界，而是以視覺感知、生活經驗為座標，建構自己的物種命名系統。<br><br>
+    紫背草生命力極強，在田邊、路旁、荒地隨處可見，是阿美族婦女日常採集時最容易取得的野菜之一。`,
+    quote: { text: '「軟毛柿和紅嘴黑鵯都稱為 da\'olaw，紫背草和長腳蚊都稱為 kadawangay——看見相似的，就給同一個名字。」', attr: '─ 阿美族植物與動物命名系統 · Chapter 4-5' },
+    season: { icon: '🌱', title: '採集季節', content: '<b>全年皆可採集</b><br><b>春夏最佳：</b>嫩葉最為鮮嫩柔軟<br><b>採集部位：</b>頂端嫩芽與嫩葉（5–10 公分），花開後葉片較老硬<br><b>辨識重點：</b>翻開葉片背面，看見紫紅色即是' },
+    cooking: { icon: '🥗', title: '烹飪方法', content: '<b>飛魚八菜一湯：</b>以紫背草為主要野菜之一，搭配飛魚乾共煮，是長濱部落的傳統湯品<br><b>大火快炒：</b>加蒜頭或薑絲，保留葉片清脆口感<br><b>汆燙涼拌：</b>燙熟後沾阿美族傳統佐料（鹽、辣椒）<br><b>注意：</b>過度烹煮會使葉片變黑，快速處理最佳' },
+    nutrition: [
+      { icon: '🟣', label: 'β-胡蘿蔔素', name: '抗氧化' },
+      { icon: '🍊', label: '維生素C', name: '免疫力' },
+      { icon: '🦴', label: '鈣質', name: '強骨' },
+      { icon: '🌿', label: '多酚類', name: '消炎' },
+      { icon: '🩸', label: '鐵質', name: '造血' },
+    ]
+  },
+  tana: {
+    id: 'tana',
+    chinese: '刺蔥',
+    amis: "tana'",
+    scientific: 'Zanthoxylum ailanthoides',
+    color: PLANT_COLOR.tana,
+    tagline: '巫師的植物\n香氣中藏著神靈的語言',
+    identification: '落葉喬木，高可達 15 公尺。莖幹及枝條密布粗大尖刺。葉為奇數羽狀複葉，小葉 11–27 片，具強烈柑橘香氣。雌雄異株，小花白色簇生；果實串狀，成熟後紅褐色，具強烈香氣。採集時務必戴手套防刺。',
+    personality: '🌶️ 刺蔥型 · 勇敢的冒險家\n你個性鮮明，香氣強烈，讓人無法忽視。你不畏艱難，身上的刺是保護自己的盔甲，也是提醒他人尊重你的方式。',
+    story: `刺蔥（虎婆刺）在阿美族傳統中是具有強大靈力的植物。「<em>五節芒、虎婆刺可以用來避邪</em>」，但這份力量只有 <span class="highlight">Cikawasay（巫師）</span>才能完整駕馭和使用。在 misalisin（驅邪祭）中，巫師會使用刺蔥的枝條，配合特定的唱誦儀式，驅除不好的能量，保護家園與族人。<br><br>
+    刺蔥的強烈香氣——那種充滿柑橘調性、令人警醒的氣味——被認為是神靈喜愛的氣味，也是驅邪保護力量的象徵。香蕉葉與生薑同樣具有除穢治病的功效，但刺蔥的靈力最為強大，「<em>但只有巫師才會使用</em>」這句話本身，就揭示了知識與力量的門檻。<br><br>
+    在日常飲食中，刺蔥嫩葉是台東阿美族珍貴的天然香料，豐年祭的糯米飯、烤肉中加入刺蔥，是最具代表性的部落滋味。`,
+    quote: { text: '「例如五節芒、虎婆刺可以用來避邪，而香蕉葉和生薑也是除穢治病之物，但只有巫師才會使用。」', attr: '─ 阿美族植物靈力記載 · Chapter 1-1' },
+    season: { icon: '🌱', title: '採集季節', content: '<b>春季：</b>採嫩葉（芽葉最嫩、香氣最濃），是最佳時期<br><b>秋季：</b>可採果實（串狀，具強烈香氣）<br><b>採集注意：</b>刺蔥全株有刺，採集需戴手套，避免刺傷<br><b>辨識：</b>強烈柑橘香氣是最直接的辨識方式' },
+    cooking: { icon: '🌶️', title: '烹飪方法', content: '<b>刺蔥海鹽：</b>嫩葉曬乾後研磨混合海鹽，是部落最珍貴的天然調味料，也是最受歡迎的伴手禮<br><b>刺蔥炒蛋：</b>嫩葉切碎與蛋花同炒，香氣四溢<br><b>刺蔥糯米飯：</b>豐年祭必備，葉片包裹糯米同蒸<br><b>燉肉：</b>與豬肉同煮去腥、提鮮增香' },
+    nutrition: [
+      { icon: '🍋', label: '精油（柑橘烯）', name: '殺菌' },
+      { icon: '💊', label: '花椒烯', name: '驅蟲止痛' },
+      { icon: '🌡️', label: '辛辣素', name: '開胃健脾' },
+      { icon: '🌿', label: '黃酮類化合物', name: '抗氧化' },
+      { icon: '🔥', label: '揮發油', name: '暖胃驅寒' },
+    ]
+  },
+  lengac: {
+    id: 'lengac',
+    chinese: '月桃',
+    amis: 'lengac',
+    scientific: 'Alpinia zerumbet',
+    color: PLANT_COLOR.lengac,
+    tagline: '包裹祭儀記憶的葉片\n吉拿富的靈魂',
+    identification: '多年生草本，高 1–3 公尺，葉片長橢圓形，葉緣銳利（名稱 lengac 即源於此）。花穗下垂，花萼白色、花唇瓣黃色帶紅斑，極為美麗。果實圓形，成熟後紅色，具芳香。地下根莖粗大，可入藥。',
+    personality: '🌸 月桃型 · 創意的安慰者\n你用美麗和香氣撫慰周圍的人。你多才多藝，一身是寶——葉可包食、花可觀賞、果可入藥，總是想辦法讓生活更美好。',
+    story: `月桃是阿美族飲食文化中最重要的包裹食材之一，也是對整個台灣原住民文化圈意義最深遠的植物之一。阿美族語 <span class="highlight">lengac</span> 的命名來自月桃葉片邊緣鋒利、「常常劃傷人」的特性，另一個俗名 <em>hinaliti'ay</em> 則直接是「割傷、劃傷」的意思。<br><br>
+    月桃葉自古用來包裹 <span class="highlight">cinafu（吉拿富）</span>——阿美族最重要的傳統食物，以黑糯米、豬肉、紅豆為餡，用月桃葉緊密包裹後水煮或蒸熟。吉拿富出現在豐年祭、婚禮、喪禮等所有重要場合，是阿美族「用食物說話」的方式。<br><br>
+    五月前後，月桃串起紅色種子的果實，既是食物也是天然裝飾。在部落，孩子們從小就認識月桃——它的花是祭典的花材，葉片是盛裝食物的器皿，種子是最天然的驅蟲香包，整株植物都是生活的夥伴。`,
+    quote: { text: '「月桃……做成吉拿富，是在每個年節給部落帶來圓滿、滋養的那種食物。」', attr: '─ 部落耆老訪談' },
+    season: { icon: '📅', title: '採集季節', content: '<b>全年：</b>葉片（包裹食物用）<br><b>春夏（4–6 月）：</b>花穗最盛，可供食用或祭典花材<br><b>秋冬：</b>成熟紅色種子串<br><b>春天：</b>嫩莖心（白色內芯，清脆可食）' },
+    cooking: { icon: '🍱', title: '烹飪方法', content: '<b>月桃茶葉蛋：</b>以月桃葉包裹滷蛋，加入月桃種子與八角同滷，香氣獨特、是部落市集的人氣商品<br><b>吉拿富（cinafu）：</b>黑糯米＋豬肉用月桃葉包裹水煮，阿美族最重要傳統食物<br><b>嫩莖心生食：</b>清脆微辛，可入沙拉<br><b>月桃花煮湯：</b>花瓣入湯，清香怡人' },
+    nutrition: [
+      { icon: '🧪', label: '精油（抗菌）', name: '天然防腐' },
+      { icon: '🌿', label: '多酚類', name: '抗氧化' },
+      { icon: '💊', label: '種子精油', name: '健胃驅脹' },
+      { icon: '🛡️', label: '黃酮素', name: '消炎' },
+      { icon: '♻️', label: '膳食纖維', name: '助消化' },
+    ]
+  },
+  kafotolay: {
+    id: 'kafotolay',
+    chinese: '野莧',
+    amis: 'kafotolay',
+    scientific: 'Amaranthus viridis',
+    color: PLANT_COLOR.kafotolay,
+    tagline: '青黃不接時的生命線\n路邊最慷慨的給予者',
+    identification: '直立草本，高 30–80 cm，莖嫩時略帶紫紅色。葉片菱狀卵形，葉面光滑，葉脈明顯。穗狀花序頂生，花極小、綠色。別名：kalipangay、Hanaceca（客語）。族人採食時同時也採根入湯，根有清熱功效。',
+    personality: '💚 野莧型 · 堅毅的守護者\n你不求華麗，只求實用。在最艱難的時刻你仍然挺立，用你豐厚的給予讓身邊的人不挨餓。你是沉默的英雄。',
+    story: `野莧菜在阿美族的飲食記憶裡，是最親切的日常野菜之一。阿美族語 <span class="highlight">kafotolay</span>，詞根中蘊含「豐沛」、「生命力強盛」的意涵，正如野莧菜在農田、路邊、庭院角落隨處生長，只要有一點土壤與雨水，便蓬勃茂生，生生不息。<br><br>
+    在稻米還未收割前的<span class="highlight">青黃不接時期</span>，野莧菜是阿美族家庭餐桌上最重要的綠色蔬菜。它不需要種植、不需要施肥，完全是大地的免費饋贈。正是這種「無所不在」的特性，讓野莧菜成為傳授孩子認識野地食材的第一課——「只要你認識它，你就不會餓肚子」。<br><br>
+    現代研究證實，野莧菜的蛋白質含量遠高於一般葉菜，被稱為「窮人的牛肉」，是全球南方傳統飲食智慧的縮影。`,
+    quote: { text: '「路邊那株不起眼的野草，在餓肚子的年代，就是我們的晚餐。」', attr: '─ 部落耆老口述' },
+    season: { icon: '🌱', title: '採集季節', content: '<b>全年可採</b>，以春至夏末最為鮮嫩<br><b>採集訣竅：</b>選取頂端嫩芽（5–10 公分），嫩葉入口最佳<br><b>避免：</b>採集路邊被農藥噴灑的植株<br><b>根部：</b>可一同採集入湯，清熱效果佳' },
+    cooking: { icon: '🥬', title: '烹飪方法', content: '<b>野莧炒小魚乾：</b>蒜頭爆香後加入小魚乾翻炒，再放嫩葉大火快炒，鹹香下飯，是最道地的部落家常味<br><b>大火快炒：</b>加蒜頭或薑絲，30 秒內起鍋（防止出水）<br><b>排骨湯：</b>嫩葉加入豬骨湯，清甜可口<br><b>汆燙涼拌：</b>加醬油、蒜末、辣椒' },
+    nutrition: [
+      { icon: '💪', label: '蛋白質（高含量）', name: '「窮人牛肉」' },
+      { icon: '🩸', label: '鐵質', name: '造血' },
+      { icon: '🦴', label: '鈣質', name: '強骨' },
+      { icon: '🌿', label: '葉酸', name: '細胞修復' },
+      { icon: '🟠', label: '維生素A', name: '護眼護膚' },
+    ]
+  },
+  lokot: {
+    id: 'lokot',
+    chinese: '山蘇',
+    amis: 'lokot',
+    scientific: 'Asplenium nidus',
+    color: PLANT_COLOR.lokot,
+    tagline: '大樹上的鳥巢\n永續採集的教課書',
+    identification: '附生蕨類，葉片長披針形，革質，深綠色具光澤，長可達 1 公尺以上。葉片中肋黑褐色突出（背面），葉背有褐色孢子囊群排列成線狀——山蘇以孢子繁殖，不開花結果，這是它與其他野菜最根本的不同。',
+    personality: '🌿 山蘇型 · 機智的行動者\n你選擇站在高處，從不同的視角觀察世界。你行動迅速、適應力強，即使颱風過後依然翠綠挺立，展現驚人的韌性。',
+    story: `山蘇在阿美族語稱為 <span class="highlight">lokot</span>，生長在大樹幹、潮濕岩壁或溪谷旁，蓬勃的翠綠葉片從中心向四周展開，宛如一個懸掛在樹幹上的巨大鳥巢，靜靜守護著樹木的生命。<br><br>
+    阿美族採集山蘇有嚴格的傳統規範——只能摘取最外圍捲曲的嫩芽（未展開的新葉），絕不傷害植株中心，讓山蘇能年年再生。這個規範不是限制，而是<span class="highlight">永續採集智慧</span>的具體實踐：「取之有道，方能長久。」<br><br>
+    颱風過後，山林被強風侵襲、滿目瘡痍，山蘇仍能在樹幹上翠綠挺立，被阿美族視為生命力堅韌的象徵。每一次颱風後去採山蘇，對部落族人而言不只是採食，更是一次確認土地仍然豐饒的儀式。`,
+    quote: { text: '「採山蘇只能摘外面的嫩芽，中心的葉子不能碰——這是老人家教的，讓它繼續長，明年才會有。」', attr: '─ 部落婦女採集知識' },
+    season: { icon: '📅', title: '採集季節', content: '<b>全年可採</b><br><b>冬春最佳：</b>嫩芽最為鮮脆，苦味最低<br><b>採集規則：</b>只取外圍捲曲嫩芽，每株留 2/3，保護植株再生<br><b>辨識：</b>嫩芽捲曲如拳頭，外表有淺棕色鱗片；葉背線狀孢子囊是山蘇的標誌' },
+    cooking: { icon: '🍽️', title: '烹飪方法', content: '<b>山蘇抓餅：</b>嫩芽汆燙後與蛋液、起司捲入手抓餅，融合傳統食材與現代飲食，是部落創意料理代表<br><b>山蘇炒小魚乾：</b>最經典阿美族做法，蒜頭爆香後大火快炒<br><b>豆豉炒山蘇：</b>豆豉提鮮、山蘇清脆，部落慶典必備<br><b>山蘇炒蛋：</b>嫩芽切段與蛋花同炒' },
+    nutrition: [
+      { icon: '🌾', label: '膳食纖維（豐富）', name: '腸道健康' },
+      { icon: '🔋', label: '維生素B2', name: '能量代謝' },
+      { icon: '🩸', label: '鐵質', name: '造血' },
+      { icon: '🦴', label: '鈣質', name: '強骨' },
+      { icon: '🧫', label: '多醣體', name: '免疫調節' },
+    ]
+  }
+}
+
+const sections = {
+  disciplines: {
+    tag: 'DISCIPLINES · 學科視角',
+    title: '一物種\n六學科解剖',
+    desc: '同一株野菜，六個學科各自看見不同的世界。',
+    cards: [
+      { icon: '🔬', title: '植物分類學', en: 'TAXONOMY', body: '它叫什麼名字？隸屬哪個科屬？台灣有幾種？從林奈分類系統到現代 DNA 親緣分析，野菜的學名是一把打開全球知識庫的鑰匙。' },
+      { icon: '🗣️', title: '語言學', en: 'LINGUISTICS', body: '阿美族怎麼稱呼它？命名背後有什麼故事？從 kadawangay（紫背草）與長腳蚊同名，到 tatokem 成為龍葵的代名詞，語言藏著族人的觀察與記憶。' },
+      { icon: '🌿', title: '生態學', en: 'ECOLOGY', body: '它長在哪裡？什麼季節？跟誰一起生長？從海岸到山地，野菜的生態棲位記錄了台東山海環境的多樣面貌。' },
+      { icon: '📜', title: '歷史學', en: 'HISTORY', body: '祭儀中它扮演什麼角色？構樹釀酒、龍葵祭儀、刺蔥驅邪，每一道儀式的記憶，都是用植物書寫的文化史。' },
+      { icon: '🏘️', title: '人類學', en: 'ANTHROPOLOGY', body: '誰在採集？如何傳承？婦女採集組織、長者口傳知識、巫師的靈植智慧——野菜知識在社會網絡中如何流動與延續？' },
+      { icon: '🍽️', title: '飲食科學', en: 'FOOD SCIENCE', body: '怎麼吃最營養？傳統烹調方法的科學依據是什麼？從「苦後甘」的龍葵到「清熱解毒」的紫背草，傳統飲食智慧與現代營養學的對話。' },
+    ]
+  },
+  pathways: {
+    tag: 'PATHWAYS · 學習路徑',
+    title: '六條通往\nDateng 的路',
+    desc: '每一條路都能讓我們更深入野菜知識系統，選一條你喜歡的方式出發。',
+    cards: [
+      { num: '路徑 01', title: '故事・繪本路徑', body: '以神話故事、部落傳說為起點，用圖像與文字把野菜的文化記憶留下來。適合語文、視覺藝術課程。' },
+      { num: '路徑 02', title: '料理・食育路徑', body: '從採集到餐桌，親手烹調每一道野菜料理。適合生活實踐、健康飲食教育。' },
+      { num: '路徑 03', title: '語言採集路徑', body: '記錄每株野菜的阿美族語名稱與命名故事，建立族語植物字典。適合族語、文化課程。' },
+      { num: '路徑 04', title: '地圖・空間路徑', body: '標記部落周邊的採集地點，建立野菜分布地圖。適合社會、自然、地理課程。' },
+      { num: '路徑 05', title: '田野・社會路徑', body: '訪問耆老、婦女採集者，記錄採集知識的社會傳承。適合社會研究、口述歷史。' },
+      { num: '路徑 06', title: '食農教育路徑', body: '以四健會作業組方式，深入探究野菜的採集、烹飪、風味與產業應用，連結部落傳統智慧與永續食農實踐。' },
+    ]
+  },
+  outcomes: {
+    tag: 'OUTCOMES · 成果擴散',
+    title: '知識如何\n向外流動？',
+    desc: '從部落教室出發，讓野菜知識觸及更廣的世界。',
+    cards: [
+      { num: '成果 01', title: '食農教育成果', body: '以四健會作業組形式，記錄野菜採集、烹飪與產業應用的完整學習歷程，獲全國第三名。' },
+      { num: '成果 02', title: '族語野菜字典', body: '收錄七株以上野菜的阿美族語名稱、命名故事、採集口訣，留給下一代。' },
+      { num: '成果 03', title: '野菜料理記錄', body: '拍攝部落耆老示範傳統野菜烹調方式，建立影像食譜庫。' },
+      { num: '成果 04', title: '採集知識地圖', body: '標記長濱鄉採集熱點、季節時令、地形特徵，成為探險家的行前指南。' },
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════════════════
+   GRAPH DATA
+═══════════════════════════════════════════════════ */
+
+const TYPE_COLOR = {
+  core:       '#DFFF00',
+  species:    '#7CB87C',
+  discipline: '#9B8EC4',
+  concept:    '#F5A623',
+  holder:     '#E88EA0',
+  pathway:    '#4ECDC4',
+  outcome:    '#E87040',
+  idtool:     '#38BDF8',
+};
+
+const nodes = [
+  // CORE
+  { id: 'dateng', label: 'Dateng\n野菜知識系統', type: 'core', size: 52, clickable: false },
+  // SPECIES
+  { id: 'rorang',     label: '構樹\nrorang',       type: 'species', size: 32, plant: 'rorang' },
+  { id: 'tatokem',    label: '龍葵\ntatokem',       type: 'species', size: 32, plant: 'tatokem' },
+  { id: 'kadawangay', label: '紫背草\nkadawangay',  type: 'species', size: 30, plant: 'kadawangay' },
+  { id: 'tana',       label: "刺蔥\ntana'",          type: 'species', size: 30, plant: 'tana' },
+  { id: 'lengac',     label: '月桃\nlengac',         type: 'species', size: 30, plant: 'lengac' },
+  { id: 'kafotolay',  label: '野莧\nkafotolay',      type: 'species', size: 28, plant: 'kafotolay' },
+  { id: 'lokot',      label: '山蘇\nlokot',          type: 'species', size: 28, plant: 'lokot' },
+  // DISCIPLINES
+  { id: 'd_taxon',  label: '植物\n分類學',    type: 'discipline', size: 22, section: 'disciplines' },
+  { id: 'd_lang',   label: '語言學',          type: 'discipline', size: 22, section: 'disciplines' },
+  { id: 'd_eco',    label: '生態學',          type: 'discipline', size: 22, section: 'disciplines' },
+  { id: 'd_hist',   label: '歷史學',          type: 'discipline', size: 22, section: 'disciplines' },
+  { id: 'd_anth',   label: '人類學',          type: 'discipline', size: 22, section: 'disciplines' },
+  { id: 'd_food',   label: '飲食\n科學',      type: 'discipline', size: 22, section: 'disciplines' },
+  // CONCEPTS
+  { id: 'c_fana',    label: '知識傳授',  type: 'concept', size: 18 },
+  { id: 'c_kawas',   label: '神靈',      type: 'concept', size: 18 },
+  { id: 'c_gather',  label: '採集',  type: 'concept', size: 16 },
+  { id: 'c_season',  label: '季節\n歲時',       type: 'concept', size: 16 },
+  { id: 'c_miacas',  label: '祭儀',     type: 'concept', size: 16 },
+  // HOLDERS
+  { id: 'h_elder',   label: '耆老',      type: 'holder', size: 18 },
+  { id: 'h_women',   label: '婦女\n採集組織', type: 'holder', size: 18 },
+  { id: 'h_shaman',  label: '巫師', type: 'holder', size: 16 },
+  // PATHWAYS
+  { id: 'p_map',     label: '地圖・\n空間', type: 'pathway', size: 20, isMapPage: true,
+    relatedTo: ['dateng','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot',
+                'd_eco','c_gather','c_season','n_idsystem'] },
+  { id: 'p_story',   label: '故事・\n繪本', type: 'pathway', size: 20, section: 'pathways' },
+  { id: 'p_food',    label: '料理・\n食育', type: 'pathway', size: 20, section: 'pathways' },
+  { id: 'p_lang',    label: '語言\n採集',   type: 'pathway', size: 18, section: 'pathways' },
+  { id: 'p_science', label: '科學\n探究',   type: 'pathway', size: 18, section: 'pathways' },
+  // OUTCOMES
+  { id: 'o_sci',   label: '食農教育', type: 'outcome', size: 18, section: 'outcomes' },
+  { id: 'o_dict',  label: '族語\n字典', type: 'outcome', size: 16, section: 'outcomes' },
+  // ADDED NODES
+  { id: 'n_about', label: '分享者\n分享人經歷', type: 'holder', size: 22, isAbout: true },
+  { id: 'n_award', label: '教案成果\n全國首獎', type: 'outcome', size: 22, isAward: true },
+  // STORY / NARRATIVE TOOLS
+  { id: 'n_quiz', label: '野菜\n心理測驗', type: 'idtool', size: 20, idTool: 'quiz',
+    relatedTo: ['p_story','dateng','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot','c_fana'] },
+  { id: 'n_game', label: '野菜\n桌遊',    type: 'idtool', size: 20, idTool: 'game',
+    relatedTo: ['p_story','dateng','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot','c_gather','d_food'] },
+  { id: 'n_ar',   label: 'AR\n擴增實境',  type: 'idtool', size: 22, idTool: 'ar',
+    relatedTo: ['dateng','n_idsystem','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot','p_science','o_sci'] },
+  // IDENTIFICATION SYSTEM（自動連結：見 AUTO-LINK GENERATOR）
+  { id: 'n_idsystem', label: '辨識\n知識系統',  type: 'idtool', size: 26, isIdSystem: true,
+    relatedTo: ['dateng','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot',
+                'd_taxon','d_eco','c_gather','p_science','o_sci','n_award'] },
+  { id: 'n_rubbing',  label: '植拓\n辨識',       type: 'idtool', size: 20, idTool: 'rubbing',
+    relatedTo: ['n_idsystem','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot',
+                'd_taxon','d_eco','p_science','h_women','o_sci'] },
+  { id: 'n_radar',    label: '風味\n雷達圖',     type: 'idtool', size: 20, idTool: 'radar',
+    relatedTo: ['n_idsystem','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot',
+                'd_food','p_food','c_gather','h_women'] },
+  { id: 'n_ai',       label: 'AI\n辨識',          type: 'idtool', size: 20, idTool: 'ai',
+    relatedTo: ['n_idsystem','rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot',
+                'd_taxon','d_eco','p_science','o_sci','n_award'] },
+];
+
+const links = [
+  // plants → core（植物連核心）
+  ...['rorang','tatokem','kadawangay','tana','lengac','kafotolay','lokot']
+    .map(id => ({ source: id, target: 'dateng', strength: 0.6 })),
+  // disciplines → core（學科連核心）
+  ...['d_taxon','d_lang','d_eco','d_hist','d_anth','d_food']
+    .map(id => ({ source: id, target: 'dateng', strength: 0.3 })),
+  // concepts → core（概念連核心）
+  ...['c_fana','c_kawas','c_gather','c_season','c_miacas']
+    .map(id => ({ source: id, target: 'dateng', strength: 0.25 })),
+  // holders → core（知識持有者連核心）
+  ...['h_elder','h_women','h_shaman']
+    .map(id => ({ source: id, target: 'dateng', strength: 0.25 })),
+  // pathways → core（學習路徑連核心）
+  ...['p_story','p_food','p_lang','p_science']
+    .map(id => ({ source: id, target: 'dateng', strength: 0.3 })),
+
+  // outcomes → pathways（成果連路徑）
+  { source: 'o_sci',  target: 'p_science', strength: 0.5 },
+  { source: 'o_dict', target: 'p_lang',    strength: 0.5 },
+
+  // ── 植物 × 學科 ─────────────────────────────────────────────────
+  { source: 'rorang',     target: 'd_taxon',  strength: 0.4 },  // 構樹分類
+  { source: 'rorang',     target: 'd_hist',   strength: 0.45 }, // 構樹釀酒歷史 ✓
+  { source: 'rorang',     target: 'd_anth',   strength: 0.35 }, // 樹皮布人類學
+  { source: 'tatokem',    target: 'd_food',   strength: 0.45 }, // 龍葵飲食科學 ✓
+  { source: 'tatokem',    target: 'd_anth',   strength: 0.35 }, // 祭儀人類學
+  { source: 'tatokem',    target: 'd_eco',    strength: 0.3  }, // 全年生態
+  { source: 'kadawangay', target: 'd_lang',   strength: 0.5  }, // 命名語言學 ✓
+  { source: 'kadawangay', target: 'd_eco',    strength: 0.35 }, // 路旁生態
+  { source: 'tana',       target: 'd_taxon',  strength: 0.3  }, // 刺蔥分類
+  { source: 'tana',       target: 'd_hist',   strength: 0.4  }, // 靈植歷史
+  { source: 'lengac',     target: 'd_food',   strength: 0.45 }, // 月桃飲食科學
+  { source: 'lengac',     target: 'd_anth',   strength: 0.4  }, // 吉拿富人類學
+  { source: 'kafotolay',  target: 'd_eco',    strength: 0.35 }, // 野莧生態
+  { source: 'kafotolay',  target: 'd_food',   strength: 0.35 }, // 窮人牛肉飲食
+  { source: 'lokot',      target: 'd_eco',    strength: 0.4  }, // 山蘇生態
+  { source: 'lokot',      target: 'd_taxon',  strength: 0.35 }, // 蕨類分類
+
+  // ── 植物 × 概念 ─────────────────────────────────────────────────
+  { source: 'rorang',     target: 'c_kawas',   strength: 0.55 }, // 神靈植物 ✓
+  { source: 'tatokem',    target: 'c_miacas',  strength: 0.55 }, // 祭儀食物 ✓
+  { source: 'tatokem',    target: 'c_gather',  strength: 0.4  }, // 採集
+  { source: 'kadawangay', target: 'c_gather',  strength: 0.4  }, // 採集
+  { source: 'tana',       target: 'c_kawas',   strength: 0.45 }, // 靈力植物
+  { source: 'tana',       target: 'c_season',  strength: 0.35 }, // 春季嫩葉
+  { source: 'lengac',     target: 'c_miacas',  strength: 0.45 }, // 吉拿富祭儀
+  { source: 'lengac',     target: 'c_season',  strength: 0.35 }, // 季節
+  { source: 'kafotolay',  target: 'c_gather',  strength: 0.4  }, // 採集
+  { source: 'kafotolay',  target: 'c_season',  strength: 0.35 }, // 青黃不接時期
+  { source: 'lokot',      target: 'c_gather',  strength: 0.45 }, // 永續採集 ✓
+  { source: 'lokot',      target: 'c_season',  strength: 0.35 }, // 冬春嫩芽
+
+  // ── 植物 × 知識持有者 ───────────────────────────────────────────
+  { source: 'tana',       target: 'h_shaman',  strength: 0.55 }, // 巫師植物 ✓
+  { source: 'rorang',     target: 'h_elder',   strength: 0.4  }, // 耆老釀酒
+  { source: 'tatokem',    target: 'h_women',   strength: 0.45 }, // 婦女採集
+  { source: 'kadawangay', target: 'h_women',   strength: 0.4  }, // 婦女採集
+  { source: 'lengac',     target: 'h_women',   strength: 0.45 }, // 婦女製吉拿富
+  { source: 'kafotolay',  target: 'h_women',   strength: 0.4  }, // 婦女採集
+  { source: 'lokot',      target: 'h_women',   strength: 0.4  }, // 婦女採集
+
+  // ── 概念 × 概念 ─────────────────────────────────────────────────
+  { source: 'c_kawas',    target: 'c_miacas',  strength: 0.45 }, // 神靈↔祭儀
+  { source: 'c_gather',   target: 'c_season',  strength: 0.4  }, // 採集↔季節
+  { source: 'c_fana',     target: 'c_gather',  strength: 0.35 }, // 知識傳授↔採集
+
+  // ── 知識持有者 × 概念 ───────────────────────────────────────────
+  { source: 'c_fana',     target: 'h_elder',   strength: 0.45 }, // 知識傳授→耆老 ✓
+  { source: 'h_women',    target: 'c_gather',  strength: 0.45 }, // 婦女↔採集 ✓
+  { source: 'h_shaman',   target: 'c_kawas',   strength: 0.5  }, // 巫師↔神靈
+  { source: 'h_elder',    target: 'c_miacas',  strength: 0.4  }, // 耆老↔祭儀
+  { source: 'h_elder',    target: 'c_season',  strength: 0.35 }, // 耆老↔歲時
+
+  // ── 學習路徑 × 學科/概念/持有者 ────────────────────────────────
+  { source: 'p_story',    target: 'h_elder',   strength: 0.4  }, // 故事路徑→耆老 ✓
+  { source: 'p_story',    target: 'c_fana',    strength: 0.4  }, // 故事→知識傳授
+  { source: 'p_food',     target: 'h_women',   strength: 0.4  }, // 料理路徑→婦女 ✓
+  { source: 'p_food',     target: 'c_gather',  strength: 0.35 }, // 料理→採集
+  { source: 'p_food',     target: 'd_food',    strength: 0.4  }, // 料理→飲食科學
+  { source: 'p_lang',     target: 'd_lang',    strength: 0.5  }, // 語言路徑→語言學
+  { source: 'p_science',  target: 'd_eco',     strength: 0.4  }, // 科學→生態學
+  { source: 'p_science',  target: 'd_taxon',   strength: 0.35 }, // 科學→分類學
+
+  // ── 成果 × 其他 ─────────────────────────────────────────────────
+  { source: 'o_sci',      target: 'd_eco',     strength: 0.4  }, // 食農教育→生態
+  { source: 'o_sci',      target: 'c_gather',  strength: 0.35 }, // 食農教育→採集
+  { source: 'o_dict',     target: 'd_lang',    strength: 0.5  }, // 字典→語言學
+
+  // ── 分享者 & 首獎 ────────────────────────────────────────────────
+  { source: 'n_about',    target: 'dateng',    strength: 0.4  },
+  { source: 'n_award',    target: 'dateng',    strength: 0.4  },
+  { source: 'n_about',    target: 'n_award',   strength: 0.7  },
+  { source: 'n_about',    target: 'o_sci',     strength: 0.4  },
+  { source: 'n_about',    target: 'c_fana',    strength: 0.4  },
+  { source: 'n_about',    target: 'h_women',   strength: 0.35 },
+  { source: 'n_about',    target: 'd_food',    strength: 0.35 },
+  { source: 'n_award',    target: 'p_science', strength: 0.4  },
+  { source: 'n_award',    target: 'o_dict',    strength: 0.3  },
+  { source: 'n_award',    target: 'h_elder',   strength: 0.3  },
+  { source: 'n_award',    target: 'o_sci',     strength: 0.45 },
+];
+
+/* AUTO-LINK GENERATOR — 新節點只需宣告 relatedTo 陣列，系統自動產生連結 */
+(function autoGenerateLinks() {
+  nodes.forEach(n => {
+    if (!n.relatedTo) return;
+    n.relatedTo.forEach(targetId => {
+      const dup = links.some(l =>
+        (l.source === n.id || (l.source&&l.source.id) === n.id) &&
+        (l.target === targetId || (l.target&&l.target.id) === targetId)
+      );
+      if (!dup) links.push({ source: n.id, target: targetId, strength: 0.35 });
+    });
+  });
+})();
+
+/* ═══════════════════════════════════════════════════
+   NAV STRIP BUILD
+═══════════════════════════════════════════════════ */
+const strip = document.getElementById('nav-plants-strip');
+Object.values(plants).forEach(p => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-plant-btn';
+  btn.id = `nbtn-${p.id}`;
+  btn.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:${p.color};display:inline-block;"></span> ${p.chinese}`;
+  btn.onclick = () => showPlant(p.id);
+  strip.appendChild(btn);
+});
+
+/* ═══════════════════════════════════════════════════
+   VIEW MANAGEMENT
+═══════════════════════════════════════════════════ */
+let _nodeG = null, _link = null, _focusedId = null;
+
+function resetFocus() {
+  _focusedId = null;
+  if (_nodeG) _nodeG.attr('opacity', 1);
+  if (_link)  _link.attr('stroke-opacity', 0.35).attr('stroke-width', d => (d.strength||0.3)*2.5);
+  document.getElementById('node-panel').classList.remove('open');
+}
+
+function focusNode(d, nodeGRef, linkRef) {
+  _nodeG = nodeGRef; _link = linkRef;
+  if (_focusedId === d.id) { resetFocus(); return; }
+  _focusedId = d.id;
+
+  const connectedNodeIds = new Set([d.id]);
+  const activeLinkIds = new Set();
+  links.forEach((lk, i) => {
+    const s = lk.source.id || lk.source;
+    const t = lk.target.id || lk.target;
+    if (s === d.id || t === d.id) {
+      connectedNodeIds.add(s);
+      connectedNodeIds.add(t);
+      activeLinkIds.add(i);
+    }
+  });
+
+  _nodeG.attr('opacity', nd => connectedNodeIds.has(nd.id) ? 1 : 0.08);
+  _link
+    .attr('stroke-opacity', (lk, i) => activeLinkIds.has(i) ? 0.85 : 0.04)
+    .attr('stroke-width',   (lk, i) => activeLinkIds.has(i) ? (lk.strength||0.3)*4 : 0.5);
+
+  const p = d.plant ? plants[d.plant] : null;
+  const color = d.plant ? PLANT_COLOR[d.plant] : TYPE_COLOR[d.type];
+
+  document.getElementById('np-accent').style.background = color;
+  document.getElementById('np-tag').textContent =
+    { core:'CORE · 核心', species:'SPECIES · 植物物種', discipline:'DISCIPLINE · 學科知識',
+      concept:'CONCEPT · 文化概念', holder:'HOLDER · 知識傳承者',
+      pathway:'PATHWAY · 學習路徑', outcome:'OUTCOME · 成果展現' }[d.type] || d.type.toUpperCase();
+  document.getElementById('np-name').textContent = d.label.replace('\n', ' ');
+  document.getElementById('np-name').style.color = color;
+
+  if (p) {
+    document.getElementById('np-amis').textContent = `${p.amis} · ${p.scientific}`;
+    document.getElementById('np-tagline').textContent = p.tagline.replace('\n', '　');
+  } else {
+    document.getElementById('np-amis').textContent = '';
+    document.getElementById('np-tagline').textContent =
+      { disciplines:'從六個學科角度解剖同一株植物，看見知識的多維面向。',
+        pathways:'六條學習路徑通往野菜知識系統的不同入口。',
+        outcomes:'知識從課堂出發，向外擴散的多種形式。',
+        c_miacas:'小米播種前夜，以龍葵湯祭拜神靈的阿美族儀式。',
+        c_kawas:'阿美族宇宙觀中無所不在的神靈力量。',
+        c_fana:'阿美族傳統知識體系的核心——知識的傳授與實踐。',
+        c_gather:'阿美族女性採集野菜的傳統智慧與社會組織。',
+        c_season:'歲時祭儀與植物採集的季節節奏。',
+        h_elder:'耆老是傳統知識最重要的守護者與傳遞者。',
+        h_women:'婦女採集組織是野菜知識的主要實踐者。',
+        h_shaman:'Cikawasay 巫師掌握植物靈力知識的特殊角色。',
+        n_about:'跨域創新與文化傳承，從部落田野到全國舞台的食農教育實踐者。',
+        n_award:'天下雜誌永續台灣創意教案，國小組全國首獎成果。',
+        n_idsystem:'從葉拓辨識、感官雷達到 AI 訓練——三種方法建立完整的野菜辨識知識系統。',
+        n_rubbing: '用紙與鉛筆拓印葉片，在細微紋路中看見植物身分的祕密。',
+        n_radar:   '用五味維度（甘苦酸鹹澀）為每株野菜建立專屬的風味指紋圖譜。',
+        n_ai:      '學生化身 AI 訓練師，以 Google Teachable Machine 教電腦認識阿美族野菜。',
+        n_quiz:    '透過性格測驗找出「你是哪一種野菜」，讓植物知識從故事走入自我認識。',
+        n_game:    '以桌遊方式探索七種野菜的採集、辨識與料理知識，讓學習在遊戲中自然發生。',
+        n_ar:      '以 AR 擴增實境技術，讓七種阿美族野菜從書頁與圖卡中躍然而出，成為立體互動學習體驗。',
+      }[d.id] || d.label.replace('\n','　');
+  }
+
+  const chips = document.getElementById('np-connections');
+  chips.innerHTML = '';
+  connectedNodeIds.forEach(nid => {
+    if (nid === d.id) return;
+    const nd = nodes.find(n => n.id === nid);
+    if (!nd) return;
+    const chip = document.createElement('div');
+    chip.className = 'np-conn-chip';
+    const chipColor = nd.plant ? PLANT_COLOR[nd.plant] : TYPE_COLOR[nd.type];
+    chip.innerHTML = `<span class="chip-dot" style="background:${chipColor}"></span>${nd.label.replace('\n',' ')}`;
+    if (nd.plant || nd.section || nd.isAbout || nd.isAward || nd.isIdSystem || nd.idTool) {
+      chip.style.cursor = 'pointer';
+      chip.style.borderColor = '#666';
+      chip.addEventListener('click', () => focusNode(nd, _nodeG, _link));
+    }
+    chips.appendChild(chip);
+  });
+
+  const goBtn = document.getElementById('np-btn-go');
+  if (d.plant) {
+    goBtn.textContent = '查看植物詳情 →';
+    goBtn.style.display = 'block';
+    goBtn.onclick = () => showPlant(d.plant);
+  } else if (d.isMapPage) {
+    goBtn.textContent = '查看數位採集地圖 →';
+    goBtn.style.display = 'block';
+    goBtn.onclick = () => showSection('map_page');
+  } else if (d.section) {
+    goBtn.textContent = '進入內容 →';
+    goBtn.style.display = 'block';
+    goBtn.onclick = () => showSection(d.section);
+  } else if (d.isAbout) {
+    goBtn.textContent = '查看分享人經歷 →';
+    goBtn.style.display = 'block';
+    goBtn.onclick = () => showAbout();
+  } else if (d.isAward) {
+    goBtn.textContent = '查看首獎介紹 →';
+    goBtn.style.display = 'block';
+    goBtn.onclick = () => showAward();
+  } else if (d.isIdSystem) {
+    goBtn.textContent = '進入辨識系統 →';
+    goBtn.style.display = 'block';
+    goBtn.onclick = () => showIdTool('idsystem');
+  } else if (d.idTool) {
+    const lbls = { rubbing:'查看植拓辨識 →', radar:'查看風味雷達圖 →', ai:'進入 AI 辨識 →', quiz:'進入野菜心理測驗 →', game:'進入野菜桌遊 →', ar:'進入 AR 擴增實境 →' };
+    goBtn.textContent = lbls[d.idTool] || '查看內容 →';
+    goBtn.style.display = 'block';
+    goBtn.onclick = () => showIdTool(d.idTool);
+  } else {
+    goBtn.style.display = 'none';
+  }
+
+  document.getElementById('node-panel').classList.add('open');
+}
+
+function hideAllViews() {
+  ['view-graph', 'view-plant', 'view-section', 'view-award', 'view-about', 'view-idtool'].forEach(id => {
+    document.getElementById(id).className = 'view hidden';
+  });
+  document.querySelectorAll('.nav-plant-btn').forEach(b => b.classList.remove('active'));
+}
+
+function showGraph() {
+  resetFocus();
+  hideAllViews();
+  document.getElementById('view-graph').className = 'view visible';
+  document.getElementById('topnav').className = 'hidden';
+}
+
+function showPlant(id) {
+  const p = plants[id];
+  if (!p) return;
+  renderPlant(p);
+  hideAllViews();
+  document.getElementById('view-plant').className = 'view visible';
+  document.getElementById('view-plant').scrollTop = 0;
+  document.getElementById('topnav').className = 'visible';
+  document.getElementById('nav-title-text').textContent = `${p.chinese} ${p.amis}`;
+  const btn = document.getElementById(`nbtn-${id}`);
+  if (btn) btn.classList.add('active');
+}
+
+function showSection(id) {
+  // 特殊子頁面不在 sections 物件內，直接傳入空殼
+  const SPECIAL = {
+    recipe_page: { tag: 'RECIPE · 野菜食譜' },
+    map_page:    { tag: 'DIGITAL MAP · 數位採集地圖' },
+  };
+  const s = sections[id] || SPECIAL[id];
+  if (!s) return;
+  renderSection(id, s);
+  hideAllViews();
+  document.getElementById('view-section').className = 'view visible';
+  document.getElementById('view-section').scrollTop = 0;
+  document.getElementById('topnav').className = 'visible';
+  document.getElementById('nav-title-text').textContent = s.tag;
+}
+
+function showAward() {
+  renderAward();
+  hideAllViews();
+  document.getElementById('view-award').className = 'view visible';
+  document.getElementById('view-award').scrollTop = 0;
+  document.getElementById('topnav').className = 'visible';
+  document.getElementById('nav-title-text').textContent = 'AWARD · 永續教案首獎';
+}
+
+function showIdTool(id) {
+  renderIdTool(id);
+  hideAllViews();
+  document.getElementById('view-idtool').className = 'view visible';
+  document.getElementById('view-idtool').scrollTop = 0;
+  document.getElementById('topnav').className = 'visible';
+  const titles = { idsystem:'ID SYSTEM · 辨識知識系統', rubbing:'RUBBING · 植拓辨識法', radar:'RADAR · 風味雷達圖', ai:'AI · 人工智慧辨識' };
+  document.getElementById('nav-title-text').textContent = titles[id] || 'ID TOOL';
+}
+
+function showAbout() {
+  renderAbout();
+  hideAllViews();
+  document.getElementById('view-about').className = 'view visible';
+  document.getElementById('view-about').scrollTop = 0;
+  document.getElementById('topnav').className = 'visible';
+  document.getElementById('nav-title-text').textContent = 'ABOUT · 分享人經歷';
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER ABOUT (分享人經歷) - 升級為原生高品質網頁排版
+═══════════════════════════════════════════════════ */
+function renderSpeakerPhotos() {
+  const container = document.getElementById('speaker-photos');
+  if (!container) return;
+  container.innerHTML = PHOTO_CONFIG.speaker.map(photo => {
+    if (photo.url) {
+      // 有照片網址 → 顯示真實照片
+      return `
+        <div style="overflow:hidden;background:#111;aspect-ratio:4/3;position:relative;">
+          <img src="${photo.url}"
+               style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease;"
+               alt="${photo.caption}"
+               onmouseover="this.style.transform='scale(1.05)'"
+               onmouseout="this.style.transform='scale(1)'"
+               onerror="this.parentElement.innerHTML=placeholderHTML('${photo.caption}','載入失敗')">
+          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.55));padding:10px 14px;font-size:11px;color:#ddd;font-family:var(--mono);letter-spacing:1px;">${photo.caption}</div>
+        </div>`;
+    } else {
+      // 空白 → 顯示佔位格
+      return `<div style="aspect-ratio:4/3;">${placeholderHTML(photo.caption,'')}</div>`;
+    }
+  }).join('');
+}
+
+function placeholderHTML(caption, note) {
+  return `
+    <div style="width:100%;height:100%;min-height:200px;background:#1a1a2a;border:2px dashed #3a3a5a;
+                display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+      <div style="font-size:32px;opacity:.3;">📷</div>
+      <div style="font-size:11px;color:#555;font-family:var(--mono);letter-spacing:2px;text-align:center;">
+        ${note || '照片預留位置'}<br>
+        <span style="font-size:9px;color:#3a3a5a;margin-top:4px;display:block;">${caption}</span>
+      </div>
+    </div>`;
+}
+
+function renderAbout() {
+  document.getElementById('about-content').innerHTML = `
+    <!-- ─ HERO ─ -->
+    <div class="award-hero about-hero">
+      <div class="award-badge" style="background:rgba(78, 205, 196, 0.12); border-color:var(--teal);">
+        <span style="font-size:24px;line-height:1;">👩‍🏫</span>
+        <span class="badge-text" style="color:var(--teal);">SPEAKER PROFILE · 分享人經歷</span>
+      </div>
+      <h2><em>跨域創新</em> 與 <em>文化傳承</em><br>從部落教室到全國舞台</h2>
+      <div class="aw-sub">致力於原住民族文化傳承、科學探究與多元專案指導</div>
+      <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div style="font-size:26px;font-family:var(--serif);font-weight:900;color:var(--ink);letter-spacing:2px;">賴奕芸</div>
+        <div style="font-size:13px;font-family:var(--mono);letter-spacing:2px;color:var(--teal);background:rgba(78,205,196,0.1);padding:6px 18px;border-radius:20px;border:1px solid rgba(78,205,196,0.3);">台東縣長濱鄉Salimpo阿美山海文化實驗小學 · 課程研發處主任</div>
+      </div>
+    </div>
+
+    <div class="plant-content">
+
+      <!-- ─ 原住民族科學博覽會 2021–2024 校本課程主題 ─ -->
+      <div class="plant-section" style="padding-top:48px;">
+        <span class="section-label">INDIGENOUS SCIENCE FAIR · 原住民族科學博覽會</span>
+        <h3 class="section-title">校本課程主題指導歷程 2021–2024</h3>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px;">
+          <!-- 2021 -->
+          <div style="background: #fff; border: 1px solid var(--warm); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+            <h4 style="font-size: 28px; font-family: var(--sans); font-weight: 900; color: var(--ink); margin-bottom: 16px;">2021</h4>
+            <div style="font-size: 48px; margin-bottom: 16px; text-shadow: 0 4px 12px rgba(0,0,0,0.1);">🛶</div>
+            <div style="font-size: 14px; font-weight: bold; color: var(--ink); line-height: 1.6; margin-bottom: 20px; flex-grow: 1;">海事要有方筏吧！</div>
+            <div style="background: #f0f0f0; color: #555; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid #ddd;">🏅 佳作獎</div>
+          </div>
+
+          <!-- 2022 -->
+          <div style="background: #fff; border: 1px solid var(--warm); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+            <h4 style="font-size: 28px; font-family: var(--sans); font-weight: 900; color: var(--ink); margin-bottom: 16px;">2022</h4>
+            <div style="font-size: 48px; margin-bottom: 16px; text-shadow: 0 4px 12px rgba(0,0,0,0.1);">🌿</div>
+            <div style="font-size: 14px; font-weight: bold; color: var(--ink); line-height: 1.6; margin-bottom: 20px; flex-grow: 1;">呼之欲出的阿美族<br>「捲菸」味，很有故事</div>
+            <div style="background: #f0f4f8; color: #5c6c7c; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid #d3e0ea;">🥈 銀熊獎</div>
+          </div>
+
+          <!-- 2023 -->
+          <div style="background: #fffdf5; border: 2px solid #D4A017; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 10px 30px rgba(212,160,23,0.15); position: relative;">
+            <div style="position: absolute; top: -14px; background: #D4A017; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; letter-spacing: 1px; box-shadow: 0 4px 8px rgba(212,160,23,0.3);">🏆 傑出指導教師獎</div>
+            <h4 style="font-size: 28px; font-family: var(--sans); font-weight: 900; color: #D4A017; margin-bottom: 16px; margin-top: 8px;">2023</h4>
+            <div style="font-size: 48px; margin-bottom: 16px; text-shadow: 0 4px 12px rgba(0,0,0,0.1);">🐚</div>
+            <div style="font-size: 14px; font-weight: bold; color: var(--ink); line-height: 1.6; margin-bottom: 20px; flex-grow: 1;">Hekal的海事—阿美族<br>「Rarapi' no Salimpo」<br>潮間帶的傳統採集智慧</div>
+            <div style="background: #fff7d6; color: #b8860b; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid #D4A017;">🥇 金熊獎</div>
+          </div>
+
+          <!-- 2024 -->
+          <div style="background: #fff; border: 1px solid var(--warm); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+            <h4 style="font-size: 28px; font-family: var(--sans); font-weight: 900; color: var(--ink); margin-bottom: 16px;">2024</h4>
+            <div style="display: flex; flex-direction: column; gap: 16px; flex-grow: 1; width: 100%;">
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 32px; margin-bottom: 8px; text-shadow: 0 4px 8px rgba(0,0,0,0.1);">🌾</div>
+                <div style="font-size: 13px; font-weight: bold; color: var(--ink); line-height: 1.5; margin-bottom: 10px;">阿美族傳統植物酒麴與酒釀<br>的科學智慧運用</div>
+                <div style="background: #fff3e0; color: #d35400; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid #ffcc80;">🥉 銅熊獎、探索精神獎</div>
+              </div>
+              <div style="border-top: 1px dashed #ddd; padding-top: 16px; display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 32px; margin-bottom: 8px; text-shadow: 0 4px 8px rgba(0,0,0,0.1);">🐟</div>
+                <div style="font-size: 13px; font-weight: bold; color: var(--ink); line-height: 1.5; margin-bottom: 10px;">mitapay 海神的饗宴—阿美族<br>燻製飛魚的傳統技法與現代技術</div>
+                <div style="background: #f0f4f8; color: #5c6c7c; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid #d3e0ea;">🥈 銀熊獎</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ 四健會食農教育成果（僅得獎橫幅）─ -->
+      <div class="plant-section">
+        <span class="section-label">4-H FOOD &amp; AGRICULTURE · 四健會食農教育成果</span>
+        <h3 class="section-title">Dateng 野菜探險家 · 餐桌上的傳統智慧</h3>
+        <div style="background:linear-gradient(135deg,#1a3a1a 0%,#2d5a2d 100%);border:2px solid #6B8F6B;border-radius:12px;padding:28px 36px;margin-top:24px;display:flex;align-items:center;gap:24px;">
+          <div style="font-size:52px;flex-shrink:0;">🌿</div>
+          <div>
+            <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#a8d5a2;margin-bottom:8px;">2025 · 行政院農業部四健會作業組競賽</div>
+            <div style="font-size:22px;font-weight:bold;color:#fff;line-height:1.4;">食農教育組 <span style="color:#a8d5a2;">|</span> <span style="color:#DFFF00;">全國第三名</span></div>
+            <div style="font-size:14px;color:#a8d5a2;margin-top:6px;">台東縣長濱鄉Salimpo阿美山海文化實驗小學</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ 分享人經歷總覽 (原生網頁排版) ─ -->
+      <div class="plant-section" style="padding-bottom: 60px;">
+        <span class="section-label">EXPERIENCE & AWARDS · 分享人經歷與獎項</span>
+        <h3 class="section-title">跨域創新與文化傳承軌跡</h3>
+
+        <div class="award-2col" style="margin-top: 24px; gap: 24px;">
+          
+          <!-- Left Col: 教學獎項 -->
+          <div style="background: #fff; border: 1px solid var(--warm); border-radius: 12px; padding: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.03);">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 28px;">
+              <div style="width: 48px; height: 48px; background: rgba(212,160,23,0.15); color: #D4A017; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">🏆</div>
+              <h4 style="font-size: 22px; font-family: var(--serif); font-weight: bold; color: var(--ink);">教育創新與永續獎項</h4>
+            </div>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px;">
+              <li style="border-left: 3px solid var(--neon); padding-left: 16px;">
+                <div style="font-size: 13px; color: #888; font-family: var(--mono); letter-spacing: 1px; margin-bottom: 4px;">2024 - 2025</div>
+                <div style="font-size: 16px; font-weight: bold; color: var(--ink); line-height: 1.5;">天下雜誌-永續臺灣創意教案 <span style="color: #D4A017; display: inline-block; margin-top: 4px;">| 全國首獎 (二連霸)</span></div>
+              </li>
+              <li style="border-left: 3px solid var(--teal); padding-left: 16px;">
+                <div style="font-size: 13px; color: #888; font-family: var(--mono); letter-spacing: 1px; margin-bottom: 4px;">2024</div>
+                <div style="font-size: 16px; font-weight: bold; color: var(--ink); line-height: 1.5;">台灣永續教育獎 <span style="color: #555; display: inline-block; margin-top: 4px;">| 傑出永續教案-銀獎</span></div>
+              </li>
+              <li style="border-left: 3px solid var(--sage); padding-left: 16px;">
+                <div style="font-size: 13px; color: #888; font-family: var(--mono); letter-spacing: 1px; margin-bottom: 4px;">2023</div>
+                <div style="font-size: 16px; font-weight: bold; color: var(--ink); line-height: 1.5; margin-bottom: 8px;">微笑台灣創意教案 <span style="color: #555;">| 日月光環境教育獎</span></div>
+                <div style="font-size: 16px; font-weight: bold; color: var(--ink); line-height: 1.5;">親子天下 <span style="color: #555;">| 2023 教育創新100</span></div>
+              </li>
+              <li style="border-left: 3px solid var(--lavender); padding-left: 16px;">
+                <div style="font-size: 13px; color: #888; font-family: var(--mono); letter-spacing: 1px; margin-bottom: 4px;">2022</div>
+                <div style="font-size: 16px; font-weight: bold; color: var(--ink); line-height: 1.5;">微笑台灣教案 <span style="color: #555;">| 最佳創意獎</span></div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right Col: 多元專案 -->
+          <div style="background: #fff; border: 1px solid var(--warm); border-radius: 12px; padding: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.03);">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 28px;">
+              <div style="width: 48px; height: 48px; background: rgba(78, 205, 196, 0.15); color: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">🎬</div>
+              <h4 style="font-size: 22px; font-family: var(--serif); font-weight: bold; color: var(--ink);">出版、數位與影音指導</h4>
+            </div>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px;">
+              <li style="border-left: 3px solid var(--pink); padding-left: 16px;">
+                <div style="font-size: 11px; color: #aaa; font-family: var(--mono); letter-spacing: 2px; margin-bottom: 6px; font-weight: bold;">MUSIC & BOOK · 音樂與出版</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6; margin-bottom: 8px;"><strong>製作專輯</strong> | 寧埔國小阿美歌謠集</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6;"><strong>出版著作</strong> | O 'olic no 'orip生活的詩、Awos野菜探險記</div>
+              </li>
+              <li style="border-left: 3px solid #4a9a6b; padding-left: 16px;">
+                <div style="font-size: 11px; color: #aaa; font-family: var(--mono); letter-spacing: 2px; margin-bottom: 6px; font-weight: bold;">TECH & READING · 科技與數位閱讀</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6; margin-bottom: 8px;"><strong>VR跨域盃 全國虛擬實境大賽</strong> | 國小高年級組冠軍</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6;"><strong>柯華葳線上數位閱讀專題探究競賽</strong> | 全國特優</div>
+              </li>
+              <li style="border-left: 3px solid #e6c84a; padding-left: 16px;">
+                <div style="font-size: 11px; color: #aaa; font-family: var(--mono); letter-spacing: 2px; margin-bottom: 6px; font-weight: bold;">DOCUMENTARY · 紀錄片指導</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6; margin-bottom: 8px;"><strong>指導神腦紀錄片競賽</strong> | 兒少組入選 (2018、2022)</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6;"><strong>教育部國教署</strong> | 戶外教育教學歷程短片組佳作</div>
+              </li>
+              <li style="border-left: 3px solid #5aacb8; padding-left: 16px;">
+                <div style="font-size: 11px; color: #aaa; font-family: var(--mono); letter-spacing: 2px; margin-bottom: 6px; font-weight: bold;">SCIENCE FAIR · 科展指導大滿貫</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6;"><strong>原住民族雲端科展</strong> | 歷年榮獲 金熊、銀熊、銅熊、佳作、探索精神獎、傑出指導教師獎</div>
+              </li>
+              <li style="border-left: 3px solid #6B8F6B; padding-left: 16px;">
+                <div style="font-size: 11px; color: #aaa; font-family: var(--mono); letter-spacing: 2px; margin-bottom: 6px; font-weight: bold;">FOOD &amp; AGRICULTURE · 食農教育</div>
+                <div style="font-size: 15px; color: var(--ink); line-height: 1.6;"><strong>四健會作業組競賽（行政院農業部）</strong> | 食農教育組 <span style="color:#6B8F6B;font-weight:bold;">全國第三名</span></div>
+                <div style="font-size: 14px; color:#555; line-height:1.5; margin-top:6px;">Dateng 野菜探險家 · 餐桌上的傳統智慧</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+  // 照片由 PHOTO_CONFIG 驅動，innerHTML 設定後再渲染
+}
+
+
+/* ═══════════════════════════════════════════════════
+   RENDER AWARD (天下雜誌首獎)
+═══════════════════════════════════════════════════ */
+function renderAward() {
+  document.getElementById('award-content').innerHTML = `
+    <!-- ─ HERO ─ -->
+    <div class="award-hero">
+      <div class="award-badge">
+        <span style="font-size:24px;line-height:1;">🏆</span>
+        <span class="badge-text">天下雜誌 · 永續台灣創意教案 · 國小組首獎 · 2025年12月</span>
+      </div>
+      <h2><em>Dateng</em> 野菜探險家<br>餐桌上的永續智慧</h2>
+      <div class="aw-sub">臺東縣 Salimpo 台東縣長濱鄉Salimpo阿美山海文化實驗小學（寧埔國小）</div>
+      <div class="award-meta-row">
+        <div class="award-meta-item">參賽教師 <b>賴奕芸 · 吳慧麗</b></div>
+        <div class="award-meta-item">主要領域 <b>資訊／科技 · 自然科學</b></div>
+        <div class="award-meta-item">課程節數 <b>86 節</b></div>
+      </div>
+    </div>
+
+    <div class="plant-content">
+      
+      <!-- ─ VIDEO ─ -->
+      <div class="plant-section" style="padding-top:48px;">
+        <span class="section-label">FILM · 成果影片</span>
+        <h3 class="section-title">看見這堂課的樣子</h3>
+        <div class="award-video-wrap">
+          <a href="https://youtu.be/JO1SWzxCFbU" target="_blank" class="video-link">
+            <img src="https://img.youtube.com/vi/JO1SWzxCFbU/maxresdefault.jpg" alt="Video Cover">
+            <div class="play-btn">
+               <div class="play-triangle"></div>
+            </div>
+            <div class="play-hint">🔗 點擊前往 YouTube 觀看完整影片</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- ─ 評審評語 ─ -->
+      <div class="plant-section">
+        <span class="section-label">JURY COMMENT · 評審評語</span>
+        <h3 class="section-title">評審如何看這堂課</h3>
+        <div class="jury-quote">
+          <span class="jq-label">COMMONWEALTH MAGAZINE JURY · 天下雜誌評審團</span>
+          <div class="jq-text">
+            此教案的核心價值在於構建了一條獨特的 <span class="jq-em">「從土地到科技的文化學習鏈」</span>。
+            課程不僅帶領學生透過 <span class="jq-em">86 節課的長時程深度探究</span>，認識在地阿美族野菜文化（Dateng）中蘊含的祖先與自然共生的智慧，
+            更以極具創意的策略，讓學生扮演 <span class="jq-em">「AI 野菜訓練師」</span>，運用 Google Teachable Machine 訓練 AI 模型辨識野菜，
+            並製作 AR 互動 <span class="jq-em">「野菜精靈圖鑑」</span>。最終成果具備高度的藝術性、科技性與社會影響力，形成文化永續的學習生態圈。
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ 教案介紹 ─ -->
+      <div class="plant-section">
+        <span class="section-label">LESSON INTRO · 教案介紹</span>
+        <h3 class="section-title">這堂課的設計邏輯</h3>
+        <div class="award-2col">
+          <div class="award-card full">
+            <span class="ac-label">CORE CONCEPT · 核心理念</span>
+            <p>
+              以「Dateng（野菜）」為切入點，將阿美族的傳統採集智慧轉化為跨學科的探究課程。
+              課程橫跨<strong>自然科學、語言、藝術、科技</strong>，
+              以文化知識系統為骨幹，設計 86 節課的長時程序列學習，
+              讓學生在「認識→探究→創作→傳播」的完整歷程中，成為在地文化知識的實踐者與傳遞者。
+            </p>
+          </div>
+          <div class="award-card">
+            <span class="ac-label">HIGHLIGHTS · 課程亮點</span>
+            <ul>
+              <li>實地採集 × 耆老口述，建立族語野菜字典</li>
+              <li>學生擔任<strong>「AI 野菜訓練師」</strong>，訓練 Teachable Machine 模型</li>
+              <li>製作 AR 互動<strong>「野菜精靈圖鑑」</strong>，科技承載文化記憶</li>
+              <li>野菜故事繪本創作，融合語文與視覺藝術</li>
+              <li>野菜料理實作，從餐桌回應 SDGs 永續飲食</li>
+            </ul>
+          </div>
+          <div class="award-card">
+            <span class="ac-label">LEARNING CHAIN · 文化學習鏈</span>
+            <ul>
+              <li><strong>土地</strong> → 採集與辨識，連結生態環境</li>
+              <li><strong>文化</strong> → 族語命名、祭儀故事、耆老智慧</li>
+              <li><strong>科學</strong> → 植物分類、營養分析、生態探究</li>
+              <li><strong>科技</strong> → AI 辨識訓練、AR 擴增實境製作</li>
+              <li><strong>永續</strong> → 文化傳承、社會影響、學習生態圈</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ 圖文重點摘要 ─ -->
+      <div class="plant-section">
+        <span class="section-label">SUMMARY · 重點摘要</span>
+        <h3 class="section-title">一眼看懂這堂課</h3>
+
+        <!-- SDGs & 素養 -->
+        <div style="display:flex; flex-wrap:wrap; gap:40px; margin-bottom:32px;">
+          <div>
+            <div style="font-size:11px;letter-spacing:3px;color:#888;font-family:var(--mono);margin-bottom:12px;font-weight:bold;">SDGs 對應目標</div>
+            <div class="sdg-chips">
+              <div class="sdg-chip" style="border-color:#4C9F38;color:#4C9F38;">🌱 SDG3 健康與福祉</div>
+              <div class="sdg-chip" style="border-color:#FD9D24;color:#FD9D24;">🏘️ SDG11 永續城鄉</div>
+              <div class="sdg-chip" style="border-color:#56C02B;color:#56C02B;">🌿 SDG15 保育陸域生態</div>
+            </div>
+          </div>
+          <div style="flex-grow:1;">
+            <div style="font-size:11px;letter-spacing:3px;color:#888;font-family:var(--mono);margin-bottom:12px;font-weight:bold;">核心素養代碼</div>
+            <div class="comp-row">
+              ${['自-E-A1','自-E-A2','自-E-B1','自-E-B3','自-E-C2','綜-E-C3','藝-E-B3','原-E-A3']
+                .map(c=>`<span class="comp-tag">${c}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- 四大成果 -->
+        <div style="font-size:11px;letter-spacing:3px;color:#888;font-family:var(--mono);margin-bottom:12px;font-weight:bold;">四大成果亮點</div>
+        <div class="course-map" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="ch-block">
+            <div class="ch-header" style="background:#2d6a4f;">🤖 AI 科技成果</div>
+            <div class="ch-body">
+              <div>
+                <div class="ch-mission">Google Teachable Machine</div>
+                <div class="ch-mission">野菜 AI 辨識模型</div>
+                <div class="ch-mission">AR 野菜精靈圖鑑</div>
+              </div>
+              <div class="ch-nodes">科技 × 文化傳承</div>
+            </div>
+          </div>
+          <div class="ch-block">
+            <div class="ch-header" style="background:#6b4226;">📖 語言文化成果</div>
+            <div class="ch-body">
+              <div>
+                <div class="ch-mission">族語野菜字典</div>
+                <div class="ch-mission">耆老口述記錄</div>
+                <div class="ch-mission">野菜故事繪本</div>
+              </div>
+              <div class="ch-nodes">語言復振 × 知識保存</div>
+            </div>
+          </div>
+          <div class="ch-block">
+            <div class="ch-header" style="background:#1d6a5a;">🔬 科學探究成果</div>
+            <div class="ch-body">
+              <div>
+                <div class="ch-mission">植物辨識與分類</div>
+                <div class="ch-mission">採集地圖繪製</div>
+                <div class="ch-mission">營養成分分析</div>
+              </div>
+              <div class="ch-nodes">自然科學 × 在地知識</div>
+            </div>
+          </div>
+          <div class="ch-block">
+            <div class="ch-header" style="background:#7a5c00;">🍽️ 飲食文化成果</div>
+            <div class="ch-body">
+              <div>
+                <div class="ch-mission">傳統料理實作</div>
+                <div class="ch-mission">野菜食譜記錄</div>
+                <div class="ch-mission">餐桌永續教育</div>
+              </div>
+              <div class="ch-nodes">飲食科學 × 永續行動</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ 探索植物 ─ -->
+      <div class="plant-section" style="padding-bottom: 40px;">
+        <span class="section-label">EXPLORE · 探索課程中的野菜</span>
+        <h3 class="section-title">認識這堂課的 7 株主角</h3>
+        <div class="plant-strip">
+          ${Object.values(plants).map(pp=>`
+            <button class="plant-strip-btn" onclick="showPlant('${pp.id}')">
+              <span class="psb-dot" style="background:${pp.color}"></span>
+              ${pp.chinese} <span style="color:#aaa;font-size:11px;font-weight:normal;margin-left:4px;font-family:var(--mono);">${pp.amis}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER PLANT & SECTION
+═══════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════
+   RENDER ID TOOL
+═══════════════════════════════════════════════════ */
+const FLAVOR_DATA = {
+  rorang:     { 甘:4, 苦:1, 酸:2, 鹹:1, 澀:1 },
+  tatokem:    { 甘:2, 苦:5, 酸:1, 鹹:1, 澀:2 },
+  kadawangay: { 甘:2, 苦:3, 酸:1, 鹹:1, 澀:3 },
+  tana:       { 甘:2, 苦:2, 酸:2, 鹹:1, 澀:1 },
+  lengac:     { 甘:3, 苦:1, 酸:2, 鹹:1, 澀:1 },
+  kafotolay:  { 甘:3, 苦:2, 酸:1, 鹹:1, 澀:2 },
+  lokot:      { 甘:2, 苦:3, 酸:1, 鹹:2, 澀:3 },
+};
+function radarSVG(pid) {
+  const d = FLAVOR_DATA[pid]; if (!d) return '';
+  const axes=['甘','苦','酸','鹹','澀'], n=5, R=68, cx=100, cy=100;
+  const col = PLANT_COLOR[pid] || '#38BDF8';
+  let s='<svg width="200" height="200" viewBox="0 0 200 200">';
+  [1,2,3,4,5].forEach(l=>{
+    const pts=axes.map((_,i)=>{const a=(Math.PI*2*i/n)-Math.PI/2;return `${cx+R*l/5*Math.cos(a)},${cy+R*l/5*Math.sin(a)}`;}).join(' ');
+    s+=`<polygon points="${pts}" fill="none" stroke="#1e3a5f" stroke-width="${l===5?1:0.5}"/>`;
+  });
+  axes.forEach((_,i)=>{const a=(Math.PI*2*i/n)-Math.PI/2;s+=`<line x1="${cx}" y1="${cy}" x2="${cx+R*Math.cos(a)}" y2="${cy+R*Math.sin(a)}" stroke="#334155" stroke-width="0.8"/>`;});
+  const dp=axes.map((ax,i)=>{const a=(Math.PI*2*i/n)-Math.PI/2,v=d[ax]||0;return `${cx+R*v/5*Math.cos(a)},${cy+R*v/5*Math.sin(a)}`;}).join(' ');
+  s+=`<polygon points="${dp}" fill="${col}" fill-opacity="0.35" stroke="${col}" stroke-width="2"/>`;
+  axes.forEach((ax,i)=>{const a=(Math.PI*2*i/n)-Math.PI/2,lx=cx+(R+14)*Math.cos(a),ly=cy+(R+14)*Math.sin(a);s+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="#94a3b8" font-size="11" font-family="system-ui">${ax}</text>`;});
+  return s+'</svg>';
+}
+
+function renderIdTool(toolId) {
+  const plantRubbingData = [
+    {id:'rorang',     note:'掌狀分裂葉，葉脈粗壯放射狀，表面粗糙感明顯，拓印紋路立體'},
+    {id:'tatokem',    note:'卵形葉，葉緣波狀起伏，葉脈羽狀，紙面呈現柔薄質地'},
+    {id:'kadawangay', note:'橢圓琴形，葉脈羽狀分叉細密，可拓印出背面紫色特徵'},
+    {id:'tana',       note:'複葉小葉對生，葉脈細緻，邊緣細鋸齒，拓印後香氣明顯'},
+    {id:'lengac',     note:'長橢圓大葉，中肋突出，平行細脈清晰，葉緣銳利感強'},
+    {id:'kafotolay',  note:'菱形卵葉，主脈三出，葉面光滑，拓印紋路乾淨清晰'},
+    {id:'lokot',      note:'長披針革質，中肋黑褐色突出，葉背孢子囊線紋是辨識關鍵'},
+  ];
+  let html='';
+  if (toolId==='idsystem') {
+    html=`<div class="idt-hero">
+      <span class="idt-tag">IDENTIFICATION SYSTEM · 辨識知識系統</span>
+      <h1 class="idt-title">如何認識一株野菜？</h1>
+      <p class="idt-sub">單靠眼睛看還不夠——三種互補的辨識方法，從觸覺、味覺到數位智慧，建立多維度的植物辨識能力。</p>
+      <div class="idt-tool-nav">
+        <button class="idt-tool-btn" onclick="showIdTool('rubbing')">🖨 植拓辨識</button>
+        <button class="idt-tool-btn" onclick="showIdTool('radar')">📡 風味雷達圖</button>
+        <button class="idt-tool-btn" onclick="showIdTool('ai')">🤖 AI 辨識訓練</button>
+      </div>
+    </div>
+    <div class="idt-body">
+      <div class="idt-section">
+        <span class="idt-section-label">THREE METHODS · 為什麼需要三種辨識法？</span>
+        <h3 class="idt-section-title">每種方法看見不同的植物面向</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:16px;">
+          <div class="idt-card" style="cursor:pointer;" onclick="showIdTool('rubbing')">
+            <span style="font-size:32px;display:block;margin-bottom:10px;">🖨</span>
+            <h4>植拓辨識</h4>
+            <p>透過拓印記錄葉片的輪廓、葉緣鋸齒與葉脈紋理，訓練對形態細節的觀察力。用手感受，才能記進腦子裡。</p>
+            <div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:#38BDF8;letter-spacing:2px;">查看詳情 →</div>
+          </div>
+          <div class="idt-card" style="cursor:pointer;" onclick="showIdTool('radar')">
+            <span style="font-size:32px;display:block;margin-bottom:10px;">📡</span>
+            <h4>風味雷達圖</h4>
+            <p>以甘、苦、酸、鹹、澀五維度量化每株野菜的味覺指紋，讓「口感」成為辨識的科學依據。</p>
+            <div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:#38BDF8;letter-spacing:2px;">查看詳情 →</div>
+          </div>
+          <div class="idt-card" style="cursor:pointer;" onclick="showIdTool('ai')">
+            <span style="font-size:32px;display:block;margin-bottom:10px;">🤖</span>
+            <h4>AI 辨識訓練</h4>
+            <p>用 Google Teachable Machine 訓練 AI 模型，學生化身「AI 訓練師」，在除錯中深化植物理解。</p>
+            <div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:#38BDF8;letter-spacing:2px;">查看詳情 →</div>
+          </div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">LEARNING CHAIN · 辨識學習鏈</span>
+        <h3 class="idt-section-title">三種方法形成遞進式學習</h3>
+        <div class="idt-card"><p style="line-height:2.4;">
+          <span style="color:#38BDF8;font-family:var(--mono);">STEP 01</span> 植拓辨識 → 觀察形態特徵，建立視覺記憶<br>
+          <span style="color:#38BDF8;font-family:var(--mono);">STEP 02</span> 風味雷達圖 → 品嚐與量化，建立感官記憶<br>
+          <span style="color:#38BDF8;font-family:var(--mono);">STEP 03</span> AI 辨識 → 教電腦辨識，在訓練中深化理解
+        </p></div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">SDGs CONNECTION</span>
+        <h3 class="idt-section-title">與永續發展目標的連結</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;">
+          <div class="idt-card"><h4>🌿 SDG 15</h4><p>記錄傳統植物知識，保護生物多樣性</p></div>
+          <div class="idt-card"><h4>🏘️ SDG 11</h4><p>建立在地野菜地圖，連結部落採集文化</p></div>
+          <div class="idt-card"><h4>📚 SDG 4</h4><p>融合原住民知識與 STEAM，創造多元學習</p></div>
+        </div>
+      </div>
+    </div>`;
+
+  } else if (toolId==='rubbing') {
+    html=`<div class="idt-hero">
+      <span class="idt-tag">PLANT RUBBING · 植拓辨識法</span>
+      <h1 class="idt-title">用紙拓出植物的指紋</h1>
+      <p class="idt-sub">將白紙覆蓋於葉片上，以鉛筆或蠟筆側面輕輕摩擦，葉片的輪廓、葉緣樣貌與葉脈紋理便如指紋般印在紙上。這個過程讓學生用「手感」認識植物，不只是用眼睛看。</p>
+    </div>
+    <div class="idt-body">
+      <div class="idt-section">
+        <span class="idt-section-label">PROCESS · 操作流程</span>
+        <h3 class="idt-section-title">五步驟完成植拓</h3>
+        <div class="idt-steps">
+          <div class="idt-step"><span class="step-num">STEP 01</span><span class="step-icon">🌿</span><span class="step-txt">採集完整、新鮮的葉片（含葉柄）</span></div>
+          <div class="idt-step"><span class="step-num">STEP 02</span><span class="step-icon">💧</span><span class="step-txt">輕輕清洗、拍乾，讓葉脈紋路更清晰</span></div>
+          <div class="idt-step"><span class="step-num">STEP 03</span><span class="step-icon">📄</span><span class="step-txt">葉脈面朝上，覆蓋薄白紙，用手固定</span></div>
+          <div class="idt-step"><span class="step-num">STEP 04</span><span class="step-icon">✏️</span><span class="step-txt">鉛筆側面輕力摩擦，從中央向外均勻拓印</span></div>
+          <div class="idt-step"><span class="step-num">STEP 05</span><span class="step-icon">🔍</span><span class="step-txt">標記植物名稱、採集地點與日期</span></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">OBSERVATION FOCUS · 三個關鍵觀察點</span>
+        <h3 class="idt-section-title">植拓讓你看見肉眼容易忽略的細節</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px;">
+          <div class="idt-card"><h4>🔷 葉片輪廓</h4><p>心形、橢圓、掌狀分裂或披針形——輪廓是辨識植物的第一印象</p></div>
+          <div class="idt-card"><h4>〰️ 葉緣樣貌</h4><p>全緣光滑、波狀起伏、鋸齒細密——每種葉緣代表不同物種特徵</p></div>
+          <div class="idt-card"><h4>🌐 葉脈紋理</h4><p>羽狀脈、掌狀脈、平行脈——葉脈是植物演化的 DNA 印記</p></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">SEVEN PLANTS · 七種野菜的植拓特徵</span>
+        <h3 class="idt-section-title">每株植物都有獨特的葉片指紋</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:14px;">
+          ${plantRubbingData.map(p=>{const pl=plants[p.id];return `<div class="idt-card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="width:10px;height:10px;border-radius:50%;background:${PLANT_COLOR[p.id]};flex-shrink:0;"></span><h4 style="margin:0;">${pl.chinese} <span style="font-family:var(--mono);font-size:11px;color:#475569;">${pl.amis}</span></h4></div><p>${p.note}</p></div>`;}).join('')}
+        </div>
+      </div>
+    </div>`;
+
+  } else if (toolId==='radar') {
+    html=`<div class="idt-hero">
+      <span class="idt-tag">FLAVOR RADAR · 風味雷達圖</span>
+      <h1 class="idt-title">把味道變成數據</h1>
+      <p class="idt-sub">讓學生品嚐七種野菜的生食與熟食，以甘、苦、酸、鹹、澀五維度記錄感官體驗，再用 iPad Numbers 繪製雷達圖。當味道變成圖形，每株野菜都有了自己的「風味指紋」。</p>
+    </div>
+    <div class="idt-body">
+      <div class="idt-section">
+        <span class="idt-section-label">FIVE DIMENSIONS · 五味維度說明</span>
+        <h3 class="idt-section-title">感官分析的五個座標軸</h3>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:12px;text-align:center;">
+          <div class="idt-card"><span style="font-size:28px;">🍯</span><h4>甘</h4><p>清甜、回甘感</p></div>
+          <div class="idt-card"><span style="font-size:28px;">☕</span><h4>苦</h4><p>苦後甘、草藥苦</p></div>
+          <div class="idt-card"><span style="font-size:28px;">🍋</span><h4>酸</h4><p>果酸、草酸感</p></div>
+          <div class="idt-card"><span style="font-size:28px;">🌊</span><h4>鹹</h4><p>礦物質感</p></div>
+          <div class="idt-card"><span style="font-size:28px;">🍃</span><h4>澀</h4><p>單寧澀感</p></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">PROCESS · 操作流程</span>
+        <h3 class="idt-section-title">從品嚐到圖表</h3>
+        <div class="idt-steps">
+          <div class="idt-step"><span class="step-num">STEP 01</span><span class="step-icon">🌿</span><span class="step-txt">品嚐生食樣本，記錄五味評分（1–5 分）</span></div>
+          <div class="idt-step"><span class="step-num">STEP 02</span><span class="step-icon">🍳</span><span class="step-txt">品嚐熟食樣本（汆燙 30 秒），再次評分</span></div>
+          <div class="idt-step"><span class="step-num">STEP 03</span><span class="step-icon">📊</span><span class="step-txt">用 iPad Numbers 建立雷達圖，比對生熟差異</span></div>
+          <div class="idt-step"><span class="step-num">STEP 04</span><span class="step-icon">💬</span><span class="step-txt">討論：烹煮如何改變味道？傳統料理方式的依據？</span></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">RADAR CHARTS · 七種野菜風味圖譜</span>
+        <h3 class="idt-section-title">每株野菜的風味指紋（熟食評分）</h3>
+        <div class="radar-grid">
+          ${Object.keys(FLAVOR_DATA).map(id=>{const pl=plants[id];return `<div class="radar-card"><h5>${pl.chinese}</h5><span class="amis-label">${pl.amis}</span>${radarSVG(id)}</div>`;}).join('')}
+        </div>
+        <div class="idt-card" style="margin-top:20px;"><h4>📝 如何解讀雷達圖？</h4><p>面積越大代表風味越豐富複雜；各軸凸出代表該味道特別顯著。龍葵的「苦」軸最高，正呼應族人說的「苦後甘」；構樹果實的「甘」軸最高，是最容易接受的入門野菜。</p></div>
+      </div>
+    </div>`;
+
+  } else if (toolId==='ai') {
+    html=`<div class="idt-hero">
+      <span class="idt-tag">AI IDENTIFICATION · 人工智慧辨識訓練</span>
+      <h1 class="idt-title">教電腦認識野菜</h1>
+      <p class="idt-sub">學生化身「AI 訓練師」，使用 Google Teachable Machine 為七種阿美族野菜建立影像辨識模型。訓練 AI 的過程，反而是最深刻的植物學習——你必須完全理解植物特徵，才能教會電腦。</p>
+    </div>
+    <div class="idt-body">
+      <div class="idt-section">
+        <span class="idt-section-label">PLATFORM · 工具介紹</span>
+        <h3 class="idt-section-title">Google Teachable Machine</h3>
+        <div class="idt-card"><p>Google 開發的免費機器學習工具，不需要寫程式碼，只需上傳圖片、設定分類、按下訓練，就能建立影像辨識 AI 模型。每個學生小組負責一種野菜，成為該植物的「專屬 AI 訓練師」。</p></div>
+        <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+          <a href="https://teachablemachine.withgoogle.com/train/image" target="_blank"
+             style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:var(--ink);color:#fff;border-radius:10px;text-decoration:none;font-family:var(--mono);font-size:13px;letter-spacing:1px;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+            🤖 開啟 Teachable Machine
+          </a>
+          <a href="https://drive.google.com/file/d/1x7rbMZ3y4omR7kLUsCYKtWHdbtpxhAUV/view?usp=sharing" target="_blank"
+             style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:transparent;color:var(--ink);border:1.5px solid var(--warm);border-radius:10px;text-decoration:none;font-family:var(--mono);font-size:13px;letter-spacing:1px;">
+            📥 下載範例檔案
+          </a>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">WORKFLOW · 五步驟訓練流程</span>
+        <h3 class="idt-section-title">從拍照到模型優化</h3>
+        <div class="idt-steps">
+          <div class="idt-step"><span class="step-num">STEP 01</span><span class="step-icon">📸</span><span class="step-txt">多角度、多光線拍攝野菜照片，每株累積 40 張以上</span></div>
+          <div class="idt-step"><span class="step-num">STEP 02</span><span class="step-icon">🗂</span><span class="step-txt">建立七個類別，將照片上傳至對應分類</span></div>
+          <div class="idt-step"><span class="step-num">STEP 03</span><span class="step-icon">⚙️</span><span class="step-txt">平台分析葉形、顏色、紋理，建立機器學習模型</span></div>
+          <div class="idt-step"><span class="step-num">STEP 04</span><span class="step-icon">🔬</span><span class="step-txt">用新照片或真實葉片測試 AI 辨識準確率</span></div>
+          <div class="idt-step"><span class="step-num">STEP 05</span><span class="step-icon">🔧</span><span class="step-txt">分析辨識錯誤原因，補充多樣化訓練照片</span></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">INSIGHT · 最深刻的學習在除錯時</span>
+        <h3 class="idt-section-title">AI 搞錯了——學生才真正理解植物</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;">
+          <div class="idt-card"><h4>❓ 常見辨識錯誤</h4><p>龍葵與紫背草容易混淆（葉形相似）；山蘇的幼葉與成葉特徵差異大；拍攝角度不足導致誤判。</p></div>
+          <div class="idt-card"><h4>💡 除錯帶來的理解</h4><p>AI 混淆時，學生必須分析「是什麼特徵讓它們看起來一樣？」這比任何講解都更深入。</p></div>
+          <div class="idt-card"><h4>🎯 訓練的核心精神</h4><p>「你要先自己搞清楚，才能教會電腦。」訓練 AI 的過程，也在訓練自己的辨識能力。</p></div>
+          <div class="idt-card"><h4>🌱 與傳統知識的對話</h4><p>AI 看圖案特徵，阿美族看命名故事——兩種辨識系統的比較，讓學生思考知識的本質。</p></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">OUTCOME · 學習成果</span>
+        <h3 class="idt-section-title">完成訓練後的學生能做到</h3>
+        <div class="idt-card"><p style="line-height:2.2;">
+          ✅ 建立七種阿美族野菜的 AI 影像辨識模型<br>
+          ✅ 以批判性思維分析 AI 辨識失敗的原因<br>
+          ✅ 理解機器學習「特徵提取」的基本原理<br>
+          ✅ 深化對七種野菜外型特徵的觀察與記憶<br>
+          ✅ 體驗「傳統知識」與「數位知識」的異同
+        </p></div>
+      </div>
+    </div>`;
+  } else if (toolId==='quiz') {
+    html=`<div class="idt-hero">
+      <span class="idt-tag">PERSONALITY QUIZ · 野菜心理測驗</span>
+      <h1 class="idt-title">你是哪一種野菜？</h1>
+      <p class="idt-sub">七種阿美族野菜，七種生命個性。透過幾個關於性格、習慣與感受的問題，找到屬於你的那株野菜——讓植物知識從課本走入自我認識。</p>
+    </div>
+    <div class="idt-body">
+      <div class="idt-section">
+        <span class="idt-section-label">EDUCATIONAL VALUE · 教育意義</span>
+        <h3 class="idt-section-title">為什麼要做野菜心理測驗？</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;">
+          <div class="idt-card"><h4>🌱 情感連結</h4><p>當學生「成為」某種野菜後，會對那株植物產生強烈的個人連結，大幅提升記憶深度與學習動機。</p></div>
+          <div class="idt-card"><h4>📖 文化滲透</h4><p>測驗結果說明中融入阿美族文化知識——學生在閱讀「自己的野菜」時，自然吸收了族語名稱、採集故事與飲食習慣。</p></div>
+          <div class="idt-card"><h4>💬 班級互動</h4><p>「你是什麼野菜？」成為班上自然發生的話題，讓七種植物在社交互動中反覆出現，形成集體記憶。</p></div>
+          <div class="idt-card"><h4>🎯 差異化學習</h4><p>每個人的測驗結果不同，引導各自深入研究「自己的野菜」，適合分組探究與個人報告設計。</p></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">HOW TO PLAY · 玩法說明</span>
+        <h3 class="idt-section-title">測驗流程</h3>
+        <div class="idt-steps">
+          <div class="idt-step"><span class="step-num">STEP 01</span><span class="step-icon">🤔</span><span class="step-txt">回答 8–10 個關於性格與生活習慣的情境問題（紙本或數位版）</span></div>
+          <div class="idt-step"><span class="step-num">STEP 02</span><span class="step-icon">🌿</span><span class="step-txt">依據答案對應到七種野菜之一，獲得專屬的「野菜個性說明書」</span></div>
+          <div class="idt-step"><span class="step-num">STEP 03</span><span class="step-icon">📚</span><span class="step-txt">閱讀對應野菜的文化故事、採集方式、阿美族語名稱與料理方法</span></div>
+          <div class="idt-step"><span class="step-num">STEP 04</span><span class="step-icon">🗣️</span><span class="step-txt">向班上介紹「我的野菜」——從個性出發，延伸到植物知識報告</span></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">RESULTS · 七種野菜個性</span>
+        <h3 class="idt-section-title">你是哪一種？</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px;">
+          ${Object.values(plants).map(p=>`
+            <div onclick="showPlant('${p.id}')" style="background:#fff;border:2px solid ${p.color}44;border-radius:12px;padding:16px;cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:12px;height:12px;border-radius:50%;background:${p.color};flex-shrink:0;"></div>
+                <div style="font-size:16px;font-weight:900;font-family:var(--serif);">${p.chinese}</div>
+                <div style="font-size:11px;font-family:var(--mono);color:#999;margin-left:auto;">${p.amis}</div>
+              </div>
+              <p style="font-size:12px;line-height:1.7;color:#555;margin:0;">${p.personality ? p.personality.split('\n')[0] : '探索中...'}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>`;
+  } else if (toolId==='game') {
+    html=`<div class="idt-hero">
+      <span class="idt-tag">BOARD GAME · 野菜桌遊</span>
+      <h1 class="idt-title">Dateng 野菜探險家桌遊</h1>
+      <p class="idt-sub">以七種阿美族野菜為主角的探究桌遊，透過採集、辨識、料理三個關卡，讓玩家在遊戲中自然建構完整的野菜知識網絡。</p>
+    </div>
+    <div class="idt-body">
+      <div class="idt-section">
+        <span class="idt-section-label">PLAY NOW · 線上遊戲</span>
+        <h3 class="idt-section-title">立即開始</h3>
+        <div style="margin-top:12px;border-radius:14px;overflow:hidden;border:2px solid var(--warm);box-shadow:0 8px 32px rgba(0,0,0,0.08);">
+          <iframe src="https://view.genially.com/6842555f180c2c8579db5324"
+            width="100%" height="540" style="border:0;display:block;" allowfullscreen loading="lazy">
+          </iframe>
+        </div>
+        <div style="margin-top:10px;text-align:right;">
+          <a href="https://view.genially.com/6842555f180c2c8579db5324" target="_blank"
+             style="font-size:12px;font-family:var(--mono);color:var(--teal);text-decoration:none;letter-spacing:1px;">↗ 在新視窗全螢幕遊玩</a>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">EDUCATIONAL VALUE · 教育意義</span>
+        <h3 class="idt-section-title">為什麼用桌遊學野菜？</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;">
+          <div class="idt-card"><h4>🎲 反覆接觸不枯燥</h4><p>在遊戲過程中，植物名稱、特徵、用途被反覆提及，透過遊戲情境自然記憶，比死背更有效。</p></div>
+          <div class="idt-card"><h4>🤝 合作與競爭並存</h4><p>玩家需要運用知識做出決策，促進討論與協作，同時激發對植物知識的好奇心與探究動機。</p></div>
+          <div class="idt-card"><h4>🌿 文化情境融入</h4><p>遊戲情境設定在部落採集場景，玩家在阿美族文化脈絡中學習，而非抽離情境的背誦。</p></div>
+          <div class="idt-card"><h4>📊 即時回饋</h4><p>遊戲規則提供即時對錯回饋，學生能立刻知道自己對植物特徵的掌握程度，形成有效的自我評估。</p></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">HOW TO PLAY · 玩法說明</span>
+        <h3 class="idt-section-title">遊戲規則</h3>
+        <div class="idt-steps">
+          <div class="idt-step"><span class="step-num">ROUND 01</span><span class="step-icon">🌱</span><span class="step-txt">採集關卡：根據季節與地形線索，判斷能採到哪種野菜</span></div>
+          <div class="idt-step"><span class="step-num">ROUND 02</span><span class="step-icon">🔍</span><span class="step-txt">辨識關卡：看圖片或描述特徵，搶答植物名稱與族語</span></div>
+          <div class="idt-step"><span class="step-num">ROUND 03</span><span class="step-icon">🍳</span><span class="step-txt">料理關卡：配對野菜與對應的傳統料理方式，完成餐桌挑戰</span></div>
+          <div class="idt-step"><span class="step-num">FINAL</span><span class="step-icon">🏆</span><span class="step-txt">積分最高者成為「部落野菜探險家」，獲得植物知識認證</span></div>
+        </div>
+      </div>
+    </div>`;
+  } else if (toolId==='ar') {
+    html=`<div class="idt-hero">
+      <span class="idt-tag">AUGMENTED REALITY · AR 擴增實境</span>
+      <h1 class="idt-title">讓野菜從圖卡躍然而出</h1>
+      <p class="idt-sub">以 AR 擴增實境技術，掃描野菜圖卡即可召喚 3D 植物模型、觸發採集故事與料理動畫。讓阿美族傳統植物知識突破平面，成為可觸碰的立體學習體驗。</p>
+    </div>
+    <div class="idt-body">
+      <div class="idt-section">
+        <span class="idt-section-label">EDUCATIONAL VALUE · 教育意義</span>
+        <h3 class="idt-section-title">AR 如何深化野菜學習？</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;">
+          <div class="idt-card"><h4>🌿 立體形態辨識</h4><p>360° 旋轉的 3D 野菜模型，讓學生能觀察到平面圖片看不到的葉背、莖段、根系特徵，大幅提升辨識精準度。</p></div>
+          <div class="idt-card"><h4>✨ 沉浸式文化情境</h4><p>觸碰植物模型即觸發阿美族採集故事、族語名稱與傳統用途說明，讓文化知識在互動體驗中自然傳遞。</p></div>
+          <div class="idt-card"><h4>📱 低門檻高參與</h4><p>只需手機或平板掃描圖卡即可啟動，無需額外設備。學生、家長都能在家中獨立探索，延伸學習場域。</p></div>
+          <div class="idt-card"><h4>🎬 多感官整合</h4><p>視覺（3D 模型）＋聽覺（族語發音）＋互動（觸碰觸發動畫）三感並用，對不同學習風格的學生都有效。</p></div>
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">AR CONTENT · 場景設計</span>
+        <h3 class="idt-section-title">DATENG AR 體驗內容</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px;">
+          ${Object.values(plants).map(p=>`
+            <div style="background:#fff;border:1px solid ${p.color}55;border-radius:12px;padding:16px 18px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:${p.color};"></div>
+                <b style="font-size:14px;">${p.chinese}</b>
+                <span style="font-size:11px;font-family:var(--mono);color:#aaa;margin-left:auto;">${p.amis}</span>
+              </div>
+              <div style="font-size:12px;line-height:1.8;color:#555;">
+                🫁 3D 植物模型<br>
+                👆 點擊觸發採集故事<br>
+                🍳 料理示範動畫
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="idt-section">
+        <span class="idt-section-label">HOW TO MAKE · 製作流程</span>
+        <h3 class="idt-section-title">五步驟建立野菜 AR 體驗</h3>
+        <div class="idt-steps">
+          <div class="idt-step"><span class="step-num">STEP 01</span><span class="step-icon">📸</span><span class="step-txt">拍攝或繪製野菜圖卡作為 AR 辨識標記（Image Target）</span></div>
+          <div class="idt-step"><span class="step-num">STEP 02</span><span class="step-icon">🧊</span><span class="step-txt">以 3D 建模工具（如 Poly Pizza / Sketchfab）取得或製作野菜 3D 模型</span></div>
+          <div class="idt-step"><span class="step-num">STEP 03</span><span class="step-icon">⚙️</span><span class="step-txt">在 AR 創作平台設定圖卡與 3D 模型的對應關係，新增觸碰互動邏輯</span></div>
+          <div class="idt-step"><span class="step-num">STEP 04</span><span class="step-icon">✍️</span><span class="step-txt">錄製族語發音、採集故事旁白，設定為觸碰後播放的音頻</span></div>
+          <div class="idt-step"><span class="step-num">STEP 05</span><span class="step-icon">📲</span><span class="step-txt">發布體驗，掃描 QR Code 即可用手機或平板啟動 AR 場景</span></div>
+        </div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('idtool-content').innerHTML = html;
+}
+
+function renderPlant(p) {
+  const taglines = p.tagline.split('\n');
+  const nutritionHTML = p.nutrition.map(n => `
+    <div class="nutrient-tag">
+      <span class="nt-icon">${n.icon}</span>
+      <div>
+        <div style="font-size:12px;font-weight:bold;">${n.label}</div>
+        <div class="nt-label" style="margin-top:2px;">${n.name}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('plant-content').innerHTML = `
+    <div class="plant-hero">
+      <div class="plant-names">
+        <span class="amis-name">${p.amis} · ${p.scientific}</span>
+        <h2>${p.chinese}</h2>
+        <div class="scientific">${p.scientific}</div>
+      </div>
+      <div class="plant-tagline">
+        <div class="tagline-text">${taglines.map(t=>`${t}<br>`).join('')}</div>
+        <div class="accent-bar" style="background:${p.color}"></div>
+      </div>
+    </div>
+    <div class="plant-color-bar" style="background:${p.color}"></div>
+
+    <div class="plant-content">
+      <div class="plant-section">
+        <span class="section-label">CULTURAL STORY · 文化故事</span>
+        <h3 class="section-title">這株植物與阿美族的關係</h3>
+        <div class="story-text">${p.story}</div>
+        ${p.quote ? `<div class="amis-quote">
+          <div class="quote-text">${p.quote.text}</div>
+          <div class="quote-attr">${p.quote.attr}</div>
+        </div>` : ''}
+      </div>
+
+      ${p.identification ? `<div class="plant-section">
+        <span class="section-label">IDENTIFICATION · 辨識特徵</span>
+        <h3 class="section-title">如何認識這株野菜</h3>
+        <div class="info-card" style="width:100%;background:rgba(223,255,0,0.04);border-color:rgba(223,255,0,0.2);">
+          <span class="card-tag">FIELD GUIDE</span>
+          <span class="card-emoji">🔍</span>
+          <p style="line-height:1.9;font-size:14px;">${p.identification}</p>
+        </div>
+      </div>` : ''}
+
+      ${p.personality ? `<div class="plant-section">
+        <span class="section-label">PERSONALITY · 你是哪種野菜？</span>
+        <h3 class="section-title">植物個性測驗結果</h3>
+        <div class="info-card" style="width:100%;background:rgba(155,142,196,0.08);border-color:rgba(155,142,196,0.3);">
+          <span class="card-tag">PLANT PERSONA</span>
+          <p style="line-height:2;font-size:14px;white-space:pre-line;">${p.personality}</p>
+        </div>
+      </div>` : ''}
+
+      <div class="plant-section">
+        <span class="section-label">PRACTICAL KNOWLEDGE · 採集與烹飪</span>
+        <h3 class="section-title">怎麼採、怎麼煮</h3>
+        <div class="info-grid">
+          <div class="info-card">
+            <span class="card-tag">HARVEST SEASON</span>
+            <span class="card-emoji">${p.season.icon}</span>
+            <h4>${p.season.title}</h4>
+            <p>${p.season.content}</p>
+          </div>
+          <div class="info-card" style="grid-column: span 2;">
+            <span class="card-tag">COOKING METHODS</span>
+            <span class="card-emoji">${p.cooking.icon}</span>
+            <h4>${p.cooking.title}</h4>
+            <p>${p.cooking.content}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="plant-section">
+        <span class="section-label">NUTRITION · 營養成分</span>
+        <h3 class="section-title">身體從這株野菜得到什麼</h3>
+        <div class="nutrition-list">${nutritionHTML}</div>
+      </div>
+
+      <div class="plant-section" style="padding-bottom: 60px;">
+        <span class="section-label">EXPLORE MORE · 繼續探索</span>
+        <h3 class="section-title">其他野菜</h3>
+        <div class="plant-strip">
+          ${Object.values(plants).filter(pp=>pp.id!==p.id).map(pp=>`
+            <button class="plant-strip-btn" onclick="showPlant('${pp.id}')">
+              <span class="psb-dot" style="background:${pp.color}"></span>
+              ${pp.chinese} <span style="color:#aaa;font-size:11px;font-weight:normal;margin-left:4px;font-family:var(--mono);">${pp.amis}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSection(id, s) {
+  // ── 特殊頁面：食譜總覽 ──────────────────────────────────────────
+  if (id === 'recipe_page') {
+    const recipeHTML = Object.values(plants).map(p => `
+      <div style="background:#fff;border:1px solid var(--warm);border-radius:14px;padding:28px 32px;box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid ${p.color}22;">
+          <div style="width:14px;height:14px;border-radius:50%;background:${p.color};flex-shrink:0;box-shadow:0 0 8px ${p.color}88;"></div>
+          <div>
+            <div style="font-size:20px;font-family:var(--serif);font-weight:900;color:var(--ink);">${p.chinese}</div>
+            <div style="font-size:11px;font-family:var(--mono);letter-spacing:2px;color:#999;">${p.amis}</div>
+          </div>
+          <div style="margin-left:auto;font-size:28px;">${p.cooking.icon}</div>
+        </div>
+        <div style="font-size:14px;line-height:2;color:#333;">${p.cooking.content}</div>
+        <button onclick="showPlant('${p.id}')" style="margin-top:16px;padding:6px 16px;background:transparent;color:var(--ink);border:1px solid var(--warm);border-radius:8px;font-size:12px;font-family:var(--mono);cursor:pointer;">查看完整介紹 →</button>
+      </div>
+    `).join('');
+
+    document.getElementById('section-content').innerHTML = `
+      <div class="section-hero">
+        <span class="tag">RECIPE · 野菜食譜</span>
+        <h2>七種野菜・全部料理法</h2>
+        <div class="desc">從部落餐桌到現代廚房，每一道料理都是與土地的對話。</div>
+      </div>
+      <div class="section-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-top:8px;">
+          ${recipeHTML}
+        </div>
+        <div style="margin-top:36px;padding:20px 24px;background:#f8f5ee;border-radius:12px;border-left:4px solid var(--neon);">
+          <div style="font-size:11px;font-family:var(--mono);letter-spacing:2px;color:#999;margin-bottom:6px;">COOKING TIP · 料理訣竅</div>
+          <p style="font-size:14px;line-height:1.9;color:#444;margin:0;">野菜料理的共同原則：<b>大火快炒、不過度烹煮</b>。多數野菜汆燙後即可食用，搭配阿美族傳統佐料（鹽、辣椒、小魚乾）最能展現風味。採集後越快料理越好，避免放置過久而苦化。</p>
+        </div>
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid #ddd;">
+          <button onclick="showSection('pathways')" style="padding:8px 18px;background:transparent;color:#888;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:var(--mono);cursor:pointer;">← 回到學習路徑</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // ── 特殊頁面：Google My Maps 數位採集地圖 ─────────────────────
+  if (id === 'map_page') {
+    document.getElementById('section-content').innerHTML = `
+      <div class="section-hero">
+        <span class="tag">DIGITAL MAP · 數位採集地圖</span>
+        <h2>地圖・空間路徑<br>數位採集地圖</h2>
+        <div class="desc">將部落採集知識轉為數位地圖，讓每個人都能找到野菜的蹤跡。</div>
+      </div>
+      <div class="section-body">
+
+        <!-- ─ 內嵌地圖 ─ -->
+        <div class="plant-section" style="padding-top:0;">
+          <span class="section-label">LIVE MAP · 長濱野菜數位採集地圖</span>
+          <div style="margin-top:16px;border-radius:14px;overflow:hidden;border:2px solid var(--warm);box-shadow:0 8px 32px rgba(0,0,0,0.08);">
+            <iframe
+              src="https://www.google.com/maps/d/u/0/embed?mid=1dNRsCTdmHcsPRHShSBC4SDOK5Lih2q4&ll=23.24424018643372,121.41495094999999&z=18"
+              width="100%" height="480" style="border:0;display:block;"
+              allowfullscreen loading="lazy">
+            </iframe>
+          </div>
+          <div style="margin-top:10px;text-align:right;">
+            <a href="https://www.google.com/maps/d/u/0/edit?mid=1dNRsCTdmHcsPRHShSBC4SDOK5Lih2q4" target="_blank"
+               style="font-size:12px;font-family:var(--mono);color:var(--teal);text-decoration:none;letter-spacing:1px;">
+              ↗ 在 Google Maps 中開啟完整地圖
+            </a>
+          </div>
+        </div>
+
+        <!-- ─ 教育意義 ─ -->
+        <div class="plant-section">
+          <span class="section-label">EDUCATIONAL VALUE · 數位採集地圖的教育意義</span>
+          <h3 class="section-title">為什麼要做採集地圖？</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:20px;">
+            <div style="background:#fff;border:1px solid var(--warm);border-radius:12px;padding:20px 22px;">
+              <div style="font-size:28px;margin-bottom:10px;">🌿</div>
+              <h4 style="font-size:15px;font-weight:bold;margin-bottom:8px;">傳統知識永久保存</h4>
+              <p style="font-size:13px;line-height:1.8;color:#555;margin:0;">耆老記憶中的採集路線與地點，透過地圖數位化，讓珍貴的族群生態知識不因人的離去而消逝，世代傳承。</p>
+            </div>
+            <div style="background:#fff;border:1px solid var(--warm);border-radius:12px;padding:20px 22px;">
+              <div style="font-size:28px;margin-bottom:10px;">📍</div>
+              <h4 style="font-size:15px;font-weight:bold;margin-bottom:8px;">在地知識主體性</h4>
+              <p style="font-size:13px;line-height:1.8;color:#555;margin:0;">由阿美族學生與部落族人自己製作的地圖，不是外來研究者的紀錄，而是部落自身對土地的詮釋與命名權。</p>
+            </div>
+            <div style="background:#fff;border:1px solid var(--warm);border-radius:12px;padding:20px 22px;">
+              <div style="font-size:28px;margin-bottom:10px;">🔗</div>
+              <h4 style="font-size:15px;font-weight:bold;margin-bottom:8px;">跨科整合學習</h4>
+              <p style="font-size:13px;line-height:1.8;color:#555;margin:0;">採集地圖同時整合地理（空間座標）、自然（物種辨識）、族語（命名）、社會（耆老訪談），是真實情境的跨域課程。</p>
+            </div>
+            <div style="background:#fff;border:1px solid var(--warm);border-radius:12px;padding:20px 22px;">
+              <div style="font-size:28px;margin-bottom:10px;">🌱</div>
+              <h4 style="font-size:15px;font-weight:bold;margin-bottom:8px;">永續採集與環境意識</h4>
+              <p style="font-size:13px;line-height:1.8;color:#555;margin:0;">記錄採集點的豐富度變化，讓學生觀察物種與環境的關係，建立「採集有節制」的生態倫理觀。</p>
+            </div>
+            <div style="background:#fff;border:1px solid var(--warm);border-radius:12px;padding:20px 22px;">
+              <div style="font-size:28px;margin-bottom:10px;">📲</div>
+              <h4 style="font-size:15px;font-weight:bold;margin-bottom:8px;">真實任務感</h4>
+              <p style="font-size:13px;line-height:1.8;color:#555;margin:0;">學生不只是「學習者」，而是實際的知識生產者。地圖會被真正使用，讓學習有真實的社會價值與成就感。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─ 製作步驟 ─ -->
+        <div class="plant-section">
+          <span class="section-label">HOW TO · 地圖製作步驟</span>
+          <h3 class="section-title">五步驟建立你的採集地圖</h3>
+          <div style="display:grid;gap:16px;margin-top:20px;">
+
+
+
+          <!-- Step 1 -->
+          <div style="background:#fff;border:1px solid var(--warm);border-radius:14px;padding:24px 28px;display:flex;gap:20px;align-items:flex-start;">
+            <div style="min-width:40px;height:40px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;">1</div>
+            <div>
+              <h4 style="font-size:17px;font-family:var(--serif);font-weight:bold;margin-bottom:8px;">開啟 Google My Maps</h4>
+              <p style="font-size:14px;line-height:1.9;color:#444;margin:0;">前往 <b>mymaps.google.com</b>，登入 Google 帳號後點擊「建立新地圖」。建議使用學校 Google Workspace 帳號，方便與師生共享。</p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div style="background:#fff;border:1px solid var(--warm);border-radius:14px;padding:24px 28px;display:flex;gap:20px;align-items:flex-start;">
+            <div style="min-width:40px;height:40px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;">2</div>
+            <div>
+              <h4 style="font-size:17px;font-family:var(--serif);font-weight:bold;margin-bottom:8px;">建立野菜分類圖層</h4>
+              <p style="font-size:14px;line-height:1.9;color:#444;margin:0;">每種野菜建立一個「圖層」，如「構樹採集點」「山蘇生長區」。圖層可設定不同顏色，讓地圖一目了然。點擊左側「新增圖層」，為每層命名並設定顏色與圖示。</p>
+              <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;">
+                ${Object.values(plants).map(p=>`<span style="padding:4px 12px;border-radius:20px;font-size:12px;font-family:var(--mono);background:${p.color}22;border:1px solid ${p.color}66;color:var(--ink);">${p.chinese}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div style="background:#fff;border:1px solid var(--warm);border-radius:14px;padding:24px 28px;display:flex;gap:20px;align-items:flex-start;">
+            <div style="min-width:40px;height:40px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;">3</div>
+            <div>
+              <h4 style="font-size:17px;font-family:var(--serif);font-weight:bold;margin-bottom:8px;">標記採集點・填寫資訊</h4>
+              <p style="font-size:14px;line-height:1.9;color:#444;margin:0;">在地圖上點擊採集地點，標記圖釘後填寫：<b>植物名稱（中文+阿美族語）、採集季節、數量豐富度（多/中/少）、地形特徵、注意事項</b>。可附上現場拍攝照片，讓記錄更完整。</p>
+              <div style="margin-top:12px;padding:12px 16px;background:#f8f5ee;border-radius:8px;font-size:13px;line-height:1.8;color:#555;">
+                📌 <b>建議欄位格式：</b><br>
+                名稱：山蘇 lokot<br>
+                季節：全年／以春季嫩芽最佳<br>
+                豐富度：★★★ 豐富<br>
+                備註：沿溪谷岩壁生長，海拔 200m
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div style="background:#fff;border:1px solid var(--warm);border-radius:14px;padding:24px 28px;display:flex;gap:20px;align-items:flex-start;">
+            <div style="min-width:40px;height:40px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;">4</div>
+            <div>
+              <h4 style="font-size:17px;font-family:var(--serif);font-weight:bold;margin-bottom:8px;">設定共享與嵌入</h4>
+              <p style="font-size:14px;line-height:1.9;color:#444;margin:0;">點擊右上角「分享」，設為「知道連結的人可以檢視」，複製連結分享給家長與學生。也可選擇「嵌入我的網站」取得程式碼，放入學校網頁或本系統，讓地圖直接在頁面中顯示。</p>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div style="background:#fff;border:1px solid var(--warm);border-radius:14px;padding:24px 28px;display:flex;gap:20px;align-items:flex-start;">
+            <div style="min-width:40px;height:40px;background:var(--neon);color:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0;">5</div>
+            <div>
+              <h4 style="font-size:17px;font-family:var(--serif);font-weight:bold;margin-bottom:8px;">學生實作任務設計</h4>
+              <p style="font-size:14px;line-height:1.9;color:#444;margin:0;">帶領學生進行「採集任務」：每組負責一種野菜，手機拍照 + 標記地點 + 口頭訪問耆老，回校後將資料更新到地圖。期末進行「地圖發表」，讓每組介紹自己標記的採集路線。</p>
+              <div style="margin-top:10px;padding:10px 14px;background:rgba(223,255,0,0.08);border:1px solid rgba(223,255,0,0.3);border-radius:8px;font-size:13px;color:#555;line-height:1.7;">
+                🌿 <b>課程連結：</b>地圖・空間路徑 × 田野・社會路徑 × 語言採集路徑，三條路徑可透過一次野外採集同時完成！
+              </div>
+            </div>
+          </div>
+
+          </div><!-- end 步驟 grid -->
+        </div><!-- end 製作步驟 plant-section -->
+
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid #ddd;">
+          <button onclick="showSection('pathways')" style="padding:8px 18px;background:transparent;color:#888;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:var(--mono);cursor:pointer;">← 回到學習路徑</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  let bodyHTML = '';
+  if (id === 'disciplines') {
+    bodyHTML = `<div class="disc-grid">
+      ${s.cards.map(c=>`<div class="disc-card">
+        <div class="disc-icon">${c.icon}</div>
+        <h3>${c.title}</h3>
+        <div class="disc-en">${c.en}</div>
+        <p>${c.body}</p>
+      </div>`).join('')}
+    </div>`;
+  } else {
+    const PAGE_MAP = {
+      '料理・食育路徑': 'recipe_page',
+      '地圖・空間路徑': 'map_page',
+    };
+    bodyHTML = `<div class="disc-grid" style="grid-template-columns: repeat(2, 1fr);">
+      ${s.cards.map(c=>{
+        const pageId = PAGE_MAP[c.title];
+        const btn = pageId
+          ? `<button onclick="showSection('${pageId}')" style="margin-top:14px;padding:8px 18px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-size:13px;font-family:var(--mono);letter-spacing:1px;cursor:pointer;">查看詳細頁面 →</button>`
+          : '';
+        return `<div class="award-card">
+          <div style="font-size: 11px; color: #aaa; letter-spacing: 3px; font-family: var(--mono); margin-bottom:8px;">${c.num||''}</div>
+          <h3 style="font-size: 22px; font-family: var(--serif); font-weight:bold; margin-bottom:12px;">${c.title}</h3>
+          <p style="font-size: 15px; color: #444; line-height: 1.7;">${c.body}</p>
+          ${btn}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  document.getElementById('section-content').innerHTML = `
+    <div class="section-hero">
+      <span class="tag">${s.tag}</span>
+      <h2>${s.title.replace('\n','<br>')}</h2>
+      <div class="desc">${s.desc}</div>
+    </div>
+    <div class="section-body">
+      ${bodyHTML}
+      <div style="margin-top:48px;padding-top:32px;border-top:1px solid #ddd;">
+        <span class="section-label">EXPLORE · 探索植物</span>
+        <div class="plant-strip">
+          ${Object.values(plants).map(pp=>`
+            <button class="plant-strip-btn" onclick="showPlant('${pp.id}')">
+              <span class="psb-dot" style="background:${pp.color}"></span>
+              ${pp.chinese}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════
+   D3 GRAPH INIT
+═══════════════════════════════════════════════════ */
+(function initGraph() {
+  const svg = d3.select('#graph-svg');
+  const W = window.innerWidth, H = window.innerHeight;
+  svg.attr('viewBox', `0 0 ${W} ${H}`);
+
+  svg.append('defs').append('pattern')
+    .attr('id','dot-grid').attr('width',24).attr('height',24).attr('patternUnits','userSpaceOnUse')
+    .append('circle').attr('cx',12).attr('cy',12).attr('r',1).attr('fill','rgba(255,255,255,0.06)');
+  svg.append('rect').attr('width',W).attr('height',H).attr('fill','url(#dot-grid)');
+
+  const defs = svg.select('defs');
+  const filter = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+  filter.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
+  const feMerge = filter.append('feMerge');
+  feMerge.append('feMergeNode').attr('in','blur');
+  feMerge.append('feMergeNode').attr('in','SourceGraphic');
+
+  // Stronger glow for plant nodes
+  const fPlant = defs.append('filter').attr('id','glow-plant').attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%');
+  fPlant.append('feGaussianBlur').attr('stdDeviation','7').attr('result','blur');
+  const fmP = fPlant.append('feMerge');
+  fmP.append('feMergeNode').attr('in','blur');
+  fmP.append('feMergeNode').attr('in','SourceGraphic');
+
+  const container = svg.append('g');
+
+  svg.call(d3.zoom()
+    .scaleExtent([0.3, 3])
+    .on('zoom', e => container.attr('transform', e.transform)));
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(d => {
+      if (d.source.id === 'dateng' || d.target.id === 'dateng') {
+        if (d.source.type === 'species' || d.target.type === 'species') return 140;
+        if (d.source.type === 'discipline' || d.target.type === 'discipline') return 190;
+        return 220;
+      }
+      return 100;
+    }).strength(d => d.strength || 0.3))
+    .force('charge', d3.forceManyBody().strength(d => {
+      if (d.type === 'core') return -800;
+      if (d.type === 'species') return -350;
+      return -200;
+    }))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('collide', d3.forceCollide(d => d.size + 14))
+    .force('topAnchor', d3.forceY(H * 0.18).strength(d => d.type === 'core' ? 0.7 : 0));
+
+  const link = container.append('g')
+    .selectAll('line').data(links).join('line')
+    .attr('stroke', d => {
+      const src = nodes.find(n => n.id === (d.source.id||d.source));
+      const tgt = nodes.find(n => n.id === (d.target.id||d.target));
+      const t = src && src.type !== 'core' ? src.type : (tgt && tgt.type);
+      return TYPE_COLOR[t] || '#333344';
+    })
+    .attr('stroke-opacity', 0.35)
+    .attr('stroke-width', d => (d.strength||0.3) * 2.5);
+
+  svg.on('click.bg', (e) => {
+    if (e.target === svg.node() || e.target.tagName === 'rect') resetFocus();
+  });
+
+  const nodeG = container.append('g')
+    .selectAll('g').data(nodes).join('g')
+    .style('cursor', 'pointer')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+    )
+    .on('click', (e, d) => {
+      e.stopPropagation();
+      focusNode(d, nodeG, link);
+    })
+    .on('mouseover', (e, d) => {
+      const tt = document.getElementById('graph-tooltip');
+      const nodeColor = d.plant ? PLANT_COLOR[d.plant] : TYPE_COLOR[d.type];
+      tt.innerHTML = `<b style="color:${nodeColor}">${d.label.replace('\n',' ')}</b><br><span style="font-size:9px;color:#666;">點擊查看關聯節點</span>`;
+      tt.style.opacity = '1';
+      tt.style.left = (e.pageX + 12) + 'px';
+      tt.style.top  = (e.pageY - 20) + 'px';
+    })
+    .on('mousemove', e => {
+      const tt = document.getElementById('graph-tooltip');
+      tt.style.left = (e.pageX + 12) + 'px';
+      tt.style.top  = (e.pageY - 20) + 'px';
+    })
+    .on('mouseout', () => {
+      document.getElementById('graph-tooltip').style.opacity = '0';
+    });
+
+  // ── All interactive nodes: single glow halo using node colour ──
+  nodeG.filter(d => d.plant || d.section || d.isAbout || d.isAward || d.isIdSystem || d.idTool)
+    .append('circle')
+    .attr('r', d => d.size + 10)
+    .attr('fill', d => d.plant ? PLANT_COLOR[d.plant] : TYPE_COLOR[d.type])
+    .attr('opacity', 0.18)
+    .attr('filter', 'url(#glow)');
+
+  nodeG.append('circle')
+    .attr('r', d => d.size)
+    .attr('fill', d => {
+      if (d.type === 'core') return TYPE_COLOR.core;
+      if (d.plant) return PLANT_COLOR[d.plant] || TYPE_COLOR[d.type];
+      return TYPE_COLOR[d.type];
+    })
+    .attr('fill-opacity', d => d.type === 'core' ? 1 : 0.85)
+    .attr('stroke', d => d.plant ? '#fff' : 'none')
+    .attr('stroke-width', d => d.plant ? 1.5 : 0)
+    .attr('stroke-opacity', 0.3);
+
+  nodeG.each(function(d) {
+    const g = d3.select(this);
+    const lines = d.label.split('\n');
+    const lineH = d.type === 'core' ? 14 : 10;
+    const fontSize = d.type === 'core' ? 12 : (d.size >= 28 ? 10 : 9);
+    const textColor = d.type === 'core' ? '#16161e' : '#fff';
+    const totalH = (lines.length - 1) * lineH;
+    lines.forEach((line, i) => {
+      g.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .attr('y', -totalH/2 + i * lineH)
+        .attr('font-size', fontSize)
+        .attr('font-family', "'Courier New', monospace")
+        .attr('font-weight', d.type === 'core' ? 'bold' : 'normal')
+        .attr('fill', textColor)
+        .attr('pointer-events', 'none')
+        .text(line);
+    });
+  });
+
+  nodeG
+    .on('mouseover.ring', function() {
+      d3.select(this).selectAll('circle').filter((d,i) => i === 0).attr('opacity', 0.3);
+    })
+    .on('mouseout.ring', function() {
+      d3.select(this).selectAll('circle').filter((d,i) => i === 0).attr('opacity', 0.12);
+    });
+
+  sim.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    nodeG.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  const legendData = Object.entries(TYPE_COLOR).map(([type, color]) => ({
+    type, color,
+    label: { core:'核心 CORE', species:'植物物種 SPECIES', discipline:'學科知識 DISCIPLINE',
+             concept:'文化概念 CONCEPT', holder:'知識傳承者 HOLDER',
+             pathway:'學習路徑 PATHWAY', outcome:'成果展現 OUTCOME' }[type]
+  }));
+  const legend = d3.select('#graph-legend');
+  legendData.forEach(d => {
+    const row = legend.append('div').attr('class','legend-item');
+    row.append('div').attr('class','legend-dot').style('background', d.color);
+    row.append('span').text(d.label);
+  });
+
+  window.addEventListener('resize', () => {
+    const nW = window.innerWidth, nH = window.innerHeight;
+    svg.attr('viewBox', `0 0 ${nW} ${nH}`);
+    sim.force('center', d3.forceCenter(nW/2, nH/2)).alpha(0.3).restart();
+  });
+})();
+
+// keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('node-panel').classList.contains('open')) {
+      resetFocus();
+    } else {
+      showGraph();
+    }
+  }
+});
+</script>
+</body>
+</html>
