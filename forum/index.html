@@ -1,0 +1,1025 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="2026 原住民族教育論壇分享簡報（公開版）：Dateng 野菜探險家－餐桌上的永續智慧。Salimpo 阿美山海文化實驗小學（寧埔國小）賴奕芸。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dateng 野菜探險家｜餐桌上的永續智慧">
+<meta property="og:description" content="2026 原住民族教育論壇分享簡報（公開版，不含可辨識學生臉孔）">
+<meta property="og:url" content="https://laierin615.github.io/laierindateng/forum/">
+<meta property="og:image" content="https://laierin615.github.io/laierindateng/forum/assets/cover.jpg">
+<title>Dateng 野菜探險家</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap">
+<style>
+:root{
+  /* Layout: a fixed 1600×900 stage scaled to the window. Ink slides bookend the talk (cover, question, graph, ending);
+     paper slides carry the classroom cases like pages of a field notebook. Courier specimen labels;
+     neon is the highlighter, rust is the teacher's voice. Colours follow the Dateng website. */
+  --void:#0b0b10;
+  --ink:#16161e; --ink-2:#1e1e2e; --ink-3:#2a2a3a;
+  --paper:#F8F4EC; --sand:#EDE5D0; --warm:#D4C9A8;
+  --neon:#DFFF00; --rust:#C1440E; --sage:#6B8F6B; --amber:#F5A623;
+  --on-paper:#1f1d18; --on-paper-2:#5d584d; --on-ink:#F3EFE4; --on-ink-2:#a8a499;
+  --rule-paper:rgba(31,29,24,.16); --grid-paper:rgba(31,29,24,.045);
+  --rule-ink:rgba(243,239,228,.16); --dot-ink:rgba(243,239,228,.07);
+  --veil:rgba(22,22,30,.25); --shade:rgba(10,10,14,.6); --shadow:rgba(20,18,12,.22); --deep-shadow:rgba(0,0,0,.5);
+  --panel:rgba(30,30,46,.96); --scrim:rgba(11,11,16,.95); --black:#000;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",Georgia,serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"Courier Prime","Courier New",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--void);color:var(--on-ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+
+/* ---------- stage ---------- */
+#viewport{position:fixed;inset:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px);overflow:hidden}
+#frame{position:relative;width:100%;height:100%}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(var(--k,.5));transform-origin:50% 50%;overflow:hidden;background:var(--ink)}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .4s ease,visibility 0s linear .4s;overflow:hidden}
+.slide.on{opacity:1;visibility:visible;transition:opacity .4s ease}
+.slide.ink{background-color:var(--ink);background-image:radial-gradient(circle,var(--dot-ink) 1.3px,transparent 1.8px);background-size:28px 28px;color:var(--on-ink)}
+.slide.paper{background-color:var(--paper);background-image:linear-gradient(var(--grid-paper) 1px,transparent 1px),linear-gradient(90deg,var(--grid-paper) 1px,transparent 1px);background-size:40px 40px;color:var(--on-paper)}
+.pad{position:absolute;inset:64px 96px 70px;display:flex;flex-direction:column}
+#pageno{position:absolute;right:40px;bottom:24px;z-index:4;font:400 17px var(--mono);letter-spacing:.12em;color:var(--on-paper-2)}
+#stage[data-tone="ink"] #pageno{color:var(--on-ink-2)}
+#progress{position:absolute;left:0;bottom:0;z-index:4;height:5px;width:0;background:var(--neon);transition:width .45s ease}
+
+/* ---------- type ---------- */
+.kicker{display:flex;align-items:baseline;gap:16px;font:700 21px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--rust)}
+.ink .kicker{color:var(--neon)}
+.kicker small{font:400 18px var(--sans);letter-spacing:.04em;text-transform:none;color:var(--on-paper-2)}
+.title{margin:12px 0 0;font:700 70px/1.15 var(--serif);letter-spacing:.01em;text-wrap:balance}
+.head-row{display:flex;align-items:baseline;gap:30px}
+.claim{margin:0;font:700 36px/1.3 var(--serif);color:var(--rust)}
+.body{margin:0;font:400 31px/1.6 var(--sans)}
+.cap{font:400 19px/1.35 var(--mono);letter-spacing:.03em;color:var(--on-paper-2)}
+.ink .cap{color:var(--on-ink-2)}
+.am{font-family:var(--mono);font-style:italic;letter-spacing:0}
+.hl{background:linear-gradient(transparent 58%,var(--neon) 58%,var(--neon) 94%,transparent 94%);padding:0 .06em}
+.teacher{margin:0;font:700 34px/1.4 var(--serif);color:var(--rust)}
+figure{margin:0}
+.ph{position:relative;overflow:hidden;background:var(--sand)}
+.ph img{display:block;width:100%;height:100%;object-fit:cover}
+.ph.contain img{object-fit:contain;background:var(--paper)}
+.ph figcaption{position:absolute;left:0;bottom:0;padding:6px 12px;font:400 17px/1.25 var(--mono);letter-spacing:.03em;color:var(--on-ink);background:var(--shade)}
+.step{opacity:0;transform:translateY(14px);transition:opacity .35s ease,transform .35s ease}
+.step.shown{opacity:1;transform:none}
+.sort-row{display:flex;align-items:center;gap:16px;margin-top:auto}
+.sort-lead{font:500 28px var(--sans);margin-right:6px}
+.chip{padding:8px 22px;font:700 28px var(--sans);border:2px solid var(--on-paper);background:var(--neon);color:var(--on-paper)}
+.chip-b{background:var(--sand)}
+.chip-q{background:transparent;border-style:dashed;border-color:var(--on-paper-2);color:var(--on-paper-2)}
+
+/* ---------- 01 cover ---------- */
+.cover-photo{position:absolute}
+.cover-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.cover-photo.bleed{top:0;right:0;width:660px;height:900px}
+.cover-photo.bleed::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--ink) 0%,transparent 30%)}
+.cover-photo.card{top:96px;right:120px;width:470px;height:668px;border:14px solid var(--paper);transform:rotate(2deg);box-shadow:0 30px 70px var(--deep-shadow)}
+.cover-pad{right:760px}
+.cover-title{margin:70px 0 0;line-height:1}
+.cover-dateng{display:block;font:900 176px/.95 var(--serif);color:var(--neon);letter-spacing:-.01em}
+.cover-zh{display:block;margin-top:18px;font:900 118px/1.05 var(--serif);color:var(--on-ink)}
+.cover-sub{margin:34px 0 0;font:500 44px/1.3 var(--sans);color:var(--warm)}
+.cover-meta{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.cover-meta p{margin:0;font:400 25px/1.5 var(--sans);color:var(--on-ink-2)}
+.cover-meta b{font-weight:700;color:var(--on-ink)}
+.cover-note{margin:14px 0 0}
+
+/* ---------- 02 question ---------- */
+.q-bg{position:absolute;inset:0}
+.q-bg img{width:100%;height:100%;object-fit:cover;opacity:.24;filter:saturate(.75)}
+.q-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--veil) 0%,var(--ink) 88%)}
+.q-lead{margin:72px 0 0;font:400 36px/1.4 var(--sans);color:var(--on-ink-2)}
+.q-big{margin:8px 0 0;font:900 170px/1.1 var(--serif);color:var(--on-ink)}
+.q-big em{font-style:normal;color:var(--neon)}
+.q-three{list-style:none;margin:auto 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.q-three li{padding-top:18px;border-top:3px solid var(--neon);font:700 42px/1.3 var(--serif);color:var(--on-ink)}
+.q-three li span{display:block;margin-bottom:10px;font:700 22px var(--mono);letter-spacing:.14em;color:var(--neon)}
+
+/* ---------- 03 people ---------- */
+.s3{flex-direction:row;gap:64px}
+.s3-text{flex:1;min-width:0;display:flex;flex-direction:column}
+.s3-text .title span{color:var(--rust)}
+.s3-lead{margin-top:30px}
+.kin{list-style:none;margin:26px 0 22px;padding:0;display:flex;gap:18px}
+.kin li{display:flex;flex-direction:column;gap:2px;padding:10px 20px 12px;border:2px solid var(--on-paper);background:var(--paper)}
+.kin .am{font-size:38px;line-height:1.1}
+.kin small{font:500 22px var(--sans);color:var(--on-paper-2)}
+.bridge{margin-top:auto;padding:6px 0 6px 22px;border-left:6px solid var(--rust);display:flex;flex-direction:column;gap:8px}
+.bridge p{margin:0;font:500 28px/1.45 var(--sans)}
+.bridge .cap{display:inline-block;width:156px;color:var(--rust)}
+.s3-photo{flex:none;width:580px;box-shadow:0 18px 40px var(--shadow)}
+.s3-stack{flex:none;width:580px;display:flex;flex-direction:column;gap:18px}
+.s3-stack .ph{flex:1;box-shadow:0 14px 32px var(--shadow)}
+
+/* ---------- 04 course map ---------- */
+.s4-q{font-size:56px}
+.facts{display:flex;gap:60px;margin:28px 0 0}
+.facts div{display:flex;align-items:baseline;gap:14px}
+.facts dt{font:700 19px var(--mono);letter-spacing:.14em;color:var(--on-paper-2)}
+.facts dd{margin:0;font:700 42px var(--serif)}
+.facts small{margin-left:10px;font:400 20px var(--mono);color:var(--on-paper-2)}
+.phases{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:48px}
+.phases li{position:relative;display:flex;flex-direction:column;min-width:0}
+.phases li+li::before{content:"→";position:absolute;left:-38px;top:120px;font:700 30px var(--sans);color:var(--rust)}
+.phases .ph{height:270px;box-shadow:0 10px 24px var(--shadow)}
+.phases h3{margin:18px 0 4px;font:700 40px/1.2 var(--serif)}
+.phases p{margin:0;font:400 25px/1.45 var(--sans);color:var(--on-paper-2)}
+.s4-foot{margin:auto 0 0;padding-left:20px;border-left:6px solid var(--rust);font:500 30px/1.4 var(--sans)}
+
+/* ---------- 05 identify ---------- */
+.s5{display:grid;grid-template-columns:470px 1fr 330px;gap:40px;margin-top:30px;align-items:start}
+.s5-photo{height:352px}
+.s5-photo.wide{height:268px}
+.tags{list-style:none;margin:16px 0 0;padding:0;display:flex;gap:14px}
+.tags li{display:flex;align-items:baseline;gap:10px;padding:6px 14px;border:2px solid var(--on-paper);font:500 24px var(--sans);background:var(--paper)}
+.tags .am{font-size:27px}
+.s5-card .ph{height:374px;background:var(--paper);box-shadow:0 14px 34px var(--shadow)}
+.s5-card figcaption{margin-top:12px}
+.s5-q{display:flex;flex-direction:column;gap:20px}
+.s5-q .cap{color:var(--rust);font-weight:700;letter-spacing:.12em}
+
+/* ---------- 06 taste ---------- */
+.s6{display:grid;grid-template-columns:520px 1fr 300px;gap:36px;margin-top:28px;align-items:start}
+.s6-text{display:flex;flex-direction:column;gap:18px}
+.s6-q{margin:0;font:700 36px/1.4 var(--serif)}
+.tastes{list-style:none;margin:4px 0;padding:0;display:flex;gap:10px}
+.tastes li{width:62px;height:62px;display:grid;place-items:center;border:2px solid var(--on-paper);font:700 32px var(--serif);background:var(--paper)}
+.tastes li:nth-child(3){background:var(--neon)}
+.s6-record{margin:0;font:500 26px/1.5 var(--sans)}
+.s6-record .cap{display:block}
+.s6-mid{display:flex;flex-direction:column;gap:20px;min-width:0}
+.s6-scores{height:330px}
+.s6-cook{height:262px}
+.s6-dish{height:262px;box-sizing:border-box;padding:22px 26px;display:flex;flex-direction:column;justify-content:center;gap:12px;background:var(--sand);border:2px solid var(--on-paper)}
+.s6-dish p{margin:0;font:500 28px/1.5 var(--sans)}
+.s6-flavor{height:424px;box-shadow:0 14px 34px var(--shadow)}
+.s6-flavor-cap{margin-top:12px}
+
+/* ---------- 07 AI ---------- */
+.s7{display:grid;grid-template-columns:640px 1fr;gap:48px;margin-top:26px}
+.loop{list-style:none;margin:0;padding:0 0 0 52px;position:relative}
+.loop::before{content:"";position:absolute;left:14px;top:28px;bottom:30px;width:22px;border:3px solid var(--rust);border-right:0}
+.loop::after{content:"";position:absolute;left:30px;top:21px;border:8px solid transparent;border-left:12px solid var(--rust)}
+.loop li{display:flex;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid var(--rule-paper);font:500 29px/1.35 var(--sans)}
+.loop b{flex:none;width:26px;font:700 24px var(--mono);color:var(--rust)}
+.loop .am{font-size:28px}
+.s7-visual{position:relative;height:420px}
+.s7-tm{position:absolute;right:0;top:0;width:640px;height:360px;border:1px solid var(--rule-paper);box-shadow:0 18px 40px var(--shadow)}
+.s7-tm img{object-position:left top}
+.s7-photo{position:absolute;left:0;bottom:0;width:300px;height:190px;border:8px solid var(--paper);box-shadow:0 14px 30px var(--shadow)}
+.s7-bubble{position:absolute;right:0;bottom:0;width:470px;box-sizing:border-box;padding:16px 22px;background:var(--paper);border:2px solid var(--rust);font-size:30px}
+.rules{margin-top:auto;display:grid;grid-template-columns:1fr 1.7fr;gap:24px}
+.rules p{margin:0;padding:16px 22px;border:2px solid var(--on-paper);font:500 28px/1.4 var(--sans);background:var(--paper)}
+.rules .rule-hard{background:var(--ink);border-color:var(--ink);color:var(--neon);font-weight:700}
+
+/* ---------- 08 tell ---------- */
+.s8{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:28px}
+.s8-col{display:flex;flex-direction:column;min-width:0}
+.s8-img{height:280px}
+.s8-col h3{margin:18px 0 8px;font:700 36px/1.2 var(--serif)}
+.s8-col p{margin:0;font:400 24px/1.55 var(--sans)}
+.s8-col .cap{margin-top:8px}
+.s8-spirit{position:relative}
+.s8-spirit>.ph:first-child{position:absolute;inset:0 120px 0 0;background:var(--paper);border:1px solid var(--rule-paper)}
+.s8-spirit>.ph:first-child img{object-fit:contain}
+.s8-ar{position:absolute;right:0;bottom:0;width:200px;height:150px;border:6px solid var(--paper);box-shadow:0 10px 24px var(--shadow)}
+.spirits{width:100%;border-collapse:collapse;font:400 22px/1.35 var(--sans)}
+.spirits td{padding:7px 0;border-bottom:1px solid var(--rule-paper);vertical-align:baseline}
+.spirits td:last-child{font-weight:700;text-align:right}
+.spirits .am{font-size:23px}
+.book{display:grid;place-items:center;background:var(--sand)}
+.book-cover{position:relative;width:200px;height:250px;box-sizing:border-box;padding:24px 18px 18px 30px;display:flex;flex-direction:column;justify-content:space-between;background:var(--ink);color:var(--on-ink);box-shadow:10px 14px 0 var(--warm)}
+.book-cover::before{content:"";position:absolute;left:10px;top:0;bottom:0;width:3px;background:var(--neon)}
+.book-cover .am{font-size:25px;line-height:1.25;color:var(--neon)}
+.book-cover small{font:500 17px/1.4 var(--sans);color:var(--on-ink-2)}
+.s8-foot{margin:auto 0 0;font:500 28px/1.5 var(--sans)}
+
+/* ---------- 09 industry ---------- */
+.s9{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:26px}
+.s9.centered{margin-block:auto}
+.visit{display:flex;flex-direction:column;min-width:0}
+.visit-img{height:250px;margin-bottom:6px}
+.visit h3{margin:16px 0 14px;font:700 38px/1.2 var(--serif)}
+.salt{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;counter-reset:salt}
+.salt li{counter-increment:salt;padding-top:10px;border-top:3px solid var(--rust)}
+.salt li::before{content:counter(salt);display:block;font:700 18px var(--mono);color:var(--rust)}
+.salt b{display:block;font:700 26px/1.3 var(--sans)}
+.salt span{display:block;margin-top:4px;font:400 19px/1.4 var(--sans);color:var(--on-paper-2)}
+.visit-kid,.worry{margin:18px 0 0;font:500 25px/1.5 var(--sans)}
+.visit-kid .cap,.worry .cap{display:block;color:var(--rust);font-weight:700}
+.quote{margin:0;font:700 42px/1.3 var(--serif);color:var(--rust)}
+.quote cite{display:block;margin-top:8px;font:400 19px var(--mono);font-style:normal;color:var(--on-paper-2)}
+
+/* ---------- 10 graph ---------- */
+.s10{flex-direction:row;align-items:center;gap:56px}
+.s10-text{flex:none;width:540px;display:flex;flex-direction:column}
+.s10-text .body{margin-top:28px;font-size:30px}
+.url{margin:30px 0 6px;font:700 22px/1.35 var(--mono);color:var(--neon);overflow-wrap:anywhere}
+a.url{display:block;text-decoration:none}
+.browser{flex:1;min-width:0;background:var(--ink-2);border:1px solid var(--rule-ink);box-shadow:0 30px 70px var(--deep-shadow)}
+.browser-bar{height:40px;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--rule-ink);font:400 16px var(--mono);color:var(--on-ink-2)}
+.browser-bar i{width:11px;height:11px;border-radius:50%;background:var(--ink-3)}
+.browser-bar span{margin-left:12px}
+.browser img{display:block;width:100%;height:auto}
+
+/* ---------- 11 evidence ---------- */
+.awards{position:absolute;top:0;right:0;display:flex;gap:30px}
+.awards figure{display:flex;align-items:center;gap:14px}
+.awards .ph{width:84px;height:112px;box-shadow:0 8px 18px var(--shadow)}
+.awards figcaption{font:500 22px/1.4 var(--sans)}
+.awards b{display:block;font-weight:700}
+.works{display:grid;gap:40px;margin-top:40px}
+.works-3{grid-template-columns:repeat(3,1fr)}
+.works-2{grid-template-columns:repeat(2,560px)}
+.works-2 .ph{height:380px}
+.works figure{display:flex;flex-direction:column;min-width:0}
+.works .ph{height:360px;box-shadow:0 14px 30px var(--shadow)}
+.works figcaption{display:flex;align-items:baseline;gap:14px;margin-top:16px}
+.works figcaption b{font:700 34px var(--serif)}
+.s11-foot{margin:auto 0 0;font:500 30px/1.5 var(--sans)}
+
+/* ---------- 12 kamamit ---------- */
+.km-award{position:absolute;top:2px;right:0;margin:0}
+.km-photos{display:grid;gap:28px;margin-top:26px}
+.km-3{grid-template-columns:repeat(3,1fr)}
+.km-3 .ph{height:262px}
+.km-1{grid-template-columns:620px 1fr;align-items:center}
+.km-1 .ph{height:340px}
+.timeline{list-style:none;margin:30px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.timeline li{display:flex;flex-direction:column;gap:4px;padding-top:14px;border-top:3px solid var(--on-paper);position:relative}
+.timeline li::before{content:"";position:absolute;left:0;top:-9px;width:15px;height:15px;border-radius:50%;background:var(--rust)}
+.timeline li:last-child::before{background:var(--neon);box-shadow:0 0 0 2px var(--on-paper)}
+.when{font:700 19px var(--mono);letter-spacing:.06em;color:var(--rust)}
+.timeline b{font:700 31px/1.3 var(--serif)}
+.timeline li>span:last-child{font:400 21px/1.45 var(--sans);color:var(--on-paper-2)}
+.km-quote,.km-quote-big{margin:0;font:700 30px/1.5 var(--serif)}
+.km-quote{margin-top:auto;padding-left:20px;border-left:6px solid var(--neon)}
+.km-quote-big{font-size:38px;padding-left:24px;border-left:6px solid var(--neon)}
+.km-quote cite,.km-quote-big cite{display:block;margin-top:6px;font:400 19px var(--mono);font-style:normal;color:var(--on-paper-2)}
+
+/* ---------- 13 errata ---------- */
+.errata{margin-top:44px;background:var(--sand);border:2px solid var(--on-paper);box-shadow:10px 12px 0 var(--warm)}
+.er-head,.er-row{display:grid;grid-template-columns:620px 320px 1fr;gap:28px;padding:0 30px}
+.er-head{padding-top:16px;padding-bottom:14px;border-bottom:2px solid var(--on-paper);font:700 19px var(--mono);letter-spacing:.12em;color:var(--on-paper-2)}
+.er-row{padding-top:32px;padding-bottom:32px;align-items:baseline}
+.er-row+.er-row{border-top:1px dashed var(--on-paper-2)}
+.er-row p{margin:0;font:500 28px/1.45 var(--sans)}
+.er-row .er-said{font:700 33px/1.4 var(--serif);text-decoration:line-through 3px transparent;transition:text-decoration-color .4s ease}
+.slide[data-at="1"] .er-said{text-decoration-color:var(--rust)}
+.er-row .er-fix{font-weight:700}
+.s13-sort{margin-top:auto}
+
+/* ---------- 14 start here ---------- */
+.formula{display:flex;align-items:stretch;gap:18px;margin-top:34px}
+.formula i{align-self:center;font:700 40px var(--sans);font-style:normal;color:var(--rust)}
+.f-item{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding:18px 20px;border:2px solid var(--on-paper);background:var(--paper)}
+.f-item b{font:700 32px/1.25 var(--serif)}
+.f-item span{font:400 20px/1.4 var(--sans);color:var(--on-paper-2)}
+.f-out{flex:none;width:280px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:18px 22px;background:var(--ink);color:var(--neon)}
+.f-out b{font:700 31px/1.3 var(--serif)}
+.lessons{list-style:none;margin:44px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+.lessons li{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:3px solid var(--rust);font:400 27px/1.5 var(--sans)}
+.lessons li span{font:700 19px var(--mono);letter-spacing:.1em;color:var(--rust)}
+.lessons p{margin:0}
+.grades{display:flex;gap:44px;margin:34px 0 0;font:500 26px var(--sans);color:var(--on-paper-2)}
+.grades b{color:var(--on-paper)}
+.s14-end{margin:auto 0 0;font:900 60px/1.2 var(--serif)}
+
+/* ---------- 15 ending ---------- */
+.end-video{position:absolute;inset:64px 96px 70px;display:flex;flex-direction:column;align-items:center;gap:20px;transition:opacity .5s ease}
+.end-video .kicker{align-self:flex-start}
+.video-frame{position:relative;width:1280px;height:552px;background:var(--black);box-shadow:0 30px 80px var(--deep-shadow);cursor:pointer}
+.video-frame video{display:block;width:100%;height:100%;object-fit:cover}
+.video-frame .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .3s ease}
+.end[data-at="1"] .poster{opacity:0}
+.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:112px;height:112px;border:0;border-radius:50%;background:var(--neon);color:var(--ink);font:700 40px/1 var(--sans);cursor:pointer;transition:opacity .3s ease}
+.end[data-at="1"] .play{opacity:0;pointer-events:none}
+.end-close{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .7s ease,visibility 0s linear .7s}
+.end.closing .end-close{opacity:1;visibility:visible;transition:opacity .7s ease}
+.end.closing .end-video{opacity:0;visibility:hidden}
+.end-pad{display:grid;grid-template-columns:1fr 300px;grid-template-rows:auto 1fr auto auto;column-gap:84px;row-gap:22px}
+.end-pad .kicker{grid-column:1/-1}
+.end-quote{grid-column:1;align-self:center;margin:0;font:700 54px/1.5 var(--serif);color:var(--on-ink);text-wrap:balance}
+.end-aray{grid-column:1;margin:0;font:900 66px/1.2 var(--serif);color:var(--neon)}
+.end-foot{grid-column:1;margin:0;font:400 22px var(--sans);color:var(--on-ink-2)}
+.qr{grid-column:2;grid-row:2/5;align-self:end;display:flex;flex-direction:column;gap:12px}
+.qr svg{display:block;width:300px;height:300px}
+.qr figcaption{display:flex;flex-direction:column;gap:4px}
+.qr .url{margin:0;font-size:20px}
+
+/* ---------- backups ---------- */
+.backup .kicker{color:var(--sage)}
+.tasks{display:grid;grid-template-columns:repeat(4,1fr);gap:36px;margin-top:36px}
+.tasks h3{margin:0 0 12px;padding-bottom:10px;border-bottom:3px solid var(--on-paper);font:700 30px var(--serif)}
+.tasks ul{list-style:none;margin:0;padding:0}
+.tasks li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--rule-paper);font:400 25px/1.35 var(--sans)}
+.tasks li b{font:700 25px var(--mono);font-variant-numeric:tabular-nums;color:var(--rust)}
+.bk-foot{margin-top:auto}
+.tbl{width:100%;border-collapse:collapse;margin-top:28px;font:400 22px/1.4 var(--sans)}
+.tbl th{padding:10px 14px;text-align:left;font:700 18px var(--mono);letter-spacing:.08em;color:var(--on-paper-2);border-bottom:3px solid var(--on-paper)}
+.tbl td{padding:14px;border-bottom:1px solid var(--rule-paper);vertical-align:top}
+.tbl td:first-child{font-weight:700;white-space:nowrap}
+.words{display:grid;grid-template-columns:1fr 1fr;gap:0 56px;margin-top:28px}
+.words div{display:grid;grid-template-columns:230px 1fr auto;align-items:baseline;gap:14px;padding:12px 0;border-bottom:1px solid var(--rule-paper)}
+.words .am{font-size:29px}
+.words span:not(.am){font:400 24px var(--sans)}
+.ok,.wait{font:700 17px var(--mono);letter-spacing:.06em;padding:3px 10px;border:2px solid var(--sage);color:var(--sage)}
+.wait{border-style:dashed;border-color:var(--rust);color:var(--rust)}
+.ethics{list-style:none;margin:32px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:20px 48px}
+.ethics li{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:baseline;padding:16px 0;border-top:3px solid var(--on-paper);font:400 26px/1.5 var(--sans)}
+.ethics b{font:700 20px var(--mono);letter-spacing:.1em;color:var(--rust)}
+
+/* ---------- presenter UI ---------- */
+#timer{position:fixed;z-index:30;top:calc(10px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:baseline;gap:12px;padding:8px 14px;background:var(--panel);border:1px solid var(--rule-ink);border-radius:8px;font:400 15px var(--mono);color:var(--on-ink-2)}
+#timer .t{font:700 26px var(--mono);font-variant-numeric:tabular-nums;color:var(--neon)}
+#timer[data-state="late"] .t{color:var(--amber)}
+#timer[data-state="over"] .t{color:var(--rust)}
+#timer[data-state="paused"] .t{color:var(--on-ink-2)}
+#cues{position:fixed;z-index:30;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:1100px;margin-inline:auto;padding:12px 18px;background:var(--panel);border:1px solid var(--rule-ink);border-left:4px solid var(--neon);border-radius:8px}
+.cue-meta{display:flex;flex-wrap:wrap;gap:6px 16px;font:400 14px var(--mono);color:var(--on-ink-2)}
+.cue-meta b{color:var(--neon)}
+.cue-text{margin:6px 0 0;font:500 19px/1.5 var(--sans);color:var(--on-ink)}
+#script{position:fixed;z-index:31;top:0;right:0;bottom:0;width:min(560px,100%);display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--rule-ink)}
+#script header{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 12px 20px;border-bottom:1px solid var(--rule-ink);font:400 14px var(--mono);color:var(--on-ink-2)}
+#script header b{font-size:16px;color:var(--neon)}
+.script-body{flex:1;overflow-y:auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 40px 20px}
+.script-body p{margin:0 0 14px;font:400 21px/1.75 var(--sans);color:var(--on-ink)}
+.script-body .stage-dir{font-size:17px;color:var(--on-ink-2)}
+.x{margin-left:auto;width:36px;height:36px;border:1px solid var(--rule-ink);border-radius:6px;background:transparent;color:var(--on-ink);font:400 20px/1 var(--sans);cursor:pointer}
+#overview,#help{position:fixed;z-index:40;inset:0;overflow-y:auto;background:var(--scrim);padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.ov-head{display:flex;align-items:center;gap:16px;max-width:1100px;margin:0 auto 16px;font:700 15px var(--mono);letter-spacing:.14em;color:var(--neon)}
+.ov-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.ov-grid button{display:flex;align-items:baseline;gap:12px;padding:14px 16px;text-align:left;background:var(--ink-2);border:1px solid var(--rule-ink);border-radius:6px;color:var(--on-ink);font:500 17px/1.35 var(--sans);cursor:pointer}
+.ov-grid button span{flex:none;min-width:2.2em;font:700 14px var(--mono);color:var(--on-ink-2)}
+.ov-grid button.now{border-color:var(--neon)}
+.ov-grid button.bk span{color:var(--amber)}
+.keys{max-width:640px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:10px 22px;font:400 18px/1.5 var(--sans);color:var(--on-ink)}
+.keys dt{font:700 16px var(--mono);color:var(--neon);text-align:right}
+.keys dd{margin:0}
+#black{position:fixed;z-index:60;inset:0;background:var(--black)}
+#nav{position:fixed;z-index:25;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;opacity:0;transition:opacity .3s ease}
+body.awake #nav,#nav:focus-within{opacity:1}
+@media (hover:none){#nav{opacity:.9}}
+#nav button{width:44px;height:44px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:400 20px/1 var(--sans);cursor:pointer}
+#hint{position:fixed;z-index:26;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 16px;background:var(--panel);border:1px solid var(--rule-ink);border-radius:8px;font:400 15px/1.4 var(--sans);color:var(--on-ink-2);text-align:center;transition:opacity .5s ease}
+#hint.gone{opacity:0;pointer-events:none}
+#jump{position:fixed;z-index:35;left:50%;top:40%;transform:translate(-50%,-50%);padding:16px 28px;background:var(--panel);border:1px solid var(--neon);border-radius:10px;font:700 34px var(--mono);color:var(--neon)}
+button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.slide,.step,.end-close,.end-video,#progress,#nav,#hint{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div id="viewport"><div id="frame">
+<div id="stage" data-tone="ink">
+
+<!-- 01 封面 -->
+<section class="slide ink cover" id="s1" data-title="封面" data-cue="Nga'ay ho｜謝謝主持人熊教授｜自我介紹：長濱、全校九成五阿美族｜介紹 Ciping 老師，族語文化問題座談時請她回答">
+  <figure class="cover-photo card"><img src="assets/cover.jpg" alt="學生的野菜圖繪與風味圖"></figure>
+  <div class="pad cover-pad">
+    <div class="kicker">2026.11.07 · 原住民族教育論壇</div>
+    <h1 class="cover-title"><span class="cover-dateng">Dateng</span><span class="cover-zh">野菜探險家</span></h1>
+    <p class="cover-sub">餐桌上的永續智慧</p>
+    <div class="cover-meta">
+      <p><b>賴奕芸</b>　Salimpo 阿美山海文化實驗小學（寧埔國小）</p>
+      <p>課程共同設計　<b>Ciping 吳慧麗</b>老師</p>
+      <p class="cap cover-note">公開版：不含可辨識學生臉孔的照片與影片</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 這可以吃嗎 -->
+<section class="slide ink" id="s2" data-title="這可以吃嗎？" data-steps="1" data-cue="想像路邊一株不認識的草→「這可以吃嗎？」→ 按下一頁出現三個追問：誰教的、怎麼確認、怎麼告訴別人">
+  <figure class="q-bg"><img src="assets/weeds.jpg" alt=""></figure>
+  <div class="pad">
+    <div class="kicker">QUESTION · 從一個問題開始</div>
+    <p class="q-lead">路邊有一株不認識的草。</p>
+    <h2 class="q-big">這可以<em>吃</em>嗎？</h2>
+    <ol class="q-three step" data-step="1">
+      <li><span>01</span>這是誰教你的？</li>
+      <li><span>02</span>你怎麼確認？</li>
+      <li><span>03</span>你要怎麼告訴別人？</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 03 知識在人身上 -->
+<section class="slide paper" id="s3" data-title="野菜知識在人身上" data-cue="Dateng 不在課本上｜ama、faki、ina｜田埂、路邊、海岸｜第二場吳雪月老師〈大地的超商〉講知識，這場講孩子怎麼學">
+  <div class="pad s3">
+    <div class="s3-text">
+      <div class="kicker">WHERE IT LIVES · 知識在哪裡</div>
+      <h2 class="title"><span>Dateng</span> 不寫在課本上</h2>
+      <p class="body s3-lead">什麼時候採、採哪個部位、怎麼煮、有什麼禁忌，這些知識在部落的人身上：</p>
+      <ul class="kin">
+        <li><span class="am">ama</span><small>阿嬤</small></li>
+        <li><span class="am">faki</span><small>叔叔、舅舅</small></li>
+        <li><span class="am">ina</span><small>媽媽、阿姨</small></li>
+      </ul>
+      <p class="body">也在他們走過的田埂、路邊和海岸。</p>
+      <div class="bridge">
+        <p><span class="cap">10:45 第二場</span>吳雪月老師〈大地的超商〉</p>
+        <p><span class="cap">這一場</span>孩子怎麼學會<b class="hl">看、問、記、說</b></p>
+      </div>
+    </div>
+    
+    <figure class="ph s3-photo"><img src="assets/elders.jpg" alt="長濱的田野"><figcaption>長濱的田埂與路邊</figcaption></figure>
+  </div>
+</section>
+
+<!-- 04 課程全貌 -->
+<section class="slide paper" id="s4" data-title="課程全貌" data-cue="三到六年級、教案規劃 86 節、12 項任務｜驅動問題｜採集→實驗→創作→分享｜前一段的照片筆記就是下一段的材料">
+  <div class="pad">
+    <div class="kicker">COURSE MAP · 課程全貌</div>
+    <h2 class="title s4-q">「餐桌上的野菜，藏著哪些<span class="hl">傳統智慧與永續</span>？」</h2>
+    <dl class="facts">
+      <div><dt>年級</dt><dd>三到六年級</dd></div>
+      <div><dt>節數</dt><dd>86 節<small>教案規劃</small></dd></div>
+      <div><dt>任務</dt><dd>12 項</dd></div>
+    </dl>
+    <ol class="phases">
+      <li><figure class="ph"><img src="assets/ph1.jpg" alt="學生的野菜科學繪圖"></figure><h3>採集</h3><p>照片、田野筆記、繪圖</p></li>
+      <li><figure class="ph"><img src="assets/ph2.jpg" alt="黑板上的酸甜苦辣香澀評分"></figure><h3>實驗</h3><p>風味紀錄、AI 測試</p></li>
+      <li><figure class="ph"><img src="assets/ph3.jpg" alt="學生畫的刺蔥精靈"></figure><h3>創作</h3><p>地圖、精靈、繪本</p></li>
+      <li><figure class="ph"><img src="assets/ph4.jpg" alt="AR 野菜精靈作品"></figure><h3>分享</h3><p>發表、訪談、走讀</p></li>
+    </ol>
+    <p class="s4-foot">前一段留下的照片和筆記，就是下一段的材料。</p>
+  </div>
+</section>
+
+<!-- 05 案例一 辨識 -->
+<section class="slide paper" id="s5" data-title="案例一｜辨識" data-cue="先請教再採集、採多少用多少｜tana' 刺蔥、kafotolay 野莧｜植拓、科學繪圖→知識卡｜兩個提問｜分清楚看到的、聽來的、不確定的">
+  <div class="pad">
+    <div class="kicker">CASE 01 · 辨識</div>
+    <div class="head-row"><h2 class="title">先請教，再採集</h2><p class="claim">採多少，用多少。</p></div>
+    <div class="s5">
+      <div>
+        <figure class="ph s5-photo wide"><img src="assets/c1photo.jpg" alt="學生畫的兩張野菜科學繪圖"><figcaption>學生的科學繪圖</figcaption></figure>
+        <ul class="tags"><li><span class="am">tana'</span>刺蔥</li><li><span class="am">kafotolay</span>野莧</li></ul>
+      </div>
+      <figure class="s5-card"><div class="ph contain"><img src="assets/card.jpg" alt="學生手寫的月桃知識卡"></div><figcaption class="cap">學生知識卡｜<span class="am">lengac</span> 月桃<br>中文名、族語名、辨識特徵、採集與料理、文化故事</figcaption></figure>
+      <div class="s5-q">
+        <p class="cap">老師最常問</p>
+        <blockquote class="teacher">「你是從哪個部位看出來的？」</blockquote>
+        <blockquote class="teacher">「這個用途，是誰告訴你的？」</blockquote>
+      </div>
+    </div>
+    <div class="sort-row"><span class="sort-lead">孩子要分得清楚</span><span class="chip">看到的</span><span class="chip chip-b">聽長輩說的</span><span class="chip chip-q">還不確定的</span></div>
+  </div>
+</section>
+
+<!-- 06 案例二 風味 -->
+<section class="slide paper" id="s6" data-title="案例二｜風味與料理" data-cue="苦苦的野菜為什麼湯好喝｜酸甜苦辣香澀→打分→風味圖｜你說的苦跟同學一樣嗎→記下部位、生熟、誰嚐｜市場請教→刺蔥炒蛋→過貓春捲">
+  <div class="pad">
+    <div class="kicker">CASE 02 · 風味與料理</div>
+    <h2 class="title">把「苦苦的」說清楚</h2>
+    <div class="s6">
+      <div class="s6-text">
+        <p class="cap">課堂上冒出的問題</p>
+        <p class="s6-q">野菜苦苦的，為什麼煮成湯卻很好喝？</p>
+        <ul class="tastes"><li>酸</li><li>甜</li><li>苦</li><li>辣</li><li>香</li><li>澀</li></ul>
+        <blockquote class="teacher">「你說的苦，跟同學說的苦一樣嗎？」</blockquote>
+        <p class="s6-record"><span class="cap">一起記下</span>部位｜生的還是煮過的｜誰嚐的</p>
+      </div>
+      <div class="s6-mid">
+        <figure class="ph s6-scores"><img src="assets/scores.jpg" alt="黑板上的酸甜苦辣香澀評分"><figcaption>酸・甜・苦・辣・香・澀 評分</figcaption></figure>
+        
+        <div class="s6-dish"><p class="cap">從市場到餐桌</p><p>向攤販請教怎麼挑、怎麼煮 → 分工做<b>刺蔥炒蛋</b> → 自己發想<b>過貓春捲</b></p></div>
+      </div>
+      <figure><div class="ph s6-flavor"><img src="assets/flavor.jpg" alt="學生畫的構樹風味圖"></div><figcaption class="cap s6-flavor-cap">學生作品｜構樹風味圖</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 07 案例三 AI -->
+<section class="slide paper" id="s7" data-title="案例三｜AI 辨識" data-cue="分組拍照→建類別→訓練→拿新葉子測→認錯了｜背景還是葉子？補拍重訓｜AI 說可以吃不算數｜AI 不取代耆老">
+  <div class="pad">
+    <div class="kicker">CASE 03 · AI 辨識</div>
+    <h2 class="title">教電腦之前，先看清楚</h2>
+    <div class="s7">
+      <ol class="loop">
+        <li><b>1</b>每種野菜拍數十張照片</li>
+        <li><b>2</b><span>建類別：<span class="am">tana'</span>・<span class="am">kafotolay</span>・<span class="am">tatokem</span></span></li>
+        <li><b>3</b>用 Teachable Machine 訓練</li>
+        <li><b>4</b>拿新的葉子測試</li>
+        <li><b>5</b><span><span class="hl">認錯了</span>？找原因、補拍、重新訓練</span></li>
+      </ol>
+      <div class="s7-visual">
+        <figure class="ph s7-tm"><img src="assets/tm2.jpg" alt="Teachable Machine 的野菜類別與測試畫面"><figcaption>Teachable Machine｜三種野菜三個類別</figcaption></figure>
+        <figure class="ph s7-photo"><img src="assets/aiphoto.jpg" alt="用平板在菜園拍攝野菜"></figure>
+        <blockquote class="teacher s7-bubble">「它認的是背景，還是葉子？」</blockquote>
+      </div>
+    </div>
+    <div class="rules"><p class="rule-hard">AI 說可以吃，不算數。</p><p>AI 不取代耆老，只幫耆老的知識被更多人看見。</p></div>
+  </div>
+</section>
+
+<!-- 08 案例四 說給別人聽 -->
+<section class="slide paper" id="s8" data-title="案例四｜說給別人聽" data-cue="Google 我的地圖：一種野菜一個圖層、阿美語＋中文｜精靈：刺蔥勇敢的冒險家、龍葵溫柔的守界者｜自傳、錄音、AR｜繪本｜個性是創作，特徵要有來源">
+  <div class="pad">
+    <div class="kicker">CASE 04 · 地圖・精靈・繪本</div>
+    <h2 class="title">說給別人聽</h2>
+    <div class="s8">
+      <article class="s8-col">
+        <figure class="ph s8-img"><img src="assets/map.jpg" alt="校園野菜地圖截圖"></figure>
+        <h3>校園野菜地圖</h3>
+        <p>Google 我的地圖：每種野菜一個圖層，地標寫阿美語和中文，附照片與辨識特徵。</p>
+      </article>
+      <article class="s8-col">
+        <div class="s8-img s8-spirit"><figure class="ph"><img src="assets/spirit.jpg" alt="學生手繪的刺蔥精靈"></figure><figure class="ph s8-ar"><img src="assets/ar.jpg" alt="AR 野菜精靈在筆電上"></figure></div>
+        <h3>野菜精靈</h3>
+        <table class="spirits">
+          <tr><td><span class="am">tana'</span> 刺蔥</td><td>全身帶刺</td><td>勇敢的冒險家</td></tr>
+          <tr><td><span class="am">tatokem</span> 龍葵</td><td>需小心處理</td><td>溫柔的守界者</td></tr>
+        </table>
+        <p class="cap">第一人稱自傳・錄下自己的聲音・手繪轉成 AR</p>
+      </article>
+      <article class="s8-col">
+        <div class="s8-img book"><div class="book-cover"><span class="am">Misolap ci Awos to dateng</span><small>Awos 的野菜探險記</small></div></div>
+        <h3>繪本</h3>
+        <p>把野菜知識編成繪本《<span class="am">Misolap ci Awos to dateng</span>》。</p>
+      </article>
+    </div>
+    <p class="s8-foot"><span class="hl">精靈的個性</span>是孩子的創作；<span class="hl">植物的特徵和用途</span>要有來源。作品上分開標示。</p>
+  </div>
+</section>
+
+<!-- 09 在地產業 -->
+<section class="slide paper" id="s9" data-title="走出校園｜在地產業" data-cue="海鹽爺爺：汲海水→柴燒→手炒→加刺蔥子、月桃子｜孩子分析在地性、文化性、故事性，提包裝建議｜火鍋店老闆：傳承老人的野菜精神；兩個擔心">
+  <div class="pad">
+    <div class="kicker">FIELD VISITS · 在地產業</div>
+    <h2 class="title">味道背後的人</h2>
+    <div class="s9 centered">
+      <article class="visit">
+        
+        <h3>海鹽爺爺的香料鹽</h3>
+        <ol class="salt">
+          <li><b>汲海水</b><span>退潮時從岩岸邊取水</span></li>
+          <li><b>柴燒濃縮</b><span>漂流木熬煮數小時</span></li>
+          <li><b>手炒成鹽</b><span>大鍋翻炒至結晶</span></li>
+          <li><b>加香料</b><span>乾炒刺蔥子、月桃子</span></li>
+        </ol>
+        <p class="visit-kid"><span class="cap">孩子分析</span>在地性・文化性・故事性 → 提出包裝建議</p>
+      </article>
+      <article class="visit">
+        
+        <h3>原鄉野菜火鍋店</h3>
+        <blockquote class="quote">「傳承老人的野菜精神」<cite>— 老闆說開店的理由</cite></blockquote>
+        <p class="worry"><span class="cap">老闆擔心</span>野菜種類變少｜傳承找不到人接</p>
+        <p class="visit-kid"><span class="cap">留給孩子的問題</span>哪些野菜越來越難找？可以怎麼一直記錄下去？</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 10 知識圖譜 -->
+<section class="slide ink" id="s10" data-title="知識圖譜" data-cue="把這些連起來：一株植物連著族語、生態、歷史、料理，也連著教我們的人｜最後一頁的 QR code 可以看簡報和網站">
+  <div class="pad s10">
+    <div class="s10-text">
+      <div class="kicker">KNOWLEDGE GRAPH</div>
+      <h2 class="title">不是菜單，<br>是一張關係網</h2>
+      <p class="body">一株植物，<br>連著族語、生態、歷史、料理，<br>也連著教我們的人。</p>
+      <a class="url" href="https://laierin615.github.io/laierindateng/" target="_blank" rel="noopener">laierin615.github.io/laierindateng</a>
+      <p class="cap">最後一頁的 QR code 可以看簡報和網站</p>
+    </div>
+    <figure class="browser"><div class="browser-bar"><i></i><i></i><i></i><span>Dateng 阿美族野菜知識系統</span></div><img src="assets/graph.jpg" alt="Dateng 網站的野菜知識圖譜"></figure>
+  </div>
+</section>
+
+<!-- 11 成果 -->
+<section class="slide paper" id="s11" data-title="讓作品說話" data-cue="2025 永續台灣創意教案國小組首獎｜四健縣賽冠軍、全國三等獎｜比獎狀更能說明學習的是作品：知識卡、風味圖、上台面對追問">
+  <div class="pad">
+    <div class="kicker">EVIDENCE · 成果</div>
+    <h2 class="title">讓作品說話</h2>
+    <div class="awards">
+      <figure><div class="ph"><img src="assets/award1.jpg" alt="永續台灣創意教案國小組首獎賀榜"></div><figcaption><b>2025 永續台灣創意教案</b>國小組首獎</figcaption></figure>
+      <figure><div class="ph"><img src="assets/award2.jpg" alt="四健作業組全國三等獎賀榜"></div><figcaption><b>2025 四健作業組</b>縣賽冠軍・全國三等獎</figcaption></figure>
+    </div>
+    <div class="works works-2">
+      <figure><div class="ph"><img src="assets/work1.jpg" alt="學生手寫的野菜知識卡"></div><figcaption><b>寫得出依據</b><span class="cap">知識卡</span></figcaption></figure>
+      <figure><div class="ph"><img src="assets/work2.jpg" alt="學生的構樹風味圖"></div><figcaption><b>解釋得了</b><span class="cap">風味圖</span></figcaption></figure>
+      
+    </div>
+    <p class="s11-foot">看學習，就看孩子能不能<span class="hl">指出線索、說明紀錄、交代來源</span>。</p>
+  </div>
+</section>
+
+<!-- 12 Kamamit -->
+<section class="slide paper" id="s12" data-title="延續｜Kamamit 野番茄" data-cue="今年中年級研究 kamamit｜7 個孩子×晒日頭工作室：荒地→番茄園→果醬｜45→約 245 元，高於售價 200｜5 月慢食節引句｜9 月杜林：老師代表，學生沒出國">
+  <div class="pad">
+    <div class="kicker">2026 · <span class="am">kamamit</span> 野番茄 <small>族語寫法確認中</small></div>
+    <h2 class="title">作品先走到了遠方</h2>
+    <p class="km-award cap">2026 臺東縣四健作業組競賽 幼初級組冠軍・全國賽佳作</p>
+    <div class="km-photos km-1">
+      
+      <figure class="ph"><img src="assets/kmturin.jpg" alt="杜林慢食節的觀眾翻閱孩子的植拓與記錄簿"><figcaption>義大利杜林｜觀眾翻閱孩子的植拓</figcaption></figure>
+      <blockquote class="km-quote-big">「拿麥克風會緊張，可是講自己真的做過的事，就比較講得出來。」<cite>— 孩子的記錄簿</cite></blockquote>
+    </div>
+    <ol class="timeline">
+      <li><span class="when">114 學年下學期</span><b>荒地 → 番茄園 → 果醬</b><span>7 位中年級孩子 × 晒日頭工作室</span></li>
+      <li><span class="when">算成本</span><b>45 元 → 約 245 元</b><span>算進工時，高於售價 200 元</span></li>
+      <li><span class="when">2026.5 臺東慢食節</span><b>第一次拿麥克風</b><span>向陌生客人三分鐘解說</span></li>
+      <li><span class="when">2026.9 義大利杜林</span><b>記錄簿與果醬展出</b><span>姚素卿老師代表，學生沒有出國</span></li>
+    </ol>
+    
+  </div>
+</section>
+
+<!-- 13 老師也會說錯 -->
+<section class="slide paper" id="s13" data-title="老師也會說錯" data-steps="1" data-cue="最重要的一課是老師學到的｜超能力、糖減半放半年｜按下一頁：暑假回頭查證→記錄簿改成不宣稱｜孩子分清楚查得到、還在猜">
+  <div class="pad">
+    <div class="kicker">ERRATA · 野番茄課的勘誤</div>
+    <h2 class="title">老師也會說錯</h2>
+    <div class="errata">
+      <div class="er-head"><span>老師原本說</span><span class="step" data-step="1">回頭查證</span><span class="step" data-step="1">記錄簿改成</span></div>
+      <div class="er-row"><p class="er-said">這株野番茄有抗病、耐旱的「超能力」</p><p class="step" data-step="1">還沒有植物學鑑定</p><p class="step er-fix" data-step="1">不宣稱它抗病或耐旱</p></div>
+      <div class="er-row"><p class="er-said">糖減半，大約可以放半年</p><p class="step" data-step="1">保存期限沒有檢驗依據</p><p class="step er-fix" data-step="1">沒有驗證，就不寫保存期限</p></div>
+    </div>
+    <div class="sort-row s13-sort"><span class="sort-lead">孩子開始練習分清楚</span><span class="chip">查得到的</span><span class="chip chip-q">還在猜的</span></div>
+  </div>
+</section>
+
+<!-- 14 給老師的起點 -->
+<section class="slide paper" id="s14" data-title="給老師的起點" data-cue="回到三個問題｜不一定要 86 節｜三樣東西→一張知識卡＋一分鐘導覽｜三節課的例子｜低年級畫、說；高年級加訪綱、來源比對｜不知道就說不知道">
+  <div class="pad">
+    <div class="kicker">START HERE · 給老師的起點</div>
+    <h2 class="title">從三樣東西開始</h2>
+    <div class="formula">
+      <div class="f-item"><b>一株在地植物</b><span>校園或部落常見、適合教學</span></div>
+      <i>＋</i>
+      <div class="f-item"><b>一位知識夥伴</b><span>長輩、族語老師或在地職人</span></div>
+      <i>＋</i>
+      <div class="f-item"><b>一項分享任務</b><span>把學到的說給別人聽</span></div>
+      <i>→</i>
+      <div class="f-out"><b>一張知識卡</b><b>＋一分鐘導覽</b></div>
+    </div>
+    <ol class="lessons">
+      <li><span>第一節</span><p>請長輩帶孩子認一株校園植物，<br>拍照、記下特徵</p></li>
+      <li><span>第二節</span><p>畫成知識卡，寫上是誰教的</p></li>
+      <li><span>第三節</span><p>練習一分鐘導覽，說給學弟妹聽</p></li>
+    </ol>
+    <p class="grades"><span><b>低年級</b>　用畫的、用說的</span><span><b>高年級</b>　再加上訪綱、來源比對</span></p>
+    <p class="s14-end">不知道，就說<span class="hl">不知道</span>。</p>
+  </div>
+</section>
+
+<!-- 15 結尾 -->
+<section class="slide ink end closing" id="s15" data-title="結尾" data-steps="0" data-cue="「最後，讓孩子自己說」→ 下一頁或空白鍵播放（約 21 秒，播完自動轉結語）→ 結語 → Aray，謝謝大家｜這是最後一頁，座談要用備用頁請按 O">
+  
+  <div class="end-close">
+    <div class="pad end-pad">
+      <div class="kicker">DATENG · 餐桌上的永續智慧</div>
+      <blockquote class="end-quote">餐桌上的永續智慧，不是把野菜保存起來，而是讓這些關係，在孩子的日常裡繼續長下去。</blockquote>
+      <p class="end-aray">Aray，謝謝大家。</p>
+      <p class="end-foot">賴奕芸｜Salimpo 阿美山海文化實驗小學（寧埔國小）</p>
+      <figure class="qr"><svg viewBox="-4 -4 41 41" shape-rendering="crispEdges" role="img" aria-label="QR code：簡報公開版網址"><rect x="-4" y="-4" width="41" height="41" style="fill:var(--paper)"/><path d="M0 0h7v1h-7zM10 0h2v1h-2zM16 0h1v1h-1zM19 0h2v1h-2zM23 0h1v1h-1zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM9 1h2v1h-2zM12 1h1v1h-1zM15 1h2v1h-2zM18 1h1v1h-1zM20 1h1v1h-1zM22 1h1v1h-1zM24 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM12 2h1v1h-1zM14 2h1v1h-1zM16 2h1v1h-1zM21 2h4v1h-4zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h2v1h-2zM12 3h1v1h-1zM18 3h2v1h-2zM22 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h2v1h-2zM13 4h4v1h-4zM20 4h1v1h-1zM22 4h2v1h-2zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM12 5h1v1h-1zM14 5h1v1h-1zM19 5h1v1h-1zM21 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h3v1h-3zM12 7h1v1h-1zM16 7h1v1h-1zM18 7h6v1h-6zM0 8h1v1h-1zM2 8h5v1h-5zM9 8h1v1h-1zM12 8h3v1h-3zM17 8h1v1h-1zM19 8h1v1h-1zM22 8h1v1h-1zM26 8h5v1h-5zM0 9h1v1h-1zM2 9h1v1h-1zM4 9h2v1h-2zM7 9h1v1h-1zM10 9h2v1h-2zM13 9h1v1h-1zM17 9h5v1h-5zM23 9h1v1h-1zM26 9h2v1h-2zM29 9h4v1h-4zM0 10h1v1h-1zM2 10h2v1h-2zM6 10h1v1h-1zM10 10h1v1h-1zM12 10h6v1h-6zM20 10h1v1h-1zM25 10h1v1h-1zM28 10h1v1h-1zM30 10h2v1h-2zM1 11h1v1h-1zM5 11h1v1h-1zM8 11h1v1h-1zM10 11h1v1h-1zM13 11h1v1h-1zM16 11h6v1h-6zM28 11h4v1h-4zM0 12h4v1h-4zM5 12h3v1h-3zM10 12h3v1h-3zM14 12h1v1h-1zM16 12h1v1h-1zM20 12h1v1h-1zM22 12h1v1h-1zM24 12h2v1h-2zM28 12h2v1h-2zM31 12h1v1h-1zM1 13h3v1h-3zM5 13h1v1h-1zM11 13h2v1h-2zM15 13h1v1h-1zM17 13h2v1h-2zM22 13h2v1h-2zM26 13h1v1h-1zM30 13h3v1h-3zM1 14h3v1h-3zM6 14h3v1h-3zM10 14h2v1h-2zM15 14h2v1h-2zM18 14h1v1h-1zM20 14h1v1h-1zM22 14h1v1h-1zM25 14h2v1h-2zM31 14h1v1h-1zM0 15h1v1h-1zM4 15h2v1h-2zM7 15h3v1h-3zM11 15h2v1h-2zM15 15h1v1h-1zM18 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h3v1h-3zM29 15h2v1h-2zM1 16h1v1h-1zM3 16h1v1h-1zM6 16h1v1h-1zM8 16h3v1h-3zM13 16h3v1h-3zM17 16h1v1h-1zM23 16h3v1h-3zM27 16h2v1h-2zM32 16h1v1h-1zM4 17h2v1h-2zM7 17h1v1h-1zM9 17h5v1h-5zM16 17h1v1h-1zM19 17h5v1h-5zM26 17h2v1h-2zM29 17h2v1h-2zM32 17h1v1h-1zM1 18h1v1h-1zM4 18h1v1h-1zM6 18h3v1h-3zM11 18h3v1h-3zM15 18h2v1h-2zM18 18h1v1h-1zM21 18h2v1h-2zM25 18h1v1h-1zM27 18h2v1h-2zM30 18h2v1h-2zM0 19h2v1h-2zM4 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM12 19h4v1h-4zM19 19h4v1h-4zM24 19h2v1h-2zM27 19h5v1h-5zM1 20h1v1h-1zM3 20h1v1h-1zM5 20h7v1h-7zM14 20h1v1h-1zM18 20h2v1h-2zM22 20h4v1h-4zM27 20h3v1h-3zM32 20h1v1h-1zM0 21h3v1h-3zM5 21h1v1h-1zM8 21h2v1h-2zM11 21h1v1h-1zM13 21h4v1h-4zM20 21h2v1h-2zM23 21h2v1h-2zM26 21h1v1h-1zM32 21h1v1h-1zM0 22h1v1h-1zM3 22h4v1h-4zM8 22h1v1h-1zM10 22h1v1h-1zM19 22h1v1h-1zM22 22h1v1h-1zM25 22h3v1h-3zM29 22h3v1h-3zM0 23h1v1h-1zM2 23h4v1h-4zM9 23h2v1h-2zM12 23h3v1h-3zM16 23h1v1h-1zM19 23h3v1h-3zM23 23h1v1h-1zM29 23h3v1h-3zM0 24h1v1h-1zM6 24h2v1h-2zM9 24h1v1h-1zM11 24h1v1h-1zM14 24h1v1h-1zM17 24h1v1h-1zM19 24h1v1h-1zM24 24h5v1h-5zM8 25h5v1h-5zM16 25h4v1h-4zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM30 25h1v1h-1zM32 25h1v1h-1zM0 26h7v1h-7zM10 26h2v1h-2zM15 26h1v1h-1zM17 26h1v1h-1zM20 26h5v1h-5zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h2v1h-2zM11 27h2v1h-2zM14 27h1v1h-1zM16 27h3v1h-3zM20 27h5v1h-5zM28 27h4v1h-4zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h2v1h-2zM11 28h2v1h-2zM16 28h1v1h-1zM24 28h6v1h-6zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h1v1h-1zM10 29h6v1h-6zM18 29h1v1h-1zM21 29h1v1h-1zM23 29h3v1h-3zM28 29h2v1h-2zM31 29h2v1h-2zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM8 30h1v1h-1zM11 30h3v1h-3zM15 30h4v1h-4zM20 30h2v1h-2zM24 30h1v1h-1zM26 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h3v1h-3zM14 31h2v1h-2zM18 31h5v1h-5zM25 31h2v1h-2zM28 31h3v1h-3zM0 32h7v1h-7zM8 32h1v1h-1zM11 32h2v1h-2zM15 32h1v1h-1zM17 32h4v1h-4zM23 32h2v1h-2zM26 32h2v1h-2zM31 32h1v1h-1z" style="fill:var(--ink)"/></svg><figcaption><span class="cap">簡報公開版</span><p class="url">laierin615.github.io/<br>laierindateng/forum</p></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 備用 A -->
+<section class="slide paper backup" id="s16" data-label="A" data-title="12 項任務與節數">
+  <div class="pad">
+    <div class="kicker">BACKUP A · 座談備用</div>
+    <h2 class="title">12 項任務與節數</h2>
+    <div class="tasks">
+      <div><h3>認識與記錄</h3><ul><li>校園野菜探險隊<b>6</b></li><li>部落植物學<b>10</b></li><li>野菜拓印<b>4</b></li></ul></div>
+      <div><h3>感官與探究</h3><ul><li>風味實驗室<b>6</b></li><li>野菜廚神挑戰<b>10</b></li><li>Dateng on the Map<b>6</b></li></ul></div>
+      <div><h3>科技與田野</h3><ul><li>AI 野菜訓練師<b>6</b></li><li>野菜時光膠囊<b>6</b></li><li>在地產業探訪<b>8</b></li></ul></div>
+      <div><h3>創作與分享</h3><ul><li>野菜文化誌出版<b>12</b></li><li>野菜精靈 AR<b>6</b></li><li>永續發表會<b>6</b></li></ul></div>
+    </div>
+    <p class="cap bk-foot">合計 86 節，是原始教案的規劃節數；各校可以依條件選用其中幾項。</p>
+  </div>
+</section>
+
+<!-- 備用 B -->
+<section class="slide paper backup" id="s17" data-label="B" data-title="評量規準（草案）">
+  <div class="pad">
+    <div class="kicker">BACKUP B · 草案，待共備確認</div>
+    <h2 class="title">評量規準</h2>
+    <table class="tbl">
+      <thead><tr><th>向度</th><th>我開始做到</th><th>我做到了</th><th>我能分享與改進</th></tr></thead>
+      <tbody>
+        <tr><td>Head 問清楚</td><td>說出 2 種野菜的名字</td><td>用特徵辨識，並解釋 AI 為何誤認</td><td>說明辨識的限制</td></tr>
+        <tr><td>Hands 做出來</td><td>跟著摘菜、洗菜</td><td>安全料理或完成地圖圖層</td><td>教同伴並修正</td></tr>
+        <tr><td>Heart 尊重</td><td>知道先請教再採集</td><td>引述耆老與店家的話並標示來源</td><td>把成果帶回部落分享</td></tr>
+        <tr><td>Health 安全</td><td>洗手、不亂吃</td><td>安全使用刀具與爐火</td><td>向他人說明安全理由</td></tr>
+        <tr><td>族語與文化</td><td>念出 Dateng 等詞彙</td><td>地標寫阿美語與中文</td><td>向長者請教並回饋</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 備用 C -->
+<section class="slide paper backup" id="s18" data-label="C" data-title="族語詞彙與核對">
+  <div class="pad">
+    <div class="kicker">BACKUP C · 海岸阿美語</div>
+    <h2 class="title">族語詞彙與核對</h2>
+    <div class="words">
+      <div><span class="am">Nga'ay ho</span><span>你好</span><i class="ok">已核對</i></div>
+      <div><span class="am">dateng</span><span>野菜</span><i class="ok">已核對</i></div>
+      <div><span class="am">ama</span><span>阿嬤</span><i class="ok">已核對</i></div>
+      <div><span class="am">midateng</span><span>採集野菜</span><i class="ok">已核對</i></div>
+      <div><span class="am">faki</span><span>叔叔、舅舅</span><i class="ok">已核對</i></div>
+      <div><span class="am">tana'</span><span>刺蔥</span><i class="ok">已核對</i></div>
+      <div><span class="am">ina</span><span>媽媽、阿姨</span><i class="ok">已核對</i></div>
+      <div><span class="am">kafotolay</span><span>野莧</span><i class="ok">已核對</i></div>
+      <div><span class="am">aray</span><span>謝謝</span><i class="ok">已核對</i></div>
+      <div><span class="am">tatokem</span><span>龍葵</span><i class="ok">已核對</i></div>
+      <div><span class="am">kamamit</span><span>野番茄</span><i class="wait">確認中</i></div>
+      <div><span class="am">lengac</span><span>月桃</span><i class="ok">已核對</i></div>
+    </div>
+    <p class="cap bk-foot">依學校族語詞庫核對；不同部落的說法可以並列，不硬統一。</p>
+  </div>
+</section>
+
+<!-- 備用 D -->
+<section class="slide paper backup" id="s19" data-label="D" data-title="安全與倫理">
+  <div class="pad">
+    <div class="kicker">BACKUP D · 座談備用</div>
+    <h2 class="title">安全與倫理</h2>
+    <ul class="ethics">
+      <li><b>採集</b><span>先請教再採集，採多少用多少</span></li>
+      <li><b>食用</b><span>能不能吃、怎麼處理，由熟悉的長輩和老師確認</span></li>
+      <li><b>器具</b><span>刀具和爐火全程有大人看顧</span></li>
+      <li><b>AI</b><span>辨識結果不作採食判定</span></li>
+      <li><b>食品</b><span>果醬標示與食品安全，由有食品登錄的工作室負責</span></li>
+      <li><b>創作</b><span>精靈個性是創作，植物知識要有來源，兩者分開標示</span></li>
+    </ul>
+  </div>
+</section>
+
+<div id="pageno"></div>
+<div id="progress"></div>
+</div>
+</div></div>
+
+<div id="timer" hidden><span class="t">0:00</span><span class="w"></span></div>
+<div id="cues" hidden><div class="cue-meta"><b class="cue-n"></b><span class="cue-title"></span><span class="cue-win"></span><span class="cue-next"></span></div><p class="cue-text"></p></div>
+<aside id="script" hidden aria-label="講稿"><header><b>講稿</b><span class="script-title"></span><button class="x" type="button" data-close="script" aria-label="關閉講稿">×</button></header><div class="script-body"></div></aside>
+<div id="overview" hidden><div class="ov-head">總覽 · 點選跳頁<button class="x" type="button" data-close="overview" aria-label="關閉總覽">×</button></div><div class="ov-grid"></div></div>
+<div id="help" hidden><div class="ov-head">按鍵<button class="x" type="button" data-close="help" aria-label="關閉按鍵說明">×</button></div>
+  <dl class="keys">
+    <dt>→ ↓ PageDown</dt><dd>下一頁（翻頁器可用）</dd>
+    <dt>← ↑ PageUp</dt><dd>上一頁</dd>
+    <dt>空白鍵</dt><dd>下一頁；結尾頁播放／暫停影片</dd>
+    <dt>F</dt><dd>全螢幕</dd>
+    <dt>T</dt><dd>開始／暫停計時，Shift+T 歸零</dd>
+    <dt>P</dt><dd>提示列（重點、本頁時間、下一頁）</dd>
+    <dt>S</dt><dd>講稿</dd>
+    <dt>O</dt><dd>總覽與備用頁</dd>
+    <dt>數字＋Enter</dt><dd>跳到第幾頁</dd>
+    <dt>B 或 .</dt><dd>黑畫面</dd>
+    <dt>Esc</dt><dd>關閉視窗</dd>
+  </dl>
+</div>
+<div id="black" hidden></div>
+<div id="jump" hidden></div>
+<nav id="nav" aria-label="翻頁"><button id="btn-prev" type="button" aria-label="上一頁">‹</button><button id="btn-next" type="button" aria-label="下一頁">›</button><button id="btn-menu" type="button" aria-label="總覽">☰</button><button id="btn-fs" type="button" aria-label="全螢幕">⤢</button></nav>
+<div id="hint">點一下畫面，再用 ← → 翻頁 · 按 ? 看所有按鍵</div>
+
+<script type="application/json" id="deck-data">{"slides": [{"title": "封面與問候", "win": [0, 45], "script": ["Nga'ay ho！大家早安，謝謝主持人熊教授。", "我是臺東長濱寧埔國小，也就是 Salimpo 阿美山海文化實驗小學的賴奕芸。學校在海岸山脈和太平洋之間，全校孩子大約九成五是阿美族。今天和我一起來的，是 Ciping 吳慧麗老師，這份野菜課程是我們兩個一起寫的。等一下的綜合座談，族語和文化的問題，Ciping 老師比我更有資格回答。"]}, {"title": "這可以吃嗎？", "win": [45, 85], "script": ["先請大家想像一個畫面：路邊有一株不認識的草。很多人心裡冒出來的第一個問題，大概是——「這可以吃嗎？」", "這是一個好問題。但在我們的課堂，它只是開始，後面還要再接三個問題：", "第一，這是誰教你的？", "第二，你怎麼確認？", "第三，你要怎麼告訴別人？", "今天這十五分鐘，我想用孩子真正做過的事，回答這三個問題。"]}, {"title": "野菜知識在人身上", "win": [85, 130], "script": ["阿美族的 Dateng，野菜，不寫在課本上。什麼時候採、採哪個部位、怎麼煮、有什麼禁忌，這些知識在部落的 ama、faki、ina 身上，在他們走過的田埂、路邊和海岸。", "等一下第二場，吳雪月老師會帶大家走進「大地的超商」。我今天要分享的是另一端：一所小學，怎麼讓孩子第一次走進這間超商的時候，學會看、學會問、學會記，也學會說。"]}, {"title": "課程全貌", "win": [130, 180], "script": ["這個課程叫「Dateng 野菜探險家」，三到六年級，教案規劃 86 節、12 項任務，用一個問題貫穿：餐桌上的野菜，藏著哪些傳統智慧與永續？", "孩子的學習分成四段。先採集：跟著長輩認識、記錄。再實驗：品嚐、比較，還要訓練 AI。接著創作：做地圖、畫精靈、編繪本。最後分享：走出校園訪問店家，也站上台介紹家鄉。", "前一段留下的照片和筆記，就是下一段的材料。"]}, {"title": "案例一｜辨識：先請教，再採集", "win": [180, 245], "script": ["第一件事，是認得。", "我們的規矩是：先請教，再採集；採多少，用多少。孩子跟著長輩走進菜園和山林，長輩說，這是 tana'，刺蔥；這是 kafotolay，野莧。", "回到教室，孩子用植拓和科學繪圖，把葉形、葉緣、葉脈畫下來，再整理成一張知識卡：中文名、族語名、辨識特徵、採集知識、料理方式，還有文化故事。", "這一段，老師最常問兩個問題：「你是從哪個部位看出來的？」「這個用途，是誰告訴你的？」", "孩子要分得清楚：哪些是自己看到的，哪些是聽長輩說的，哪些還不確定。認得一株野菜，不只是叫得出名字，而是說得出依據。"]}, {"title": "案例二｜風味與料理：把「苦苦的」說清楚", "win": [245, 310], "script": ["第二件事，是嚐。", "課堂上冒出一個問題：野菜苦苦的，為什麼煮成湯卻很好喝？我們就把「苦」拆開來。孩子用酸、甜、苦、辣、香、澀這幾個詞，先寫下自己的感覺，再打分數、畫成風味圖。", "這時候，一個很好的問題出現了：你說的苦，跟同學說的苦，一樣嗎？孩子發現，要比較，就得一起記下：是哪個部位、生的還是煮過的、是誰嚐的。", "接著，孩子到市場向攤販請教怎麼挑、怎麼煮；回到學校分工做刺蔥炒蛋，再自己發想出過貓春捲。料理讓知識回到生活。孩子要能說出：這道菜的食材從哪裡來、跟誰學的、為什麼這樣煮。"]}, {"title": "案例三｜AI 辨識：教電腦之前，先看清楚", "win": [310, 375], "script": ["第三件事，我們請孩子當老師——教電腦認野菜。", "孩子分組，為刺蔥、野莧、龍葵各拍幾十張照片，用 Teachable Machine 訓練一個辨識模型，再拿新的葉子去測。結果，它認錯了。", "這正是我們要的時刻。孩子開始找原因：是它沒看過這個角度？還是它認的其實是背景，不是葉子？於是回去補拍、重新訓練。為了讓 AI 認得更準，孩子得比以前更仔細地看每一種野菜。", "有兩件事，我們跟孩子講得很清楚。第一，AI 說可以吃，不算數——能不能吃，要問長輩、問老師。第二，AI 不取代耆老，它只是幫耆老的知識，被更多人看見。"]}, {"title": "案例四｜說給別人聽：地圖、精靈、繪本", "win": [375, 445], "script": ["第四件事，是說給別人聽。", "孩子把採集點放進 Google 我的地圖，每一種野菜一個圖層，地標寫上阿美語和中文，附上照片和辨識特徵。校園，變成一張可以帶人走讀的地圖。", "孩子也幫野菜設計精靈：刺蔥全身帶刺，是勇敢的冒險家；龍葵要小心處理，是溫柔的守界者。他們用第一人稱寫自傳、錄下自己的聲音，再把手繪的精靈做成 AR。我們也把野菜知識編成一本繪本，《Misolap ci Awos to dateng》，Awos 的野菜探險記。", "精靈的個性，是孩子的創作；植物的特徵和用途，要有來源。這兩件事，我們在作品上分開標示。"]}, {"title": "走出校園｜在地產業：味道背後的人", "win": [445, 500], "script": ["野菜不只在餐桌上，也在別人的生計裡。", "孩子拜訪長濱的海鹽爺爺，看他退潮時取海水、用漂流木柴燒、手炒成鹽，再加入乾炒過的刺蔥子、月桃子。孩子回來分析這包鹽的在地性、文化性和故事性，也提出自己的包裝建議。", "他們還帶著訪綱，去問一家原鄉野菜火鍋店的老闆。老闆說，開店是為了「傳承老人的野菜精神」；他也擔心兩件事：野菜種類變少了，傳承也找不到人接。這些話，也留給孩子新的問題：哪些野菜越來越難找？我們可以怎麼一直記錄下去？"]}, {"title": "知識圖譜", "win": [500, 530], "script": ["把這些連起來，孩子手上的不是一張菜單，而是一張關係網：一株植物，連著族語、生態、歷史、料理，也連著教我們的人。我們把它整理成這個網站，最後一頁的 QR code 可以看到今天的簡報和這個網站，歡迎大家會後慢慢看。"]}, {"title": "讓作品說話", "win": [530, 570], "script": ["這個課程在 2025 年拿到永續台灣創意教案國小組首獎；孩子的四健作業組，拿下縣賽冠軍、全國三等獎。", "但比獎狀更能說明學習的，是孩子的作品：一張寫得出依據的知識卡、一張解釋得了的風味圖，還有一次站上台、面對評審追問的發表。我們看學習，就看孩子能不能指出線索、說明紀錄、交代來源。"]}, {"title": "延續｜Kamamit 野番茄：作品先走到了遠方", "win": [570, 650], "script": ["野菜課沒有在得獎那天結束。今年，中年級的孩子接著研究 kamamit，野番茄。", "七個孩子和在地的工作室合作，把一塊荒地變成番茄園，最後熬成果醬。他們還算了一罐果醬的成本：一開始只算到 45 元，因為自己採的番茄記成 0；把大家花的工時也算進去，變成大約 245 元，比他們參考市場訂的售價 200 元還高。孩子發現，價格裡藏著看不見的勞動。", "五月的臺東慢食節，孩子第一次拿麥克風，向陌生的客人解說。有個孩子在記錄簿寫下：「拿麥克風會緊張，可是講自己真的做過的事，就比較講得出來。」", "九月，學校的姚素卿老師和工作室，把孩子的記錄簿和師生一起熬的果醬，帶到義大利杜林的國際慢食節。孩子沒有出國，但他們的作品，先走到了遠方。"]}, {"title": "老師也會說錯", "win": [650, 715], "script": ["這一年，最重要的一課，其實是老師學到的。", "野番茄課的第一堂，老師把一個一般說法——作物的野生親戚，可能保留抗病、耐旱的差異——直接說成：眼前這株野番茄，有抗病、耐旱的「超能力」。熬果醬時，老師又說糖減半大約可以放半年，孩子就照著在貼紙上寫了保存期限。", "暑假整理記錄簿，回頭查證才發現：這株野番茄還沒有經過植物學鑑定，保存期限也沒有檢驗依據。我們把記錄簿改成兩句話：不宣稱它抗病或耐旱；沒有驗證，就不寫保存期限。孩子也開始練習分清楚，哪些是「查得到的」，哪些「還在猜」。"]}, {"title": "給老師的起點", "win": [715, 785], "script": ["回到一開始的三個問題：誰教的、怎麼確認、怎麼告訴別人。要讓孩子回答這三題，不一定需要 86 節。我建議從三樣東西開始：", "一株在地植物：校園或部落常見、適合教學的。", "一位知識夥伴：願意一起教的長輩、族語老師或在地職人。", "一項分享任務：一張知識卡，加上一分鐘導覽。", "舉例來說：第一節，請長輩帶孩子認一株校園植物，拍照、記下特徵；第二節，畫成知識卡，寫上是誰教的；第三節，練習一分鐘導覽，說給學弟妹聽。低年級用畫的、用說的；高年級再加上訪綱和來源比對。", "老師一定會遇到答不出來的問題，甚至會說錯。那就帶著孩子一起去查——不知道，就說不知道。"]}, {"title": "結尾與孩子的聲音", "win": [785, 840], "script": ["最後，讓孩子自己說。", "〔按空白鍵或翻頁器「下一頁」播放影片，約 21 秒：孩子在 2025 全國四健賽攤位向評審介紹〕", "當孩子能指出一株植物的特徵，說得出是跟誰學的，再把它分享出去，他就在和土地、長輩，還有身邊的人建立關係。對我們來說，餐桌上的永續智慧，不是把野菜保存起來，而是讓這些關係，在孩子的日常裡繼續長下去。", "Aray，謝謝大家。"]}]}</script>
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const DATA = JSON.parse($('#deck-data').textContent);
+  const vp = $('#viewport'), frame = $('#frame'), stage = $('#stage');
+  const slides = $$('.slide', stage);
+  const N = slides.length;
+  const MAIN = slides.filter(s => !s.classList.contains('backup')).length;
+  // ?steps=all shows every build state, ?shot hides the on-screen hint and buttons (both for layout checks)
+  const ALL_STEPS = /[?&]steps=all\b/.test(location.search);
+  const SHOT = /[?&]shot\b/.test(location.search);
+  let cur = 0, step = 0;
+
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+  };
+  const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  const label = i => slides[i].dataset.label || String(i + 1).padStart(2, '0');
+  const stepsOf = s => +(s.dataset.steps || 0);
+
+  function fit() {
+    const w = frame.clientWidth, h = frame.clientHeight;
+    stage.style.setProperty('--k', Math.max(0.05, Math.min(w / 1600, h / 900)));
+  }
+
+  function applyStep(s, st) {
+    s.dataset.at = st;
+    $$('[data-step]', s).forEach(el => el.classList.toggle('shown', +el.dataset.step <= st));
+    const v = $('video', s);
+    if (v) {
+      if (st === 1) v.play().catch(() => {}); else v.pause();
+      s.classList.toggle('closing', st >= 2);
+    }
+  }
+
+  function go(i, st = 0) {
+    i = Math.max(0, Math.min(N - 1, i));
+    const old = slides[cur];
+    if (old !== slides[i]) {
+      old.classList.remove('on'); old.setAttribute('aria-hidden', 'true');
+      const ov = $('video', old); if (ov) ov.pause();
+    }
+    cur = i;
+    const s = slides[cur];
+    step = ALL_STEPS ? stepsOf(s) : Math.min(st, stepsOf(s));
+    s.classList.add('on'); s.removeAttribute('aria-hidden');
+    const v = $('video', s);
+    if (v && step === 0) { try { v.currentTime = 0; } catch (e) { /* not loaded yet */ } }
+    applyStep(s, step);
+    update();
+  }
+  // the ending is a stop: backups are reached only through the overview or a page number
+  function next() {
+    const s = slides[cur];
+    if (step < stepsOf(s)) { step++; applyStep(s, step); update(); }
+    else if (cur !== MAIN - 1 && cur < N - 1) go(cur + 1, 0);
+  }
+  function prev() {
+    const s = slides[cur];
+    if (step > 0) { step--; applyStep(s, step); update(); }
+    else if (cur > 0) go(cur - 1, stepsOf(slides[cur - 1]));
+  }
+  function space() {
+    const s = slides[cur], v = $('video', s);
+    if (v && step < 2) {
+      if (step === 0) next();
+      else if (v.paused) v.play().catch(() => {});
+      else v.pause();
+    } else next();
+  }
+
+  function update() {
+    const s = slides[cur];
+    const backup = s.classList.contains('backup');
+    stage.dataset.tone = s.classList.contains('ink') ? 'ink' : 'paper';
+    $('#pageno').textContent = backup ? '備用 ' + s.dataset.label : label(cur) + ' / ' + String(MAIN).padStart(2, '0');
+    $('#progress').style.width = (backup ? 100 : (cur + 1) / MAIN * 100) + '%';
+    try { history.replaceState(null, '', '#' + s.id); } catch (e) { /* sandboxed */ }
+    $$('.ov-grid button').forEach((b, k) => b.classList.toggle('now', k === cur));
+    renderCues(); renderScript(); renderTimer();
+  }
+
+  function renderCues() {
+    const box = $('#cues'); if (box.hidden) return;
+    const s = slides[cur], d = DATA.slides[cur] || {}, n = slides[cur + 1];
+    $('.cue-n', box).textContent = s.dataset.label ? '備用 ' + s.dataset.label : label(cur);
+    $('.cue-title', box).textContent = s.dataset.title;
+    $('.cue-win', box).textContent = d.win ? '本頁 ' + fmt(d.win[0]) + '–' + fmt(d.win[1]) : '';
+    $('.cue-next', box).textContent = n ? '下一頁：' + n.dataset.title : '';
+    $('.cue-text', box).textContent = s.dataset.cue || '座談備用頁';
+  }
+  function renderScript() {
+    const box = $('#script'); if (box.hidden) return;
+    const s = slides[cur], d = DATA.slides[cur] || {};
+    $('.script-title', box).textContent = (s.dataset.label ? '備用 ' + s.dataset.label : label(cur)) + '　' + s.dataset.title + (d.win ? '　' + fmt(d.win[0]) + '–' + fmt(d.win[1]) : '');
+    const body = $('.script-body', box);
+    body.textContent = '';
+    (d.script || ['這一頁是座談備用，沒有講稿。']).forEach(t => {
+      const p = document.createElement('p');
+      if (/^〔.*〕$/.test(t)) p.className = 'stage-dir';
+      p.textContent = t; body.appendChild(p);
+    });
+    body.scrollTop = 0;
+  }
+
+  const KEY = 'dateng-forum-timer';
+  let T = Object.assign({ acc: 0, start: null, running: false, shown: false }, store.get(KEY) || {});
+  const elapsed = () => T.acc + (T.running && T.start ? (Date.now() - T.start) / 1000 : 0);
+  function toggleTimer() {
+    if (T.running) { T.acc = elapsed(); T.running = false; T.start = null; }
+    else { T.start = Date.now(); T.running = true; T.shown = true; }
+    store.set(KEY, T); renderTimer();
+  }
+  function resetTimer() { T = { acc: 0, start: null, running: false, shown: false }; store.set(KEY, T); renderTimer(); }
+  function renderTimer() {
+    const el = $('#timer'); el.hidden = !T.shown; if (!T.shown) return;
+    const t = elapsed(), w = (DATA.slides[cur] || {}).win;
+    let state = 'ok', note = '';
+    if (!T.running) { state = 'paused'; note = '暫停中'; }
+    else if (t > 900) { state = 'over'; note = '超過 15 分鐘'; }
+    else if (w && t > w[1] + 10) { state = 'late'; note = '慢了 ' + fmt(t - w[1]); }
+    else if (w && t < w[0] - 20) { note = '快了 ' + fmt(w[0] - t); }
+    el.dataset.state = state;
+    $('.t', el).textContent = fmt(t);
+    $('.w', el).textContent = [w ? '本頁 ' + fmt(w[0]) + '–' + fmt(w[1]) : '', note].filter(Boolean).join('　');
+  }
+  setInterval(() => { if (T.running) renderTimer(); }, 500);
+
+  function toggle(id, force) {
+    const el = $('#' + id);
+    const show = force === undefined ? el.hidden : force;
+    el.hidden = !show;
+    if (id === 'cues') renderCues();
+    if (id === 'script') renderScript();
+    if (id === 'overview' && show) { const b = $('.ov-grid button.now'); if (b) b.focus(); }
+  }
+  function closeOverlays() { ['overview', 'help', 'black', 'script'].forEach(id => { $('#' + id).hidden = true; }); }
+  function toggleFS() {
+    const d = document, el = d.documentElement;
+    if (d.fullscreenElement || d.webkitFullscreenElement) { const x = d.exitFullscreen || d.webkitExitFullscreen; if (x) x.call(d); return; }
+    const r = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (r) { const p = r.call(el); if (p && p.catch) p.catch(() => {}); }
+  }
+
+  // overview grid
+  const grid = $('.ov-grid');
+  slides.forEach((s, k) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    if (s.classList.contains('backup')) b.className = 'bk';
+    const n = document.createElement('span'); n.textContent = s.dataset.label || label(k);
+    const t = document.createElement('b'); t.textContent = s.dataset.title;
+    b.append(n, t);
+    b.addEventListener('click', () => { toggle('overview', false); go(k, 0); });
+    grid.appendChild(b);
+  });
+
+  let digits = '', digitTimer;
+  const jump = $('#jump');
+  function clearDigits() { digits = ''; jump.hidden = true; }
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if ((k === 'Enter' || k === ' ') && e.target.closest && e.target.closest('button')) return;
+    if (!$('#overview').hidden || !$('#help').hidden) {
+      if (k === 'Escape' || k === 'o' || k === 'O' || k === '?') { $('#overview').hidden = true; $('#help').hidden = true; e.preventDefault(); }
+      return;
+    }
+    // like PowerPoint: any key on the black screen only brings the slide back
+    if (!$('#black').hidden && k !== 'b' && k !== 'B' && k !== '.') { $('#black').hidden = true; e.preventDefault(); return; }
+    switch (k) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown': next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': prev(); break;
+      case 'Enter': if (digits) { go(+digits - 1, 0); clearDigits(); } else next(); break;
+      case ' ': space(); break;
+      case 'Home': go(0); break;
+      case 'End': go(MAIN - 1, stepsOf(slides[MAIN - 1])); break;
+      case 'f': case 'F': toggleFS(); break;
+      case 't': case 'T': if (e.shiftKey) resetTimer(); else toggleTimer(); break;
+      case 'p': case 'P': toggle('cues'); break;
+      case 's': case 'S': toggle('script'); break;
+      case 'o': case 'O': case 'g': case 'G': toggle('overview'); break;
+      case 'b': case 'B': case '.': toggle('black'); break;
+      case '?': case 'h': case 'H': toggle('help'); break;
+      case 'Escape': closeOverlays(); clearDigits(); break;
+      default:
+        if (/^[0-9]$/.test(k)) {
+          digits = (digits + k).slice(-2); jump.hidden = false; jump.textContent = '跳到 ' + digits + '（Enter）';
+          clearTimeout(digitTimer); digitTimer = setTimeout(clearDigits, 2500);
+        } else return;
+    }
+    e.preventDefault();
+  });
+
+  $$('[data-close]').forEach(b => b.addEventListener('click', () => toggle(b.dataset.close, false)));
+  $('#btn-prev').addEventListener('click', prev);
+  $('#btn-next').addEventListener('click', next);
+  $('#btn-menu').addEventListener('click', () => toggle('overview'));
+  $('#btn-fs').addEventListener('click', toggleFS);
+  $('#black').addEventListener('click', () => toggle('black', false));
+  $$('.video-frame').forEach(f => f.addEventListener('click', space));
+  $$('video', stage).forEach(v => v.addEventListener('ended', () => {
+    const s = v.closest('.slide');
+    setTimeout(() => { if (slides[cur] === s && step === 1) { step = 2; applyStep(s, 2); update(); } }, 700);
+  }));
+
+  let sx = null, sy = null;
+  vp.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+  vp.addEventListener('touchend', e => {
+    if (sx === null) return;
+    const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) (dx < 0 ? next : prev)();
+    sx = null;
+  }, { passive: true });
+
+  let idle;
+  function wake() { document.body.classList.add('awake'); clearTimeout(idle); idle = setTimeout(() => document.body.classList.remove('awake'), 2600); }
+  addEventListener('mousemove', wake);
+  const hint = $('#hint');
+  if (SHOT) { hint.hidden = true; $('#nav').hidden = true; }
+  const hideHint = () => hint.classList.add('gone');
+  addEventListener('keydown', hideHint, { once: true });
+  addEventListener('pointerdown', hideHint, { once: true });
+  setTimeout(hideHint, 10000);
+
+  addEventListener('resize', fit);
+  document.addEventListener('fullscreenchange', fit);
+  slides.forEach(s => s.setAttribute('aria-hidden', 'true'));
+  fit();
+  const m = location.hash.match(/^#s(\d+)$/);
+  go(m ? +m[1] - 1 : 0, 0);
+})();
+</script>
+</body>
+</html>
