@@ -561,6 +561,18 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 .ar3-box,.ar3-hand{height:350px}
 .ar3-arrow{top:150px}
 .ar3-box.loading::after{content:"載入中…";position:absolute;inset:0;display:grid;place-items:center;font:500 22px var(--sans);color:var(--on-paper-2)}
+
+.qz-card.scn{padding-left:calc(43% + 40px)}
+.qz-scene{position:absolute;left:0;top:0;bottom:0;width:43%;overflow:hidden;background:#cfe3c4}
+.qz-scene svg{display:block;width:100%;height:100%}
+.qz-scene.still .qs,.qz-scene.still .qs *{animation-play-state:paused!important;animation-delay:-3.1s!important}
+.qz-card.scn{padding-top:26px;padding-bottom:26px}.qz-card.scn .qz-q{font-size:34px}
+.qz-card.scn .qz-opts{grid-template-columns:1fr;gap:12px}
+.qz-card.scn .qz-opts button{min-height:66px;padding:12px 20px;font-size:24px}
+.qz-card.scn .qz-again{right:26px}
+.qz-ai{position:absolute;left:12px;bottom:10px;margin:0;padding:3px 10px;font:500 14px/1.3 var(--sans);color:#fff;background:rgba(20,30,24,.55)}
+.qz-book{position:absolute;top:48px;right:96px;z-index:2;margin:0;padding:10px 20px;font:700 22px var(--sans);color:var(--on-paper);background:var(--paper);border:2px solid var(--on-paper);cursor:pointer}
+.qz-book:hover{background:var(--neon)}
 </style>
 <div id="viewport"><div id="frame">
 <div id="stage" data-tone="ink">
@@ -798,7 +810,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 </section>
 
 <!-- 10 心理測驗 -->
-<section class="slide paper" id="s10" data-title="案例四｜O maan a datengan kiso？你是哪一種野菜？" data-steps="4" data-cue="O maan a datengan kiso？我們玩一次｜每按一次下一頁替大家選：躲雨→大路→照顧小鳥→應該有毒吧｜結果龍葵，溫柔的守界者｜在山上標準答案只有一個：先問長輩｜點右邊精靈，左邊出現它的人格特質｜右下 QR：觀眾用手機自己玩｜會後可用滑鼠自己玩、按重玩">
+<section class="slide paper" id="s10" data-title="案例四｜O maan a datengan kiso？你是哪一種野菜？" data-steps="4" data-cue="O maan a datengan kiso？我們玩一次｜每按一次下一頁替大家選：躲雨→大路→照顧小鳥→應該有毒吧｜結果龍葵，溫柔的守界者｜在山上標準答案只有一個：先問長輩｜點右邊精靈，左邊出現它的人格特質｜右下 QR：觀眾用手機自己玩｜右上「繪本原頁」跳回第 9 頁的第 24 頁，再按下一頁回來｜會後可用滑鼠自己玩、按重玩">
   <div class="pad">
     <div class="kicker">CASE 04 · 繪本裡的心理測驗</div>
     <div class="head-row"><h2 class="title"><span class="am">O maan a datengan kiso?</span></h2><p class="claim">你是哪一種野菜？</p></div>
@@ -814,6 +826,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
       </div>
     </div>
   </div>
+  <button type="button" class="qz-book" id="qz-book" title="跳到第 9 頁的繪本，翻到第 24 頁">↩ 繪本原頁 p.24–25</button>
 </section>
 
 <!-- 11 AR：3D 模型 -->
@@ -1561,7 +1574,364 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   book.addEventListener('click', function () { show(cur + 1); });
   s.querySelector('.fb-nav').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; e.stopPropagation(); b.blur(); show(cur + +b.dataset.d); });
   s.addEventListener('step', function (e) { show(KEY[e.detail] || 0); });
+  s.addEventListener('page', function (e) { show(e.detail); });
   show(KEY[+(s.dataset.at || 0)] || 0, true);
+})();
+/* Quiz scenes: a tiny explorer in a forest of giant wild vegetables. QZScene.render(key) -> <svg> string; QZScene.css goes in a <style> */
+(function () {
+  var uid = 0, P = '';
+  function f(n) { return Math.round(n * 10) / 10; }
+  function rng(seed) { var s = seed; return function () { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
+  function u(id) { return 'url(#' + P + id + ')'; }
+  function lin(id, stops, x2, y2) {
+    return '<linearGradient id="' + P + id + '" x1="0" y1="0" x2="' + (x2 == null ? 1 : x2) + '" y2="' + (y2 == null ? 1 : y2) + '">' +
+      stops.map(function (s) { return '<stop offset="' + s[0] + '" stop-color="' + s[1] + '"' + (s[2] != null ? ' stop-opacity="' + s[2] + '"' : '') + '/>'; }).join('') + '</linearGradient>';
+  }
+  function rad(id, stops) {
+    return '<radialGradient id="' + P + id + '">' + stops.map(function (s) { return '<stop offset="' + s[0] + '" stop-color="' + s[1] + '"' + (s[2] != null ? ' stop-opacity="' + s[2] + '"' : '') + '/>'; }).join('') + '</radialGradient>';
+  }
+  function defs(sky) {
+    return '<defs>' + lin('sky', sky, 0, 1) +
+      lin('l1', [[0, '#c8e87e'], [.55, '#6db04a'], [1, '#2f7a3a']]) + lin('l2', [[0, '#8cc965'], [1, '#1f5c33']]) +
+      lin('l3', [[0, '#b4e39a'], [.5, '#4f9e5a'], [1, '#1d5a3c']]) + lin('lp', [[0, '#c79ad6'], [1, '#5a3678']]) +
+      lin('lf', [[0, '#b7d8bf'], [1, '#86b59b']]) + lin('ld', [[0, '#3f6a55'], [1, '#1d3a33']]) +
+      lin('gl', [[0, '#fff', .38], [.45, '#fff', 0]], 1, 0) + lin('bark', [[0, '#9a7a5c'], [.5, '#7a5c45'], [1, '#4f3b2d']], 1, 0) +
+      lin('soil', [[0, '#e3cb98'], [1, '#b8955f']], 0, 1) + lin('moss', [[0, '#8cc463'], [1, '#3f7f3c']], 0, 1) +
+      lin('ray', [[0, '#fffbe0', .55], [1, '#fffbe0', 0]], 0, 1) + rad('bok', [[0, '#fff', .55], [.6, '#fff', .18], [1, '#fff', 0]]) +
+      rad('berry', [[0, '#7a5a9e'], [.55, '#3b2752'], [1, '#140d1c']]) + rad('glow', [[0, '#ffe7a0', .9], [.4, '#ffb648', .45], [1, '#ff8a3d', 0]]) +
+      rad('vig', [[.62, '#10201a', 0], [1, '#10201a', .3]]) + rad('fly', [[0, '#fbff9e', 1], [.3, '#e8ff7a', .55], [1, '#e8ff7a', 0]]) +
+      '<filter id="' + P + 'b2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6"/></filter>' +
+      '<filter id="' + P + 'b5" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4.5"/></filter>' +
+      '<filter id="' + P + 'b9" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="8"/></filter></defs>';
+  }
+  function g(inner, tr, cls, extra) { return '<g' + (tr ? ' transform="' + tr + '"' : '') + (cls ? ' class="' + cls + '"' : '') + (extra || '') + '>' + inner + '</g>'; }
+  /* ---- plants ---- */
+  function leaf(o) {
+    var L = o.L, W = o.W, c = o.bend || 0, ov = o.ovate;
+    var d = ov ? 'M0 0C' + f(W * 1.25) + ' ' + f(-L * .12) + ' ' + f(W * .95 + c * .6) + ' ' + f(-L * .78) + ' ' + f(c) + ' ' + f(-L) + 'C' + f(-W * .95 + c * .6) + ' ' + f(-L * .78) + ' ' + f(-W * 1.25) + ' ' + f(-L * .12) + ' 0 0Z'
+               : 'M0 0C' + f(W) + ' ' + f(-L * .22) + ' ' + f(W * .95 + c * .6) + ' ' + f(-L * .72) + ' ' + f(c) + ' ' + f(-L) + 'C' + f(-W * .95 + c * .6) + ' ' + f(-L * .72) + ' ' + f(-W) + ' ' + f(-L * .22) + ' 0 0Z';
+    var s = '<path d="' + d + '" fill="' + u(o.g || 'l1') + '"/>';
+    if (o.v) {
+      s += '<path d="M0 0Q' + f(c * .45) + ' ' + f(-L * .5) + ' ' + f(c) + ' ' + f(-L) + '" stroke="' + o.v + '" stroke-width="' + f(Math.max(.7, W * .07)) + '" fill="none" stroke-linecap="round" opacity=".8"/>';
+      var vs = '', st = o.vs || .11;
+      for (var t = .12; t < .88; t += st) {
+        var mx = c * t * t, my = -L * t, ex = W * .82 * Math.sin(Math.PI * Math.min(.95, t + .08)) * (ov ? 1.15 : 1), ey = -L * (t + (o.par ? .02 : .1));
+        vs += 'M' + f(mx) + ' ' + f(my) + 'L' + f(mx + ex * .92 + c * t * .3) + ' ' + f(ey) + 'M' + f(mx) + ' ' + f(my) + 'L' + f(mx - ex * .92 + c * t * .3) + ' ' + f(ey);
+      }
+      s += '<path d="' + vs + '" stroke="' + o.v + '" stroke-width="' + f(Math.max(.35, W * .028)) + '" fill="none" opacity=".32"/>';
+    }
+    if (o.gloss !== false) s += '<path d="' + d + '" fill="' + u('gl') + '"/>';
+    if (o.purple) s += '<path d="' + d + '" fill="' + u('lp') + '" opacity=".55" transform="translate(' + f(W * .12) + ' 2) scale(.96)"/>';
+    var inner = g(s, '', o.sw ? 'qs-sw' + o.sw : '', o.dl ? ' style="animation-delay:' + o.dl + 's"' : '');
+    return g(inner, 'translate(' + f(o.x) + ' ' + f(o.y) + ') rotate(' + f(o.a || 0) + ')', '', (o.op != null ? ' opacity="' + o.op + '"' : '') + (o.fl ? ' filter="' + u(o.fl) + '"' : ''));
+  }
+  function stem(x1, y1, cx, cy, x2, y2, w, col) { return '<path d="M' + f(x1) + ' ' + f(y1) + 'Q' + f(cx) + ' ' + f(cy) + ' ' + f(x2) + ' ' + f(y2) + '" stroke="' + (col || '#4f8a3a') + '" stroke-width="' + w + '" fill="none" stroke-linecap="round"/>'; }
+  function pinnate(o) { // 刺蔥 compound leaf
+    var b = o.bend || 0, s = stem(0, 0, b * .6, -o.L * .5, b, -o.L, o.rw || 2.4, o.rc || '#7a8a3e'), n = o.n || 6;
+    for (var i = 1; i <= n; i++) {
+      var t = i / (n + .6), px = b * t * t, py = -o.L * t, sz = o.ls * (1 - t * .3);
+      s += leaf({ x: px, y: py, L: sz, W: sz * .27, a: -64 + t * 18, g: o.g || 'l1', v: '#2f6b2e', vs: .2, gloss: false });
+      s += leaf({ x: px, y: py, L: sz, W: sz * .27, a: 64 - t * 18, g: o.g || 'l1', v: '#2f6b2e', vs: .2, gloss: false });
+      s += '<path d="M' + f(px - 1) + ' ' + f(py + 3) + 'l-3 2 3 .5z" fill="#c9b27a"/>';
+    }
+    s += leaf({ x: b, y: -o.L, L: o.ls * .75, W: o.ls * .2, a: 0, g: o.g || 'l1', v: '#2f6b2e', vs: .2, gloss: false });
+    return g(g(s, '', o.sw ? 'qs-sw' + o.sw : ''), 'translate(' + f(o.x) + ' ' + f(o.y) + ') rotate(' + f(o.a || 0) + ')', '', o.fl ? ' filter="' + u(o.fl) + '"' : '');
+  }
+  function trunk(o) { // thorny 刺蔥 trunk, base at (x,y), rising h
+    var w = o.w, h = o.h, l = o.lean || 0, s = '<path d="M' + f(-w / 2) + ' 0C' + f(-w / 2 + l * .3) + ' ' + f(-h * .4) + ' ' + f(-w * .36 + l * .7) + ' ' + f(-h * .7) + ' ' + f(-w * .34 + l) + ' ' + f(-h) +
+      'H' + f(w * .34 + l) + 'C' + f(w * .36 + l * .7) + ' ' + f(-h * .7) + ' ' + f(w / 2 + l * .3) + ' ' + f(-h * .4) + ' ' + f(w / 2) + ' 0Z" fill="' + u('bark') + '"/>';
+    var r = rng(o.seed || 7), d = '';
+    for (var y = -10; y > -h; y -= 9 + r() * 7) {
+      var t = -y / h, cx = l * t, half = w / 2 - (w * .16) * t, side = r() < .5 ? -1 : 1, bx = cx + side * half * (.3 + r() * .7), sz = 3 + r() * 3.5;
+      d += '<path d="M' + f(bx - sz * .55) + ' ' + f(y + sz * .4) + 'L' + f(bx + side * sz * .25) + ' ' + f(y - sz * 1.3) + 'L' + f(bx + sz * .55) + ' ' + f(y + sz * .4) + 'Z" fill="#e2d2a6" stroke="#8a7350" stroke-width=".5"/>';
+    }
+    s += '<path d="M' + f(-w * .1) + ' -4C' + f(-w * .05 + l * .3) + ' ' + f(-h * .4) + ' ' + f(l * .7) + ' ' + f(-h * .7) + ' ' + f(l) + ' ' + f(-h) + '" stroke="#b39a7c" stroke-width="1" fill="none" opacity=".5"/>' + d;
+    return g(s, 'translate(' + f(o.x) + ' ' + f(o.y) + ')', '', o.fl ? ' filter="' + u(o.fl) + '"' : '');
+  }
+  function fern(o) { // 山蘇 rosette of strap leaves
+    var s = '', n = o.n || 7;
+    for (var i = 0; i < n; i++) { var a = -70 + 140 * i / (n - 1); s += leaf({ x: 0, y: 0, L: o.L * (1 - Math.abs(a) / 260), W: o.L * .09, a: a, bend: a * .35, g: i % 2 ? 'l3' : 'l2', v: '#163f22', vs: .07, par: 1, sw: o.sw, dl: -i * .7 }); }
+    return g(s, 'translate(' + f(o.x) + ' ' + f(o.y) + ')', '', o.fl ? ' filter="' + u(o.fl) + '"' : '');
+  }
+  function lobed(o) { // 構樹 leaf
+    var s = o.s, d = 'M0 0C' + f(14 * s) + ' ' + f(-6 * s) + ' ' + f(28 * s) + ' ' + f(-10 * s) + ' ' + f(30 * s) + ' ' + f(-30 * s) + 'C' + f(22 * s) + ' ' + f(-30 * s) + ' ' + f(16 * s) + ' ' + f(-32 * s) + ' ' + f(12 * s) + ' ' + f(-40 * s) +
+      'C' + f(22 * s) + ' ' + f(-52 * s) + ' ' + f(14 * s) + ' ' + f(-70 * s) + ' 0 ' + f(-80 * s) + 'C' + f(-14 * s) + ' ' + f(-70 * s) + ' ' + f(-22 * s) + ' ' + f(-52 * s) + ' ' + f(-12 * s) + ' ' + f(-40 * s) +
+      'C' + f(-16 * s) + ' ' + f(-32 * s) + ' ' + f(-22 * s) + ' ' + f(-30 * s) + ' ' + f(-30 * s) + ' ' + f(-30 * s) + 'C' + f(-28 * s) + ' ' + f(-10 * s) + ' ' + f(-14 * s) + ' ' + f(-6 * s) + ' 0 0Z';
+    var v = 'M0 0V' + f(-76 * s) + 'M0 ' + f(-14 * s) + 'L' + f(24 * s) + ' ' + f(-28 * s) + 'M0 ' + f(-14 * s) + 'L' + f(-24 * s) + ' ' + f(-28 * s) + 'M0 ' + f(-34 * s) + 'L' + f(10 * s) + ' ' + f(-42 * s) + 'M0 ' + f(-34 * s) + 'L' + f(-10 * s) + ' ' + f(-42 * s);
+    return g(g('<path d="' + d + '" fill="' + u(o.g || 'l2') + '"/><path d="' + v + '" stroke="' + (o.v || '#244d2c') + '" stroke-width="' + f(.9 * s) + '" fill="none" opacity=".6"/>', '', o.sw ? 'qs-sw' + o.sw : ''),
+      'translate(' + f(o.x) + ' ' + f(o.y) + ') rotate(' + f(o.a || 0) + ')', '', (o.op != null ? ' opacity="' + o.op + '"' : '') + (o.fl ? ' filter="' + u(o.fl) + '"' : ''));
+  }
+  function tassel(x, y, h, c) { // 紫背草 flower head on a stem
+    return stem(x, y, x + 3, y - h * .5, x + 1, y - h, 1.6, '#5f8a4a') + '<path d="M' + f(x - 3) + ' ' + f(y - h) + 'h8l-1.5 -6h-5z" fill="#6f9a52"/>' +
+      '<g class="qs-tw" style="animation-delay:-' + f(h % 2) + 's">' + [-3, -1.5, 0, 1.5, 3, 4.5].map(function (dx) { return '<path d="M' + f(x + 1 + dx * .5) + ' ' + f(y - h - 5) + 'l' + f(dx) + ' -7" stroke="' + (c || '#d667a8') + '" stroke-width="1.6" stroke-linecap="round"/>'; }).join('') + '</g>';
+  }
+  function berries(x, y, n, sz, seed) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) {
+      var a = (i / n) * Math.PI * 2, rr = i ? sz * 1.1 : 0, bx = x + Math.cos(a) * rr, by = y + Math.sin(a) * rr * .8 + r() * 2, green = r() < .22;
+      s += stem(x, y - sz * 2.2, (x + bx) / 2, y - sz * 1.6, bx, by - sz * .9, .9, '#3f6b33') +
+        '<circle cx="' + f(bx) + '" cy="' + f(by) + '" r="' + f(sz) + '" fill="' + (green ? '#93c46a' : u('berry')) + '"/><ellipse cx="' + f(bx - sz * .35) + '" cy="' + f(by - sz * .38) + '" rx="' + f(sz * .3) + '" ry="' + f(sz * .2) + '" fill="#fff" opacity=".7"/>';
+    }
+    return s;
+  }
+  /* ---- the explorer (feet at 0,0, ~80 tall) ---- */
+  function explorer(o) {
+    var pose = o.pose || 'stand', skin = '#f2c8a2', shirt = '#3f9a63', shorts = '#c9ab78', boot = '#c9452f';
+    var hat = '<g><ellipse cx="1" cy="-70" rx="15.5" ry="3.8" fill="#c98d1d" stroke="#3a2a22" stroke-width=".7"/><path d="M-9-70C-9-80-6-82 1-82S11-80 11-70Z" fill="#e8b23a" stroke="#3a2a22" stroke-width=".7"/><path d="M-9.4-72.5H11.4V-70H-9.4Z" fill="#9c6a14"/><ellipse cx="1" cy="-70.6" rx="15.5" ry="2.6" fill="#f0c04e"/></g>';
+    var head = '<g transform="translate(1 -52) scale(1.24) translate(-1 52)"><g class="qs-head"><circle cx="1" cy="-62" r="10.5" fill="' + skin + '" stroke="#3a2a22" stroke-width=".7"/><path d="M-9.4-64C-9-71-3-73 2-72-5-70-7-66-7.6-60Z" fill="#2b1d17"/>' +
+      '<g class="qs-blink"><ellipse cx="5.2" cy="-62.5" rx="1.25" ry="1.6" fill="#2b1d17"/><ellipse cx="9.3" cy="-62.3" rx="1.1" ry="1.5" fill="#2b1d17"/></g>' +
+      '<circle cx="8" cy="-58.4" r="2.2" fill="#ee8f8a" opacity=".55"/><path d="M5.6-56.6q1.8 1.3 3.4 0" stroke="#7a3b2b" stroke-width=".9" fill="none" stroke-linecap="round"/>' + hat + '</g></g>';
+    var pack = o.noPack ? '' : '<g><rect x="-17" y="-55" width="12" height="25" rx="4" fill="#e57a2b" stroke="#7a3510" stroke-width=".7"/><rect x="-17" y="-55" width="12" height="9" rx="4" fill="#c25f1c"/><rect x="-15" y="-41" width="8" height="7" rx="2" fill="#f19a4a"/></g>';
+    var torso = '<path d="M-8.5-53Q1-56 9.5-53L10-31H-9Z" fill="' + shirt + '" stroke="#1f4a33" stroke-width=".7"/><path d="M2-53.5L3.5-31" stroke="#5fb683" stroke-width="2" opacity=".6"/>' + (o.noPack ? '' : '<path d="M-6-53L-2-31" stroke="#a9471a" stroke-width="2"/>') +
+      '<path d="M-10-33H11L12.5-22H2L1-26-1.2-22H-11.5Z" fill="' + shorts + '"/>';
+    function leg(cls, x, back) { return g(g('<rect x="-2.6" y="0" width="5.2" height="22" rx="2.6" fill="' + (back ? '#e0b38c' : skin) + '"/><path d="M-3.5 18h7.3c2.8 0 4.6 2 4.6 4.6V26H-3.5Z" fill="' + (back ? '#a8381f' : boot) + '"/>', '', cls), 'translate(' + x + ' -26)'); }
+    function arm(cls, x, back, up) { return g(g('<rect x="-3" y="0" width="6" height="8" rx="3" fill="' + shirt + '"/><rect x="-2.3" y="6" width="4.6" height="13" rx="2.3" fill="' + (back ? '#e0b38c' : skin) + '"/><circle cx="0" cy="20" r="2.8" fill="' + (back ? '#e0b38c' : skin) + '"/>', up ? 'rotate(' + up + ')' : '', cls), 'translate(' + x + ' -51)'); }
+    var body;
+    if (pose === 'crouch') {
+      body = '<g transform="translate(0 14)"><path d="M-6-27L-14-14-8-1" stroke="#e0b38c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M-11-2h9c2.4 0 3.6 1.4 3.6 3.4V3H-11Z" fill="#a8381f"/>' +
+        '<path d="M2-27L12-16 6-1" stroke="' + skin + '" stroke-width="5.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2-2h9c2.4 0 3.6 1.4 3.6 3.4V3H2Z" fill="' + boot + '"/>' +
+        g(pack + torso + arm('qs-reach', 7, 0, -58) + head, 'rotate(14 0 -28)') + '</g>';
+    } else if (pose === 'sit') {
+      body = '<g transform="translate(0 12)"><path d="M-2-22L12-26 15-2" stroke="#e0b38c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M11-3h8c2.4 0 3.6 1.4 3.6 3.4V2H11Z" fill="#a8381f"/>' +
+        '<path d="M2-22L18-24 20-1" stroke="' + skin + '" stroke-width="5.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16-2h8c2.4 0 3.6 1.4 3.6 3.4V3H16Z" fill="' + boot + '"/>' +
+        g(arm('', -4, 1, -8) + pack + torso + arm('qs-wave', 6, 0, o.armUp || -30) + head, 'translate(0 8)') + '</g>';
+    } else {
+      body = '<g class="qs-bob">' + arm('qs-armB', -4, 1) + leg('qs-legB', -3, 1) + pack + leg('qs-legA', 3, 0) + torso + arm('qs-armA', 6, 0, o.armUp) + head + '</g>';
+    }
+    var shadow = '<ellipse cx="2" cy="1" rx="17" ry="3.2" fill="#1d2a1a" opacity=".22"/>';
+    var inner = shadow + g(body, o.face < 0 ? 'scale(-1 1)' : '');
+    return g(g(g(inner, 'scale(' + (o.s || 1) + ')'), '', 'qs-ex qs-' + (o.state || 'idle') + (o.walkin === false ? '' : ' qs-in')), 'translate(' + f(o.x) + ' ' + f(o.y) + ')');
+  }
+  /* ---- atmosphere ---- */
+  function pollen(n, seed, col) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) s += '<circle class="qs-float" style="animation-delay:-' + f(r() * 9) + 's;animation-duration:' + f(7 + r() * 6) + 's" cx="' + f(r() * 400) + '" cy="' + f(60 + r() * 200) + '" r="' + f(.6 + r() * 1.4) + '" fill="' + (col || '#fff7cf') + '" opacity=".85"/>';
+    return s;
+  }
+  function bokeh(n, seed, op) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) s += '<circle class="qs-pulse" style="animation-delay:-' + f(r() * 6) + 's" cx="' + f(r() * 400) + '" cy="' + f(r() * 170) + '" r="' + f(6 + r() * 14) + '" fill="' + u('bok') + '" opacity="' + (op || .3) + '"/>';
+    return s;
+  }
+  function rays(xs, op) {
+    return '<g class="qs-rays" opacity="' + (op || .7) + '">' + xs.map(function (x, i) { return '<path d="M' + x + ' -20l' + (18 + i * 4) + ' 0L' + (x - 90 + i * 8) + ' 270l-' + (46 + i * 6) + ' 0Z" fill="' + u('ray') + '" style="animation-delay:-' + (i * 1.7) + 's"/>'; }).join('') + '</g>';
+  }
+  function rainL(n, seed, len, w, col, cls) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) { var x = r() * 460 - 30, y = r() * 300 - 300; s += '<path d="M' + f(x) + ' ' + f(y) + 'l-' + f(len * .18) + ' ' + f(len) + '" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round"/>'; }
+    return '<g class="' + cls + '">' + s + '<g transform="translate(0 300)">' + s + '</g></g>';
+  }
+  function fireflies(n, seed) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) s += '<g class="qs-wander" style="animation-delay:-' + f(r() * 8) + 's;animation-duration:' + f(6 + r() * 5) + 's"><circle class="qs-tw" style="animation-delay:-' + f(r() * 3) + 's" cx="' + f(20 + r() * 360) + '" cy="' + f(60 + r() * 170) + '" r="' + f(4 + r() * 3) + '" fill="' + u('fly') + '"/></g>';
+    return s;
+  }
+  function ground(top, col, soil) {
+    return '<path d="M0 ' + top + 'C80 ' + (top - 14) + ' 150 ' + (top + 6) + ' 220 ' + (top - 6) + 'S340 ' + (top - 10) + ' 400 ' + (top + 2) + 'V260H0Z" fill="' + u(col || 'moss') + '"/>' + (soil || '');
+  }
+  function tufts(seed, y0, n, col) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) { var x = r() * 400, y = y0 + r() * (258 - y0), h = 4 + r() * 6; s += '<path d="M' + f(x) + ' ' + f(y) + 'l-2 -' + f(h) + 'M' + f(x) + ' ' + f(y) + 'l1 -' + f(h * 1.2) + 'M' + f(x) + ' ' + f(y) + 'l3 -' + f(h * .8) + '" stroke="' + (col || '#2f6b2e') + '" stroke-width="1" stroke-linecap="round" opacity=".7"/>'; }
+    return s;
+  }
+  function pebbles(seed, n, y0) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) { var x = r() * 400, y = y0 + r() * (256 - y0), w = 3 + r() * 7; s += '<ellipse cx="' + f(x) + '" cy="' + f(y) + '" rx="' + f(w) + '" ry="' + f(w * .55) + '" fill="#9d9a86"/><ellipse cx="' + f(x - w * .3) + '" cy="' + f(y - w * .2) + '" rx="' + f(w * .45) + '" ry="' + f(w * .2) + '" fill="#d6d2bd" opacity=".7"/>'; }
+    return s;
+  }
+  function clover(x, y, k) {
+    var s = stem(x, y, x + 2 * k, y - 8 * k, x + k, y - 14 * k, 1.2 * k, '#4f8a3a'), cx = x + k, cy = y - 14 * k;
+    [0, 120, 240].forEach(function (a) { s += '<g transform="translate(' + f(cx) + ' ' + f(cy) + ') rotate(' + a + ')"><path d="M0 0C' + f(-6 * k) + ' ' + f(-2 * k) + ' ' + f(-6 * k) + ' ' + f(-9 * k) + ' 0 ' + f(-7 * k) + 'C' + f(6 * k) + ' ' + f(-9 * k) + ' ' + f(6 * k) + ' ' + f(-2 * k) + ' 0 0Z" fill="#6fb34f" stroke="#3f7a33" stroke-width=".5"/></g>'; });
+    return s;
+  }
+  function dew(x, y, r) { return '<g class="qs-tw" style="animation-duration:3.6s"><circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(r) + '" fill="#e9fbff" opacity=".55" stroke="#ffffff" stroke-width=".5"/><circle cx="' + f(x - r * .35) + '" cy="' + f(y - r * .35) + '" r="' + f(r * .3) + '" fill="#fff"/></g>'; }
+  function details(seed, y0) { var r = rng(seed + 100), s = pebbles(seed, 9, y0 + 8); for (var i = 0; i < 5; i++) s += clover(r() * 400, y0 + 16 + r() * (240 - y0), .9 + r() * .8); return s; }
+  function frame(sky, back, mid, near, fx, opt) {
+    opt = opt || {};
+    return '<svg class="qs" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + (opt.label || '') + '">' + defs(sky) +
+      '<rect width="400" height="260" fill="' + u('sky') + '"/>' + (opt.under || '') +
+      '<g class="qs-cam"><g class="qs-px1">' + back + '</g><g class="qs-px2">' + mid + '</g><g class="qs-px3">' + near + '</g></g>' + fx +
+      '<rect width="400" height="260" fill="' + u('vig') + '" pointer-events="none"/></svg>';
+  }
+  /* ---- scenes ---- */
+  var S = {};
+  S.intro = function () {
+    var back = '<circle cx="320" cy="34" r="70" fill="' + u('bok') + '" opacity=".9"/>' + bokeh(6, 3, .55) +
+      leaf({ x: 30, y: 270, L: 250, W: 40, a: 18, bend: 30, g: 'lf', fl: 'b5', op: .8 }) + leaf({ x: 380, y: 270, L: 260, W: 44, a: -14, bend: -30, g: 'lf', fl: 'b5', op: .8 }) +
+      trunk({ x: 300, y: 250, w: 26, h: 290, lean: 12, fl: 'b2', seed: 3 }) + pinnate({ x: 312, y: 70, L: 120, ls: 34, a: -60, bend: -20, fl: 'b2', sw: 1 });
+    var mid = ground(218, 'moss', '<path d="M150 260C170 240 190 232 196 222S214 210 240 208L262 210C236 214 222 224 220 236S210 252 214 260Z" fill="' + u('soil') + '" opacity=".9"/>') + tufts(4, 222, 26) +
+      leaf({ x: 40, y: 236, L: 230, W: 34, a: 46, bend: 70, g: 'l3', v: '#1d5a33', vs: .05, par: 1, sw: 2 }) + leaf({ x: 70, y: 240, L: 180, W: 30, a: 22, bend: 40, g: 'l1', v: '#2f6b2e', vs: .05, par: 1, sw: 1, dl: -1 }) +
+      fern({ x: 352, y: 236, L: 120, n: 7, sw: 3 }) + details(1, 218) + dew(104, 150, 3) + dew(330, 168, 2.6) +
+      leaf({ x: 250, y: -30, L: 200, W: 40, a: -128, bend: -30, g: 'l3', v: '#1d5a33', vs: .06, par: 1, sw: 2 }) + leaf({ x: 160, y: -40, L: 170, W: 34, a: 150, bend: 20, g: 'l1', v: '#2f6b2e', vs: .06, par: 1, sw: 1 }) +
+      explorer({ x: 196, y: 226, s: .64, state: 'look' });
+    var near = leaf({ x: -20, y: 280, L: 190, W: 46, a: 30, bend: 40, g: 'l2', fl: 'b9', op: .95 }) + leaf({ x: 430, y: -20, L: 150, W: 40, a: -150, g: 'l1', fl: 'b9', op: .9 });
+    return frame([[0, '#d4ecd2'], [.6, '#f3f0d0'], [1, '#f9e8c4']], back, mid, near, rays([250, 300, 350], .8) + pollen(22, 9), { label: '小小探險家走進巨大的野菜森林' });
+  };
+  S.rain = function () {
+    var back = '<ellipse cx="120" cy="-10" rx="190" ry="60" fill="#56676a" opacity=".55" filter="' + u('b9') + '"/><ellipse cx="330" cy="0" rx="160" ry="50" fill="#4c5c60" opacity=".5" filter="' + u('b9') + '"/>' +
+      rainL(70, 11, 9, .7, '#dfe9ea', 'qs-rainF') +
+      leaf({ x: 60, y: 270, L: 240, W: 40, a: 12, g: 'ld', fl: 'b5', op: .75 }) + leaf({ x: 350, y: 270, L: 250, W: 44, a: -10, g: 'ld', fl: 'b5', op: .75 }) + fern({ x: 250, y: 240, L: 110, n: 6, fl: 'b2' });
+    var mid = ground(214, 'moss') + '<ellipse cx="150" cy="240" rx="46" ry="6" fill="#a9c3c6" opacity=".7"/><ellipse cx="290" cy="248" rx="34" ry="4.5" fill="#a9c3c6" opacity=".6"/>' +
+      '<g class="qs-ring"><ellipse cx="140" cy="240" rx="8" ry="2" fill="none" stroke="#e9f4f4" stroke-width=".8"/></g><g class="qs-ring" style="animation-delay:-.6s"><ellipse cx="166" cy="242" rx="8" ry="2" fill="none" stroke="#e9f4f4" stroke-width=".8"/></g><g class="qs-ring" style="animation-delay:-1.1s"><ellipse cx="292" cy="248" rx="8" ry="2" fill="none" stroke="#e9f4f4" stroke-width=".8"/></g>' +
+      tufts(5, 220, 22, '#244f2a') + details(5, 214) + leaf({ x: 420, y: 140, L: 200, W: 44, a: -78, bend: -40, g: 'l2', v: '#173f27', vs: .06, par: 1, sw: 2 }) + dew(250, 104, 2.4) +
+      stem(36, 260, 60, 150, 80, 96, 5, '#3c7a3a') + leaf({ x: 80, y: 98, L: 230, W: 46, a: 74, bend: 60, g: 'l3', v: '#173f27', vs: .05, par: 1, sw: 1 }) +
+      '<g class="qs-drip"><path d="M286 132q2.5 4 0 6.5q-2.5-2.5 0-6.5z" fill="#e6f3f4"/></g><g class="qs-drip" style="animation-delay:-.9s"><path d="M262 120q2.5 4 0 6.5q-2.5-2.5 0-6.5z" fill="#e6f3f4"/></g>' +
+      explorer({ x: 214, y: 232, s: .64, state: 'shiver', armUp: -160 });
+    var near = leaf({ x: 420, y: 280, L: 200, W: 50, a: -32, g: 'ld', fl: 'b9', op: .95 }) + rainL(22, 21, 26, 1.8, '#f2f8f8', 'qs-rainN');
+    var fx = '<rect class="qs-flash" width="400" height="260" fill="#fff"/>';
+    return frame([[0, '#7f979c'], [.6, '#a9bcb9'], [1, '#c9d4cc']], back, mid, near, fx, { label: '森林裡突然下起大雨' });
+  };
+  S.fork = function () {
+    var back = '<path d="M-20 200A230 200 0 0 1 300 30" stroke="#ff9b9b" stroke-width="5" fill="none" opacity=".22"/><path d="M-12 204A230 200 0 0 1 306 36" stroke="#ffe08a" stroke-width="5" fill="none" opacity=".22"/><path d="M-4 208A230 200 0 0 1 312 42" stroke="#9fe0a8" stroke-width="5" fill="none" opacity=".22"/><path d="M4 212A230 200 0 0 1 318 48" stroke="#9fc6ff" stroke-width="5" fill="none" opacity=".2"/>' +
+      '<circle cx="70" cy="30" r="80" fill="' + u('bok') + '"/>' + bokeh(5, 13, .5) +
+      leaf({ x: 20, y: 250, L: 220, W: 38, a: 20, g: 'lf', fl: 'b5', op: .8 }) + trunk({ x: 268, y: 210, w: 16, h: 230, lean: 6, fl: 'b2', seed: 9 }) + pinnate({ x: 270, y: 60, L: 100, ls: 28, a: 50, bend: 18, fl: 'b2', sw: 2 });
+    var mid = ground(200, 'moss') +
+      '<path d="M120 260L150 200H186L204 260Z" fill="' + u('soil') + '"/><path d="M146 202L118 160H134L170 202Z" fill="' + u('soil') + '" opacity=".75"/>' +
+      '<path d="M228 260C250 236 300 238 292 222S240 214 262 200 320 192 312 176" stroke="#c7a46e" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="1 10"/>' +
+      tufts(6, 206, 24) + details(6, 206) + trunk({ x: 330, y: 214, w: 30, h: 240, lean: -10, seed: 4 }) + trunk({ x: 244, y: 226, w: 20, h: 200, lean: 14, seed: 6 }) +
+      pinnate({ x: 336, y: 90, L: 130, ls: 36, a: -70, bend: -30, sw: 1 }) +
+      '<g transform="translate(200 214)"><rect x="-1.6" y="-26" width="3.2" height="28" fill="#7a5235"/><path d="M-2-24h-20l-5 4 5 4h20z" fill="#a8774f"/><path d="M2-15h20l5 4-5 4H2z" fill="#a8774f"/></g>' +
+      sparkles(14, 31) + explorer({ x: 176, y: 236, s: .64, state: 'scan' });
+    var near = leaf({ x: -30, y: 270, L: 170, W: 48, a: 40, g: 'l2', fl: 'b9', op: .9 }) + '<circle cx="380" cy="230" r="34" fill="#cfe9a8" opacity=".5" filter="' + u('b9') + '"/>';
+    return frame([[0, '#d9f1ea'], [.55, '#fbf4d6'], [1, '#fde7c4']], back, mid, near, rays([110, 160], .55) + pollen(14, 12), { label: '雨停了，眼前一條平坦大路和一條蜿蜒小徑' });
+  };
+  function sparkles(n, seed) {
+    var r = rng(seed), s = '';
+    for (var i = 0; i < n; i++) { var x = r() * 400, y = 40 + r() * 190, z = 1.5 + r() * 2; s += '<path class="qs-tw" style="animation-delay:-' + f(r() * 3) + 's" d="M' + f(x) + ' ' + f(y - z * 2) + 'L' + f(x + z * .5) + ' ' + f(y - z * .5) + 'L' + f(x + z * 2) + ' ' + f(y) + 'L' + f(x + z * .5) + ' ' + f(y + z * .5) + 'L' + f(x) + ' ' + f(y + z * 2) + 'L' + f(x - z * .5) + ' ' + f(y + z * .5) + 'L' + f(x - z * 2) + ' ' + f(y) + 'L' + f(x - z * .5) + ' ' + f(y - z * .5) + 'Z" fill="#fff"/>'; }
+    return s;
+  }
+  function bird(x, y, s) { // light-vented bulbul, hurt wing
+    var b = '<ellipse cx="0" cy="0" rx="34" ry="24" fill="#8a9a5e"/><path d="M-28 4C-14 22 18 24 30 8 18 18-12 18-28 4Z" fill="#e6e1c8"/>' +
+      '<circle cx="28" cy="-16" r="15" fill="#2e2a26"/><path d="M20-27C26-31 34-29 36-24 30-26 24-25 20-27Z" fill="#f4f1e8"/><ellipse cx="22" cy="-22" rx="5" ry="4" fill="#f7f4ec"/>' +
+      '<path d="M41-17l13 3-13 4z" fill="#3a332c"/><g class="qs-blink"><circle cx="34" cy="-18" r="2.4" fill="#111"/><circle cx="34.8" cy="-18.8" r=".8" fill="#fff"/></g>' +
+      '<path d="M-30-6l-24 2 22 8z" fill="#5f6b3f"/><path d="M8 20l-2 10M-6 20l-3 10" stroke="#5b4636" stroke-width="2.4" stroke-linecap="round"/>';
+    var wing = '<g class="qs-flap"><path d="M-6-8C-30-2-44 18-46 32-30 26-14 14-4 0Z" fill="#6f7f48"/><path d="M-20 8l-16 18M-14 4l-14 16" stroke="#56653a" stroke-width="1.2"/></g>';
+    return g(g(b + wing, '', 'qs-shake'), 'translate(' + x + ' ' + y + ') scale(' + s + ')');
+  }
+  S.bird = function () {
+    var back = bokeh(7, 17, .45) + leaf({ x: 40, y: 260, L: 220, W: 40, a: 16, g: 'lf', fl: 'b5', op: .8 }) + fern({ x: 330, y: 220, L: 150, n: 8, fl: 'b2', sw: 3 });
+    var light = '';
+    var r = rng(41);
+    for (var i = 0; i < 7; i++) light += '<ellipse class="qs-pulse" style="animation-delay:-' + f(r() * 5) + 's" cx="' + f(r() * 400) + '" cy="' + f(212 + r() * 44) + '" rx="' + f(14 + r() * 20) + '" ry="' + f(3 + r() * 3) + '" fill="#fff6c8" opacity=".55"/>';
+    var mid = ground(206, 'moss') + light + tufts(7, 212, 24) + details(7, 210) + fern({ x: 60, y: 236, L: 100, n: 6, sw: 2 }) +
+      bird(258, 222, .78) + '<g class="qs-fall"><path d="M300 40c6 3 8 9 5 13-6-2-8-8-5-13z" fill="#a0aa78"/></g><g class="qs-fall" style="animation-delay:-3s"><path d="M210 30c6 3 8 9 5 13-6-2-8-8-5-13z" fill="#e6e1c8"/></g>' +
+      explorer({ x: 172, y: 236, s: .64, pose: 'crouch', state: 'idle' });
+    var near = leaf({ x: 420, y: 280, L: 190, W: 50, a: -40, g: 'l2', fl: 'b9', op: .9 }) + leaf({ x: -10, y: -10, L: 140, W: 36, a: 150, g: 'l1', fl: 'b9', op: .8 });
+    return frame([[0, '#dff1d6'], [.6, '#f3f3d8'], [1, '#f6ead0']], back, mid, near, rays([200, 260, 320], .55) + pollen(12, 18), { label: '路上有一隻受傷的小鳥' });
+  };
+  S.log = function () {
+    var back = '<path d="M250 180C280 120 320 90 360 86S410 100 420 120V200H250Z" fill="#a9cf9d" filter="' + u('b2') + '"/><path d="M330 96l10-20 12 18z" fill="#c9c2a8"/><circle cx="342" cy="70" r="40" fill="' + u('bok') + '"/>' +
+      bokeh(5, 23, .45) + leaf({ x: 40, y: 250, L: 200, W: 40, a: 10, g: 'lf', fl: 'b5', op: .8 });
+    var log = '<g transform="translate(200 200) rotate(-9)"><path d="M-190-22H150C164-22 172-10 172 0S164 22 150 22H-190Z" fill="' + u('bark') + '"/>' +
+      '<path d="M-170-10H120M-140 6H60M-60-14H100M40 12H140" stroke="#5b4332" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>' +
+      '<ellipse cx="160" cy="0" rx="12" ry="22" fill="#d9b48a"/><ellipse cx="160" cy="0" rx="7" ry="14" fill="none" stroke="#a67d52" stroke-width="1.5"/><ellipse cx="160" cy="0" rx="3" ry="6" fill="none" stroke="#a67d52" stroke-width="1.2"/>' +
+      '<path d="M-180-22C-150-30-90-26-40-24S60-30 120-24" stroke="#79b553" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+      '<g transform="translate(-40 -24)"><path d="M-2 0v-8" stroke="#efe2c4" stroke-width="3"/><ellipse cx="-2" cy="-9" rx="8" ry="4.5" fill="#e0683a"/><circle cx="-5" cy="-10" r="1" fill="#fff"/><circle cx="0" cy="-11" r="1" fill="#fff"/></g>' +
+      '<g transform="translate(60 -26)"><path d="M0 0v-6" stroke="#efe2c4" stroke-width="2.4"/><ellipse cx="0" cy="-7" rx="6" ry="3.4" fill="#e9893f"/></g>' +
+      leaf({ x: 90, y: -24, L: 26, W: 5, a: -20, g: 'l1', gloss: false }) + leaf({ x: 94, y: -24, L: 22, W: 4, a: 15, g: 'l1', gloss: false }) +
+      '<path d="M-110-20l-20-52M-130-72l-16-8M-130-72l2-18M20-22l8-46M28-68l14-10" stroke="#6c5038" stroke-width="7" stroke-linecap="round" fill="none"/></g>';
+    var mid = ground(204, 'moss', '<path d="M150 260L176 210H220L250 260Z" fill="' + u('soil') + '"/>') + tufts(8, 210, 22) + details(8, 208) + log +
+      '<path d="M270 200C290 170 310 140 334 104" stroke="#fff" stroke-width="2" stroke-dasharray="2 7" fill="none" opacity=".75" stroke-linecap="round"/>' +
+      explorer({ x: 196, y: 246, s: .64, state: 'look' }) + '<g class="qs-qm"><circle cx="222" cy="168" r="11" fill="#fff" stroke="#3d2b28" stroke-width="1.2"/><text x="222" y="173" font-size="14" font-weight="900" fill="#d2552c" text-anchor="middle" font-family="sans-serif">?</text></g>';
+    var near = leaf({ x: -20, y: 290, L: 180, W: 50, a: 36, g: 'l2', fl: 'b9', op: .9 }) + '<g class="qs-fall"><path d="M120 10c6 3 8 9 5 13-6-2-8-8-5-13z" fill="#c9a35a"/></g><g class="qs-fall" style="animation-delay:-2.5s"><path d="M300 0c6 3 8 9 5 13-6-2-8-8-5-13z" fill="#9ccb83"/></g>';
+    return frame([[0, '#d6ebf1'], [.6, '#f2efd9'], [1, '#f5e6c8']], back, mid, near, rays([300, 350], .6) + pollen(16, 24), { label: '倒下的大樹擋住了路' });
+  };
+  S.pack = function () {
+    var back = bokeh(8, 29, .5) + leaf({ x: 30, y: 260, L: 210, W: 40, a: 14, g: 'lf', fl: 'b5', op: .75, purple: 1 }) + leaf({ x: 380, y: 260, L: 220, W: 44, a: -14, g: 'lf', fl: 'b5', op: .75 }) +
+      tassel(90, 200, 120, '#e07ab8') + tassel(340, 210, 130, '#d667a8');
+    var pk = '<g transform="translate(234 234)"><path d="M-24-26C-26-10-26 0-22 4H22C26 0 26-10 24-26Z" fill="#e57a2b" stroke="#7a3510" stroke-width=".8"/><ellipse cx="0" cy="-26" rx="24" ry="7" fill="#7a3510"/><path d="M-24-26C-30-38-12-46 0-44" fill="none" stroke="#c25f1c" stroke-width="5" stroke-linecap="round"/><rect x="-13" y="-12" width="26" height="13" rx="4" fill="#c25f1c" stroke="#7a3510" stroke-width=".7"/><rect x="-3" y="-9" width="6" height="4" rx="1" fill="#f3d27a"/><path d="M-20-20C-30-10-30 0-24 4" stroke="#a9471a" stroke-width="3" fill="none"/></g>';
+    var items = '<g class="qs-bobA"><g transform="translate(212 170) rotate(-10)"><rect x="-6" y="-2" width="12" height="28" rx="3" fill="#5f9fd6"/><rect x="-3.5" y="-9" width="7" height="7" rx="1.5" fill="#2f5f8f"/><rect x="-1" y="-12" width="5" height="3" fill="#2f5f8f"/><path d="M-3 10c3-5 7-4 6 2-2 4-6 3-6-2z" fill="#7bc46a"/></g></g>' +
+      '<g class="qs-bobB"><g transform="translate(254 164) rotate(10)"><rect x="-14" y="-2" width="28" height="34" rx="2" fill="#f6ead0" stroke="#b39b6a" stroke-width="1.2"/><path d="M-14-2v34" stroke="#d2552c" stroke-width="3"/><path d="M-8 6h16M-8 12h14M-8 18h16" stroke="#c9b48a" stroke-width="1.2"/><path d="M-8 26c4-4 8 2 12-2s6-3 8-1" stroke="#6f5753" stroke-width="1.2" fill="none" stroke-dasharray="1.5 2"/><circle cx="11" cy="24" r="1.6" fill="#d2552c"/></g></g>';
+    var r = rng(55), gn = '';
+    for (var i = 0; i < 8; i++) gn += '<circle class="qs-buzz" style="animation-delay:-' + f(r() * 2) + 's" cx="' + f(120 + r() * 60) + '" cy="' + f(110 + r() * 40) + '" r="1" fill="#3d2b28" opacity=".6"/>';
+    var mid = ground(206, 'moss') + tufts(9, 212, 20) + leaf({ x: 330, y: 250, L: 120, W: 28, a: -50, g: 'l1', v: '#2f6b2e', purple: 1, sw: 2 }) + leaf({ x: 60, y: 250, L: 110, W: 26, a: 50, g: 'l1', v: '#2f6b2e', purple: 1, sw: 1 }) +
+      '<path d="M128 240C126 220 146 208 166 208S198 222 196 240Z" fill="#8c9a84" stroke="#5f6a58" stroke-width=".8"/><path d="M132 222C146 210 168 208 190 216" stroke="#7fb35b" stroke-width="5" fill="none" stroke-linecap="round"/>' + details(9, 210) +
+      explorer({ x: 162, y: 216, s: .64, pose: 'sit', state: 'idle', noPack: 1, armUp: -70 }) + pk + items + sparkles(8, 57) + gn;
+    var near = leaf({ x: 430, y: 290, L: 170, W: 50, a: -36, g: 'l2', fl: 'b9', op: .9, purple: 1 }) + tassel(20, 290, 140, '#e7a0cf');
+    return frame([[0, '#f4e9d6'], [.6, '#fbf2df'], [1, '#f6e1c4']], back, mid, near, pollen(16, 30, '#ffe9f4'), { label: '打開背包：防蟲噴劑和行程規劃筆記本' });
+  };
+  S.fruit = function () {
+    var back = bokeh(6, 37, .45) + leaf({ x: 360, y: 260, L: 230, W: 46, a: -12, g: 'lf', fl: 'b5', op: .8, ovate: 1 }) + leaf({ x: 20, y: 260, L: 200, W: 40, a: 20, g: 'lf', fl: 'b5', op: .8, ovate: 1 });
+    var plant = stem(40, 260, 30, 120, 150, 40, 9, '#3f6b33') + stem(150, 40, 220, 20, 300, 58, 6, '#3f6b33') +
+      leaf({ x: 110, y: 64, L: 110, W: 36, a: -70, g: 'l2', v: '#173f27', ovate: 1, sw: 1 }) + leaf({ x: 200, y: 32, L: 110, W: 38, a: 20, g: 'l3', v: '#173f27', ovate: 1, sw: 2 }) +
+      leaf({ x: 280, y: 52, L: 100, W: 34, a: 76, g: 'l2', v: '#173f27', ovate: 1, sw: 1, dl: -2 }) + leaf({ x: 60, y: 150, L: 90, W: 30, a: -40, g: 'l3', v: '#173f27', ovate: 1, sw: 3 }) +
+      '<g transform="translate(250 54)"><path d="M0 0l-4 6 4 1 4-1z" fill="#fff" opacity=".9"/><circle cx="0" cy="5" r="1.4" fill="#f4c430"/></g>' +
+      g(stem(190, 34, 200, 60, 196, 80, 2, '#3f6b33') + stem(262, 46, 268, 76, 262, 96, 2, '#3f6b33') + berries(196, 98, 6, 8, 3) + berries(262, 112, 5, 7, 8), '', 'qs-sw1') +
+      '<g class="qs-drip"><path d="M198 116q2.5 4 0 6.5q-2.5-2.5 0-6.5z" fill="#dff2f4"/></g>';
+    var mid = ground(212, 'moss') + tufts(10, 218, 24) + details(10, 214) + plant + explorer({ x: 214, y: 238, s: .64, state: 'look' }) +
+      '<g class="qs-qm"><circle cx="246" cy="164" r="12" fill="#fff" stroke="#3d2b28" stroke-width="1.2"/><path d="M238 174l-6 8 10-4z" fill="#fff" stroke="#3d2b28" stroke-width="1"/><text x="246" y="169" font-size="15" font-weight="900" fill="#d2552c" text-anchor="middle" font-family="sans-serif">?</text></g>';
+    var near = leaf({ x: 430, y: 280, L: 180, W: 56, a: -40, g: 'l2', fl: 'b9', op: .92, ovate: 1 });
+    return frame([[0, '#c3e1cb'], [.6, '#e6f1dc'], [1, '#eee8cf']], back, mid, near, rays([150, 210, 270], .5) + pollen(14, 38), { label: '樹上掛著不認識的果實' });
+  };
+  S.camp = function () {
+    var r = rng(61), stars = '';
+    for (var i = 0; i < 18; i++) stars += '<circle class="qs-tw" style="animation-delay:-' + f(r() * 3) + 's" cx="' + f(r() * 400) + '" cy="' + f(r() * 110) + '" r="' + f(.5 + r() * 1.1) + '" fill="#fff8d8"/>';
+    var back = stars + '<circle cx="320" cy="44" r="13" fill="#fff4cf"/><circle cx="320" cy="44" r="40" fill="' + u('bok') + '" opacity=".6"/>' +
+      lobed({ x: -10, y: 120, s: 1.6, a: 120, g: 'ld', fl: 'b2' }) + lobed({ x: 410, y: 110, s: 1.7, a: -120, g: 'ld', fl: 'b2' }) + lobed({ x: 180, y: -20, s: 1.2, a: 180, g: 'ld', fl: 'b5', op: .9 }) +
+      leaf({ x: 60, y: 240, L: 180, W: 40, a: 12, g: 'ld', fl: 'b5', op: .8, ovate: 1 });
+    var tent = '<g transform="translate(110 226)"><path d="M-48 0C-40-40-20-62 0-64S40-40 48 0Z" fill="#e8803a"/><path d="M0-64C-6-40-8-20-12 0H12C8-20 6-40 0-64Z" fill="#a74e1e"/><path d="M-48 0C-40-40-20-62 0-64" stroke="#f6a35e" stroke-width="2" fill="none"/><path d="M-50 0H50" stroke="#5c2c14" stroke-width="2.4"/></g>';
+    var fire = '<g transform="translate(262 232)"><path d="M-16 4l32-8M-16-4l32 8" stroke="#6b4a2e" stroke-width="5" stroke-linecap="round"/>' +
+      '<path class="qs-flick" d="M0-34C9-22 14-14 12-5 10 2-10 2-12-5-14-14-8-22 0-34Z" fill="#ffb648"/><path class="qs-flick" style="animation-delay:-.18s" d="M0-20C5-13 8-9 7-4 6 0-6 0-7-4-8-9-4-13 0-20Z" fill="#ff6a3d"/></g>';
+    var em = '', re = rng(63);
+    for (var j = 0; j < 9; j++) em += '<circle class="qs-ember" style="animation-delay:-' + f(re() * 3) + 's" cx="' + f(256 + re() * 12) + '" cy="210" r="' + f(.8 + re() * 1) + '" fill="#ffc36b"/>';
+    var mid = '<ellipse cx="262" cy="226" rx="120" ry="60" fill="' + u('glow') + '" class="qs-glow"/>' + ground(214, 'ld') + tufts(11, 218, 18, '#0f2a1d') + tent + fire + em +
+      tassel(340, 246, 50, '#f08ac8') + tassel(356, 248, 40, '#c99af0') + tassel(326, 250, 34, '#f08ac8') +
+      explorer({ x: 214, y: 234, s: .64, pose: 'sit', state: 'idle', armUp: -40 });
+    var near = lobed({ x: 400, y: 300, s: 1.4, a: -40, g: 'ld', fl: 'b9' }) + fireflies(14, 65);
+    return frame([[0, '#262b4d'], [.55, '#4c3f66'], [1, '#7a5574']], back, mid, near, '', { label: '在森林裡露營：帳篷、營火和野花' });
+  };
+  var CSS = [
+    '.qs{display:block;width:100%;height:100%}',
+    '.qs-sw1,.qs-sw2,.qs-sw3,.qs-ring,.qs-flap,.qs-shake,.qs-flick,.qs-head,.qs-blink,.qs-legA,.qs-legB,.qs-armA,.qs-armB,.qs-reach,.qs-wave,.qs-qm{transform-box:fill-box}',
+    '.qs-cam{transform-box:view-box;transform-origin:200px 160px;animation:qs-cam 18s ease-in-out infinite alternate}',
+    '@keyframes qs-cam{from{transform:scale(1)}to{transform:scale(1.07) translate(-4px,-3px)}}',
+    '.qs-px1{animation:qs-px 16s ease-in-out infinite alternate}.qs-px3{animation:qs-px 16s ease-in-out infinite alternate-reverse}',
+    '@keyframes qs-px{from{transform:translateX(-5px)}to{transform:translateX(5px)}}',
+    '.qs-sw1,.qs-sw2,.qs-sw3{transform-origin:50% 100%;animation:qs-sw 5.5s ease-in-out infinite}.qs-sw2{animation-duration:4.2s;animation-delay:-1.3s}.qs-sw3{animation-duration:7s;animation-delay:-2.1s}',
+    '@keyframes qs-sw{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}',
+    '.qs-rays path{animation:qs-ray 6s ease-in-out infinite}@keyframes qs-ray{0%,100%{opacity:.35}50%{opacity:1}}',
+    '.qs-float{animation:qs-float 10s linear infinite}@keyframes qs-float{0%{transform:translate(0,0);opacity:0}15%{opacity:.9}100%{transform:translate(26px,-80px);opacity:0}}',
+    '.qs-pulse{animation:qs-pulse 5s ease-in-out infinite}@keyframes qs-pulse{0%,100%{opacity:.25}50%{opacity:.75}}',
+    '.qs-tw{animation:qs-tw 2.4s ease-in-out infinite}@keyframes qs-tw{0%,100%{opacity:.2}50%{opacity:1}}',
+    '.qs-rainF{animation:qs-rain .9s linear infinite}.qs-rainN{animation:qs-rain .45s linear infinite;opacity:.55}',
+    '@keyframes qs-rain{from{transform:translateY(0)}to{transform:translateY(300px)}}',
+    '.qs-ring{transform-origin:50% 50%;animation:qs-ring 1.4s ease-out infinite}@keyframes qs-ring{from{transform:scale(.2);opacity:1}to{transform:scale(2.2);opacity:0}}',
+    '.qs-drip{animation:qs-drip 1.8s ease-in infinite}@keyframes qs-drip{0%,30%{transform:translateY(0);opacity:1}100%{transform:translateY(110px);opacity:0}}',
+    '.qs-flash{opacity:0;animation:qs-flash 7s linear infinite}@keyframes qs-flash{0%,90%,92%,96%,100%{opacity:0}91%{opacity:.4}94%{opacity:.25}}',
+    '.qs-fall{animation:qs-fall 7s linear infinite}@keyframes qs-fall{0%{transform:translate(0,-20px) rotate(0);opacity:0}10%{opacity:1}100%{transform:translate(50px,250px) rotate(320deg);opacity:0}}',
+    '.qs-flap{transform-origin:90% 10%;animation:qs-flap .7s ease-in-out infinite alternate}@keyframes qs-flap{from{transform:rotate(2deg)}to{transform:rotate(-9deg)}}',
+    '.qs-shake{transform-origin:50% 100%;animation:qs-shake 2.2s ease-in-out infinite}@keyframes qs-shake{0%,70%,100%{transform:rotate(0)}76%{transform:rotate(-2deg)}84%{transform:rotate(2deg)}}',
+    '.qs-bobA{animation:qs-bob 2.6s ease-in-out infinite}.qs-bobB{animation:qs-bob 2.6s ease-in-out -1.3s infinite}@keyframes qs-bob{0%,100%{transform:translateY(8px)}50%{transform:translateY(-8px)}}',
+    '.qs-buzz{animation:qs-buzz 1.2s ease-in-out infinite alternate}@keyframes qs-buzz{0%{transform:translate(0,0)}33%{transform:translate(6px,-4px)}66%{transform:translate(-4px,3px)}100%{transform:translate(3px,5px)}}',
+    '.qs-flick{transform-origin:50% 100%;animation:qs-flick .32s ease-in-out infinite alternate}@keyframes qs-flick{from{transform:scale(1,1)}to{transform:scale(.86,1.14)}}',
+    '.qs-ember{animation:qs-ember 2.6s ease-out infinite}@keyframes qs-ember{0%{transform:translate(0,0);opacity:1}100%{transform:translate(-14px,-120px);opacity:0}}',
+    '.qs-glow{animation:qs-pulse 1.6s ease-in-out infinite}',
+    '.qs-wander{animation:qs-wander 8s ease-in-out infinite alternate}@keyframes qs-wander{0%{transform:translate(0,0)}50%{transform:translate(14px,-10px)}100%{transform:translate(-8px,6px)}}',
+    '.qs-qm{animation:qs-qm 2.4s ease-in-out infinite}@keyframes qs-qm{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}',
+    /* explorer */
+    '.qs-in{animation:qs-in 2.2s cubic-bezier(.3,.6,.4,1) both}@keyframes qs-in{from{transform:translateX(-140px)}to{transform:none}}',
+    '.qs-legA,.qs-legB,.qs-armA,.qs-armB{transform-origin:50% 0}',
+    '.qs-in .qs-legA,.qs-walk .qs-legA{animation:qs-leg .44s ease-in-out 5 alternate}.qs-in .qs-legB,.qs-walk .qs-legB{animation:qs-leg .44s ease-in-out 5 alternate-reverse}',
+    '.qs-in .qs-armA{animation:qs-arm .44s ease-in-out 5 alternate-reverse}.qs-in .qs-armB{animation:qs-arm .44s ease-in-out 5 alternate}',
+    '.qs-in .qs-bob{animation:qs-step .22s ease-in-out 10 alternate}',
+    '@keyframes qs-leg{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}@keyframes qs-arm{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}@keyframes qs-step{from{transform:translateY(0)}to{transform:translateY(-2px)}}',
+    '.qs-head{transform-origin:50% 90%}',
+    '.qs-look .qs-head{animation:qs-look 5s ease-in-out 2.2s infinite}@keyframes qs-look{0%,100%{transform:rotate(0)}25%,75%{transform:rotate(-16deg)}}',
+    '.qs-scan .qs-head{animation:qs-scan 4s ease-in-out 2.2s infinite}@keyframes qs-scan{0%,100%{transform:rotate(0)}20%,40%{transform:rotate(-10deg) translateX(-1px)}60%,80%{transform:rotate(9deg)}}',
+    '.qs-shiver .qs-bob{animation:qs-shiv .18s linear 2.2s infinite alternate}@keyframes qs-shiv{from{transform:translateX(-.5px)}to{transform:translateX(.5px)}}',
+    '.qs-blink{transform-origin:50% 50%;animation:qs-blink 4.2s infinite}@keyframes qs-blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}',
+    '.qs-reach{transform-origin:50% 0;animation:qs-reach 2.6s ease-in-out infinite}@keyframes qs-reach{0%,100%{transform:rotate(-58deg)}50%{transform:rotate(-70deg)}}',
+    '.qs-wave{transform-origin:50% 0}',
+    '.qs-out .qs-ex{animation:qs-out .9s ease-in forwards}.qs-out .qs-ex .qs-legA{animation:qs-leg .3s ease-in-out infinite alternate}.qs-out .qs-ex .qs-legB{animation:qs-leg .3s ease-in-out infinite alternate-reverse}',
+    '@keyframes qs-out{to{transform:translateX(240px)}}',
+    '.qs-out .qs-cam{animation:qs-push .9s ease-in forwards}@keyframes qs-push{to{transform:scale(1.25) translate(-30px,-6px);opacity:.15}}',
+    '@media (prefers-reduced-motion:reduce){.qs *,.qs{animation:none!important}}'
+  ].join('\n');
+  window.QZScene = {
+    css: CSS,
+    keys: ['intro', 'rain', 'fork', 'bird', 'log', 'pack', 'fruit', 'camp'],
+    render: function (k) { P = 'qs' + (++uid) + '-'; return S[k](); }
+  };
 })();
 /* ---- picture-book quiz (slide 10): the deck's step replays the demo path, clicks play freely ---- */
 (function () {
@@ -1585,7 +1955,15 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     tatokem: ['龍葵型', '溫柔的守界者', 'Tatokem', '你安靜低調，但當覺得不被尊重或受傷害時，會用柔和的力量劃清界線，不讓自己受傷。'],
     lengac: ['月桃型', '創意的安慰者', 'Lengac', '你用溫暖和創意照顧身邊的每一個人，總是帶給人安全感。']
   };
-  var DEMO = [0, 0, 0, 0], cur = 'q1', picks = [], last = null;
+  var DEMO = [0, 0, 0, 0], cur = 'q1', picks = [], last = null, busy = 0;
+  var SK = { q1: 'rain', q2: 'fork', q3: 'bird', q4: 'log', q5: 'pack', q6: 'fruit', q7: 'camp' }, SC = window.QZScene;
+  var STILL = window.__still || /[?&]shot/.test(location.search);
+  if (SC) document.head.insertAdjacentHTML('beforeend', '<style>' + SC.css + '</style>');
+  document.getElementById('qz-book').addEventListener('click', function (e) {
+    e.stopPropagation(); this.blur(); var s9 = document.getElementById('s9'); if (!s9 || !window.__deck) return;
+    __deck.go([].indexOf.call(document.querySelectorAll('.slide'), s9), +s9.dataset.steps);
+    setTimeout(function () { s9.dispatchEvent(new CustomEvent('page', { detail: 23 })); }, 60);
+  });
   grid.innerHTML = Object.keys(R).map(function (k) { return '<figure data-r="' + k + '" role="button" tabindex="0" title="看人格特質"><img src="assets/sp_' + k + '.jpg" alt="' + R[k][2] + ' ' + R[k][0] + '精靈"><figcaption><span class="am">' + R[k][2] + '</span>' + R[k][0] + '</figcaption></figure>'; }).join('');
   var qt = document.getElementById('qz-qr-t'); if (qt) grid.appendChild(qt.content.cloneNode(true));
   function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
@@ -1594,11 +1972,12 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     var again = picks.length || !Q[cur] ? '<button type="button" class="qz-again" data-again>↺ 重玩</button>' : '';
     if (Q[cur]) {
       var q = Q[cur];
-      card.innerHTML = again + '<p class="qz-label">第 ' + (picks.length + 1) + ' 題</p><p class="qz-q">' + esc(q[0]) + '</p><div class="qz-opts">' +
+      card.classList.toggle('scn', !!SC);
+      card.innerHTML = (SC ? '<div class="qz-scene' + (STILL ? ' still' : '') + '">' + SC.render(SK[cur]) + '<p class="qz-ai">場景動畫：AI 程式繪製</p></div>' : '') + again + '<p class="qz-label">第 ' + (picks.length + 1) + ' 題</p><p class="qz-q">' + esc(q[0]) + '</p><div class="qz-opts">' +
         q[1].map(function (o, i) { return '<button type="button" data-i="' + i + '">' + esc(o[0]) + '</button>'; }).join('') + '</div>';
       grid.classList.remove('done');
     } else {
-      var r = R[cur];
+      var r = R[cur]; card.classList.remove('scn');
       card.innerHTML = again + '<p class="qz-label">' + (picks.length ? '你的野菜是' : '野菜精靈的人格特質') + '</p><div class="qz-res"><img src="assets/sp_' + cur + '.jpg" alt="' + r[2] + ' ' + r[0] + '精靈"><div><p class="qz-amis">' + r[2] + '</p><p class="qz-type">' + r[0] + '・' + r[1] + '</p><p class="qz-desc">' + r[3] + '</p>' +
         (last === 'q6' ? '<p class="qz-elder">在山上：不認識的果實，先問長輩。</p>' : '') + '</div></div>';
       grid.classList.add('done');
@@ -1612,10 +1991,14 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   grid.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); pick(e.target.closest('figure')); } });
   card.addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
-    if (b.hasAttribute('data-again')) reset(); else choose(+b.dataset.i);
-    b.blur(); render();
+    if (busy) return; b.blur();
+    if (b.hasAttribute('data-again')) { reset(); render(); return; }
+    choose(+b.dataset.i); b.classList.add('on');
+    var sv = card.querySelector('.qz-scene svg');
+    if (!sv || STILL) return render();
+    sv.classList.add('qs-out'); busy = setTimeout(function () { busy = 0; render(); }, 750);
   });
-  function replay(st) { reset(); for (var k = 0; k < st && Q[cur]; k++) choose(DEMO[k]); render(); }
+  function replay(st) { clearTimeout(busy); busy = 0; reset(); for (var k = 0; k < st && Q[cur]; k++) choose(DEMO[k]); render(); }
   s.addEventListener('step', function (e) { replay(e.detail); });
   replay(+(s.dataset.at || 0));
 })();
