@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>O maan a datengan kiso? 你是哪一種野菜？</title>
+<meta name="description" content="寧埔國小孩子創作的繪本《Misolap ci Awos to dateng》裡的野菜心理測驗：跟著蝸牛 Awos 走進森林，找出你的野菜精靈。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@1,700&display=swap">
+<style>
+:root{
+  --bg:#f6e2dd; --bg-2:#efcfc8; --ink:#3d2b28; --ink-2:#6f5753; --line:#7d625d;
+  --card:#fffaf5; --teal:#2f8f84; --teal-ink:#f4fbf8; --neon:#f9ff7a; --rust:#d2552c; --green:#4c9a3c;
+  --b1:#c3c6e8; --b2:#f3bf8d; --b3:#c4e2a8; --b4:#cfe6f0; --b5:#f5b6cf; --b6:#b8e2cf; --b7:#d6bfcc;
+  --mono:"Courier Prime","Courier New",ui-monospace,monospace;
+  --sans:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--sans);
+  background-image:radial-gradient(circle at 12% 8%,#f9d3cb 0,transparent 38%),radial-gradient(circle at 92% 40%,#f3d9cf 0,transparent 42%),radial-gradient(circle at 20% 92%,#f1cfc6 0,transparent 40%)}
+.am{font-family:var(--mono);font-style:italic;font-weight:700}
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(18px + env(safe-area-inset-top,0px)) calc(22px + env(safe-area-inset-bottom,0px))}
+.screen{display:flex;flex-direction:column;gap:16px;flex:1}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn{display:block;width:100%;padding:14px 18px;border:2px solid var(--ink);background:var(--ink);color:#fff;font-weight:800;font-size:18px;border-radius:14px}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:active{transform:translateY(1px)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* intro */
+.kick{margin:0;font:700 13px/1.4 var(--sans);letter-spacing:.14em;color:var(--rust)}
+.hero{position:relative;padding:8px 0 0}
+.hero h1{margin:0;display:flex;flex-direction:column;gap:6px}
+.hero h1 .am{font-size:clamp(25px,8vw,40px);line-height:1.1;color:var(--ink)}
+.hero h1 .zh{font-size:clamp(28px,8.6vw,40px);font-weight:900;line-height:1.15;color:var(--green);text-shadow:2px 2px 0 #fff}
+.sign{margin:0;padding:16px 18px;border-radius:10px;background:#7b5843;color:#fbf2e6;font-size:16px;line-height:1.7;box-shadow:0 6px 0 #5e4130}
+.intro-art{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 2px 0 rgba(61,43,40,.15)}
+.intro-art svg{display:block;width:100%;height:auto}
+.note{margin:0;font-size:14px;color:var(--ink-2)}
+/* question */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.step{margin:0;font:800 15px/1 var(--sans);letter-spacing:.12em;color:var(--rust)}
+.restart{border:0;background:none;padding:6px 0;font-size:14px;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.trail{display:flex;align-items:center;gap:0;margin:0;padding:0;list-style:none}
+.trail li{flex:1;height:0;border-top:3px dotted var(--line);position:relative}
+.trail li::after{content:"";position:absolute;right:-6px;top:-8px;width:12px;height:12px;border-radius:3px;background:var(--line)}
+.trail li.on{border-top-style:solid;border-color:var(--rust)}
+.trail li.on::after{background:var(--rust)}
+.scene{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 2px 0 rgba(61,43,40,.15)}
+.scene svg{display:block;width:100%;height:auto}
+.qtext{position:relative;margin:0;padding:18px 20px;font:900 21px/1.5 var(--sans);text-wrap:balance;border-radius:42% 58% 46% 54% / 56% 44% 56% 44%}
+.opts{display:flex;flex-direction:column;gap:12px;margin-top:auto}
+.opt{display:flex;align-items:center;gap:12px;width:100%;padding:15px 16px;text-align:left;font-size:17px;line-height:1.45;background:var(--card);
+  border:2px dashed var(--line);border-radius:14px;transition:transform .15s,border-color .15s,background .15s}
+.opt::before{content:"→";flex:none;font:700 20px var(--mono);color:var(--rust)}
+.opt:hover,.opt:focus-visible{border-style:solid;border-color:var(--rust);outline:none}
+.opt.picked{background:var(--ink);color:#fff;border-style:solid;border-color:var(--ink)}
+/* result */
+.res-label{margin:0;font:800 15px/1 var(--sans);letter-spacing:.12em;color:var(--rust)}
+.res{display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:20px;background:var(--teal);color:var(--teal-ink);box-shadow:0 6px 0 #22685f}
+.res-head{display:grid;grid-template-columns:104px minmax(0,1fr);gap:14px;align-items:center}
+.res-head img{width:104px;height:104px;display:block;border:5px solid #fff;border-radius:6px;background:#33968e}
+.res-amis{margin:0;font-size:min(7vw,34px);line-height:1.1;color:var(--neon)}
+.res-type{margin:8px 0 0;font:900 18px/1.4 var(--sans)}
+.res-desc{margin:0;font-size:17px;line-height:1.7}
+.elder{margin:0;padding:10px 14px;border-radius:10px;background:var(--neon);color:var(--ink);font-weight:800}
+.three{position:relative;border-radius:16px;overflow:hidden;background:radial-gradient(ellipse at 50% 85%,#e4d9b8 0,#f3ecd9 40%,#fbf7ee 75%)}
+.three canvas{display:block;width:100%;height:300px;touch-action:none;cursor:grab}
+.three .hint{position:absolute;right:12px;bottom:8px;font:400 13px var(--mono);color:#6f6a5c;pointer-events:none}
+.three .cap{position:absolute;left:14px;top:10px;margin:0;font-size:13px;font-weight:700;color:#5b5648;pointer-events:none}
+.three.loading::after{content:"3D 精靈載入中…";position:absolute;inset:0;display:grid;place-items:center;color:#6f6a5c;font-size:15px}
+.voice{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border:2px solid var(--ink);border-radius:14px;background:var(--neon);color:var(--ink);font-weight:800;font-size:17px}
+.voice[aria-pressed="true"]{background:var(--ink);color:var(--neon)}
+.voice small{font-weight:400;font-size:13px}
+/* all spirits */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.grid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;border:0;background:none;text-align:center}
+.grid img{width:100%;aspect-ratio:1;display:block;border-radius:10px;border:3px solid transparent;background:#33968e}
+.grid button:focus-visible img,.grid button:hover img{border-color:var(--rust)}
+.grid .am{font-size:13px;color:var(--rust)}
+.grid span+span{font-size:14px;font-weight:700}
+footer{margin-top:22px;padding-top:14px;border-top:2px dotted var(--line);font-size:13px;line-height:1.7;color:var(--ink-2)}
+footer a{color:var(--ink)}
+/* scene motion */
+.drop{animation:fall 1.1s linear infinite}
+@keyframes fall{0%{transform:translate(0,-40px);opacity:0}15%{opacity:.85}100%{transform:translate(-10px,210px);opacity:0}}
+.sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 3.2s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+.spin{transform-box:fill-box;transform-origin:50% 50%;animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.flap{transform-box:fill-box;transform-origin:10% 20%;animation:flap .5s ease-in-out infinite alternate}
+@keyframes flap{from{transform:rotate(4deg)}to{transform:rotate(-14deg)}}
+.shake{transform-box:fill-box;transform-origin:50% 100%;animation:shake 1.6s ease-in-out infinite}
+@keyframes shake{0%,70%,100%{transform:rotate(0)}75%{transform:rotate(-4deg)}85%{transform:rotate(4deg)}}
+.bobA{animation:bobA 2.4s ease-in-out infinite}
+.bobB{animation:bobA 2.4s ease-in-out -1.2s infinite}
+@keyframes bobA{0%,100%{transform:translateY(8px)}50%{transform:translateY(-10px)}}
+.flick{transform-box:fill-box;transform-origin:50% 100%;animation:flick .35s ease-in-out infinite alternate}
+@keyframes flick{from{transform:scale(1,1)}to{transform:scale(.88,1.12)}}
+.tw{animation:tw 2s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
+.crawl{animation:crawl 3s ease-in-out infinite}
+@keyframes crawl{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+.leaf{animation:leaf 5s linear infinite}
+@keyframes leaf{0%{transform:translate(0,-20px) rotate(0);opacity:0}10%{opacity:1}100%{transform:translate(40px,200px) rotate(260deg);opacity:0}}
+.fade-in{animation:fadein .35s ease both}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="screen" id="intro">
+    <p class="kick">寧埔國小・野菜繪本心理測驗</p>
+    <div class="hero"><h1><span class="am">O maan a datengan kiso?</span><span class="zh">你是哪一種野菜？</span></h1></div>
+    <div class="intro-art" id="intro-art"></div>
+    <p class="sign">在阿美族的文化裡，植物就像我們的朋友，甚至會變成我們的名字！每一種植物都有自己的性格和力量。來玩玩看這個小測驗，找出你的野菜魂！</p>
+    <button class="btn" type="button" data-go="start">跟著蝸牛 Awos 走進森林 →</button>
+    <p class="note">共 3–4 題，點選答案就會往下走。</p>
+  </section>
+
+  <section class="screen" id="quiz" hidden>
+    <div class="top"><p class="step" id="q-step">第 1 題</p><button class="restart" type="button" data-go="start">重新開始</button></div>
+    <ol class="trail" id="q-trail" aria-hidden="true"><li></li><li></li><li></li><li></li></ol>
+    <div class="scene" id="q-scene"></div>
+    <p class="qtext" id="q-text"></p>
+    <div class="opts" id="q-opts"></div>
+  </section>
+
+  <section class="screen" id="result" hidden>
+    <p class="res-label" id="r-label">你的野菜是</p>
+    <div class="res fade-in" id="r-card">
+      <div class="res-head"><img id="r-img" alt=""><div><p class="res-amis am" id="r-amis"></p><p class="res-type" id="r-type"></p></div></div>
+      <p class="res-desc" id="r-desc"></p>
+      <p class="elder" id="r-elder" hidden>在山上：不認識的果實，先問長輩。</p>
+    </div>
+    <div class="three loading" id="r-three"><p class="cap">孩子的手繪，用 AI 變成 3D</p><canvas id="r-canvas" aria-label="精靈 3D 模型，可用手指轉動"></canvas><span class="hint">↻ 用手指轉動</span></div>
+    <button class="voice" type="button" id="r-voice" aria-pressed="false"></button>
+    <div class="row"><button class="btn" type="button" data-go="start">再玩一次</button><button class="btn ghost" type="button" data-go="all">看全部精靈</button></div>
+  </section>
+
+  <section class="screen" id="all" hidden>
+    <p class="res-label">七種野菜精靈</p>
+    <div class="grid" id="all-grid"></div>
+    <p class="note">點一隻精靈，看它的人格特質。精靈的樣子和性格，都是孩子的創作。</p>
+    <button class="btn" type="button" data-go="start">開始測驗</button>
+  </section>
+
+  <footer>題目與七種野菜精靈出自 Salimpo 阿美山海文化實驗小學（寧埔國小）孩子創作的繪本《<span class="am">Misolap ci Awos to dateng</span>》。精靈聲音是孩子錄的。本頁不收集任何作答資料。<br><a href="../forum/">看完整簡報 →</a></footer>
+</main>
+<script>
+// Tiny WebGL turntable for the deck's AR slide: auto-rotates while its slide is on, drag to spin; set() swaps the model
+(function () {
+  function dec(s, T) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return new T(u.buffer); }
+  function persp(f, a, n, z) { var t = 1 / Math.tan(f / 2); return [t / a, 0, 0, 0, 0, t, 0, 0, 0, 0, (z + n) / (n - z), -1, 0, 0, 2 * z * n / (n - z), 0]; }
+  function mul(a, b) { var o = []; for (var i = 0; i < 4; i++) for (var j = 0; j < 4; j++) { var s = 0; for (var k = 0; k < 4; k++) s += a[k * 4 + j] * b[i * 4 + k]; o[i * 4 + j] = s; } return o; }
+  function rot(y, x) { var cy = Math.cos(y), sy = Math.sin(y), cx = Math.cos(x), sx = Math.sin(x);
+    return mul([1, 0, 0, 0, 0, cx, sx, 0, 0, -sx, cx, 0, 0, 0, 0, 1], [cy, 0, -sy, 0, 0, 1, 0, 0, sy, 0, cy, 0, 0, 0, 0, 1]); }
+  window.turntable = function (cv, m, o) {
+    var gl = cv.getContext('webgl', { antialias: true, alpha: true, preserveDrawingBuffer: true }); if (!gl) return null;
+    var vs = 'attribute vec3 p,nm;attribute vec3 c;attribute vec2 t;uniform mat4 M,R;varying vec3 vn,vc;varying vec2 vt;void main(){gl_Position=M*vec4(p,1.);vn=(R*vec4(nm,0.)).xyz;vc=c;vt=t;}';
+    var fs = 'precision mediump float;varying vec3 vn,vc;varying vec2 vt;uniform sampler2D T;uniform float X;void main(){vec3 n=normalize(vn);if(!gl_FrontFacing)n=-n;' +
+      'float l=.55+.45*max(dot(n,normalize(vec3(.4,.7,.8))),0.)+.12*max(dot(n,normalize(vec3(-.6,.2,-.5))),0.);vec3 b=X>.5?texture2D(T,vt).rgb:vc;gl_FragColor=vec4(b*l,1.);}';
+    function sh(t, s) { var x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); return x; }
+    var pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr); gl.useProgram(pr);
+    gl.enable(gl.DEPTH_TEST);
+    var bufs = [], n = 0, tx = null, ang = 0, tilt = 0, dist = 2.6, drag = null, last = 0, sl = cv.closest('.slide');
+    function buf(arr, name, k, type, norm) { var bf = gl.createBuffer(); bufs.push(bf); gl.bindBuffer(gl.ARRAY_BUFFER, bf); gl.bufferData(gl.ARRAY_BUFFER, arr, gl.STATIC_DRAW);
+      var l = gl.getAttribLocation(pr, name); if (l < 0) return; gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, k, type, !!norm, 0, 0); }
+    function set(m, o) {
+      o = o || {}; ang = o.start || 0; tilt = o.tilt || 0.12; dist = o.dist || 2.6;
+      bufs.forEach(function (b) { gl.deleteBuffer(b); }); bufs = [];
+      ['p', 'nm', 'c', 't'].forEach(function (a) { var l = gl.getAttribLocation(pr, a); if (l >= 0) gl.disableVertexAttribArray(l); });
+      var P = dec(m.pos, Int16Array), I = dec(m.idx, Uint16Array), N = new Float32Array(P.length), V = new Float32Array(P.length);
+      for (var i = 0; i < P.length; i++) V[i] = P[i] / 32767;
+      for (i = 0; i < I.length; i += 3) { var a = I[i] * 3, b = I[i + 1] * 3, c = I[i + 2] * 3;
+        var ux = V[b] - V[a], uy = V[b + 1] - V[a + 1], uz = V[b + 2] - V[a + 2], vx = V[c] - V[a], vy = V[c + 1] - V[a + 1], vz = V[c + 2] - V[a + 2];
+        var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+        N[a] += nx; N[a + 1] += ny; N[a + 2] += nz; N[b] += nx; N[b + 1] += ny; N[b + 2] += nz; N[c] += nx; N[c + 1] += ny; N[c + 2] += nz; }
+      var tex = m.mode === 'tex';
+      buf(V, 'p', 3, gl.FLOAT); buf(N, 'nm', 3, gl.FLOAT);
+      if (tex) { buf(dec(m.uv, Uint16Array), 't', 2, gl.UNSIGNED_SHORT, true);
+        tx = tx || gl.createTexture(); var im = new Image(); im.onload = function () { gl.bindTexture(gl.TEXTURE_2D, tx);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, im);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); draw(); }; im.src = m.tex;
+      } else buf(dec(m.col, Uint8Array), 'c', 3, gl.UNSIGNED_BYTE, true);
+      var ib = gl.createBuffer(); bufs.push(ib); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, I, gl.STATIC_DRAW); n = I.length;
+      gl.uniform1f(gl.getUniformLocation(pr, 'X'), tex ? 1 : 0); draw();
+    }
+    function draw() { var r = Math.min(2, window.devicePixelRatio || 1), w = Math.round(cv.clientWidth * r), h = Math.round(cv.clientHeight * r);
+      if (!w || !h || !n) return; if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } gl.viewport(0, 0, w, h);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      var R = rot(ang, tilt), T = R.slice(); T[14] = -dist;
+      gl.uniformMatrix4fv(gl.getUniformLocation(pr, 'M'), false, mul(persp(0.7, w / h, 0.1, 10), T));
+      gl.uniformMatrix4fv(gl.getUniformLocation(pr, 'R'), false, R); gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0); }
+    function tick(t) { var on = !sl || sl.classList.contains('on');
+      if (on && !drag) ang += Math.min(t - last, 50) * 0.0006; last = t; if (on) draw();
+      requestAnimationFrame(tick); }
+    cv.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, y: e.clientY, a: ang, t: tilt }; cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener('pointermove', function (e) { if (!drag) return; ang = drag.a + (e.clientX - drag.x) * 0.01; tilt = Math.max(-1.2, Math.min(1.2, drag.t + (e.clientY - drag.y) * 0.01)); draw(); });
+    cv.addEventListener('pointerup', function () { drag = null; });
+    cv.addEventListener('pointercancel', function () { drag = null; });
+    if (m) set(m, o);
+    if (!(window.__still || /[?&]shot/.test(location.search))) requestAnimationFrame(tick);
+    return { draw: draw, set: set };
+  };
+  // load assets/m_<name>.js once (script tags also work from file://), then call back
+  var wait = {};
+  window.__mready = function (k) { (wait[k] || []).forEach(function (f) { f(window.__models[k]); }); wait[k] = null; };
+  window.loadModel = function (k, base, cb) {
+    var M = window.__models = window.__models || {};
+    if (M[k]) return cb(M[k]);
+    if (wait[k]) return wait[k].push(cb);
+    wait[k] = [cb]; var s = document.createElement('script'); s.src = (base == null ? 'assets/' : base) + 'm_' + k + '.js'; s.async = true;
+    s.onerror = function () { wait[k] = null; }; document.head.appendChild(s);
+  };
+})();
+
+</script>
+<script>
+(function () {
+  var A = '../forum/assets/';
+  var Q = {
+    q1: ['你在森林裡走著，突然下起了大雨，你會怎麼辦？', [['找個地方躲雨，等雨停了再繼續走', 'q2'], ['馬上尋找路徑，加快腳步繼續往前走，不讓雨阻礙你', 'q4']], 'rain', '--b1'],
+    q2: ['雨停了，你發現前面有條分岔路，一條是平坦的大路，另一條是蜿蜒的小徑，你會怎麼選擇？', [['走平坦的大路', 'q3'], ['走蜿蜒的小徑', 'q4']], 'fork', '--b2'],
+    q3: ['你在路上遇到一隻受傷的小鳥，牠需要幫助。你會怎麼做？', [['停下來照顧小鳥，幫牠包紮傷口', 'q6'], ['找幫手來幫助牠', 'q7']], 'bird', '--b3'],
+    q4: ['你繼續前進，發現前方的路被倒下的樹木擋住了，你會怎麼處理？', [['找個高處觀察，看是否有其他路徑', 'q5'], ['想辦法用靈活的身手繞過去', 'lokot']], 'log', '--b4'],
+    q5: ['打開背包會先拿出哪個東西？', [['防蟲噴劑', 'tana'], ['行程規劃筆記本', 'rorang']], 'pack', '--b5'],
+    q6: ['在樹上看到不認識的果實，你覺得……', [['應該有毒吧', 'tatokem'], ['應該可以吃吧', 'lengac']], 'fruit', '--b6'],
+    q7: ['在森林裡露營，你喜歡負責哪項工作？', [['搭帳篷、升火', 'kafotolay'], ['採花來佈置', 'kadawangay']], 'camp', '--b7']
+  };
+  var R = {
+    lokot: ['山蘇型', '機智的行動者', 'Lokot', '你思維敏捷，反應快速，適應力強，靈活應變，遇到問題總能快速調整策略找到解決方法。'],
+    tana: ['刺蔥型', '勇敢的冒險家', "Tana'", '你是團體中的領導者，遇到困難時從不退縮，勇於嘗試新挑戰。'],
+    rorang: ['構樹型', '智慧的謀士', 'Rorang', '你冷靜理性，總能從整體角度思考問題，是團隊中的智囊。'],
+    kadawangay: ['紫背草型', '神秘的觀察者', 'Kadawangay', '你擅長觀察細節，總能在安靜中發現別人看不到的事物。'],
+    kafotolay: ['野莧型', '堅毅的守護者', 'Kafotolay', '你是穩重可靠的夥伴，無論環境如何改變，你始終保持冷靜堅定。'],
+    tatokem: ['龍葵型', '溫柔的守界者', 'Tatokem', '你安靜低調，但當覺得不被尊重或受傷害時，會用柔和的力量劃清界線，不讓自己受傷。'],
+    lengac: ['月桃型', '創意的安慰者', 'Lengac', '你用溫暖和創意照顧身邊的每一個人，總是帶給人安全感。']
+  };
+  var HAS3D = { tana: 1, rorang: 1, kadawangay: 1, kafotolay: 1, tatokem: 1, lengac: 1 };
+
+  /* ---- scenes: Awos the snail walks through the forest ---- */
+  function snail(x, y, s, cls) {
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')"><g class="' + (cls || 'crawl') + '">' +
+      '<path d="M-26 8c4-6 30-8 44-6 6 1 9 4 8 8H-28z" fill="#f2d48f" stroke="#c9a35a" stroke-width="1.5"/>' +
+      '<path d="M18 4l6-16M23 5l9-13" stroke="#c9a35a" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="-13" r="2.6" fill="#3d2b28"/><circle cx="32" cy="-9" r="2.6" fill="#3d2b28"/>' +
+      '<circle cx="-6" cy="-8" r="15" fill="#f28c28" stroke="#b4541a" stroke-width="2"/>' +
+      '<path d="M-6-8m-1 0a3 3 0 1 1 5 2a7 7 0 1 1-10-6a11 11 0 1 1 14 12" fill="none" stroke="#b4541a" stroke-width="2" stroke-linecap="round"/></g></g>';
+  }
+  function tree(x, y, s, c) {
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')"><rect x="-6" y="-10" width="12" height="60" rx="4" fill="#7a5235"/>' +
+      '<g class="sway"><circle cx="0" cy="-34" r="30" fill="' + c + '"/><circle cx="-22" cy="-16" r="20" fill="' + c + '" opacity=".9"/><circle cx="22" cy="-18" r="22" fill="' + c + '" opacity=".85"/></g></g>';
+  }
+  function rain() {
+    var d = '';
+    for (var i = 0; i < 26; i++) {
+      var x = 10 + (i * 53) % 330, de = ((i * 37) % 11) / 10;
+      d += '<line class="drop" style="animation-delay:-' + de + 's" x1="' + x + '" y1="0" x2="' + (x - 4) + '" y2="16" stroke="#6f7fb8" stroke-width="2" stroke-linecap="round"/>';
+    }
+    return d;
+  }
+  var SC = {
+    intro: '<svg viewBox="0 0 340 170" role="img" aria-label="蝸牛 Awos 在野菜之間散步"><rect width="340" height="170" fill="#fbeee6"/>' +
+      '<path d="M0 130q80-30 170-8t170-10v58H0z" fill="#c4e2a8"/>' +
+      '<g class="sway"><path d="M60 128c-4-30 6-60 20-80M80 48c-12-2-26 6-30 18 14 2 26-6 30-18zM74 80c10-8 26-8 34 2-12 8-26 6-34-2zM66 104c-12-6-26-2-32 8 12 6 26 2 32-8z" fill="#5f9e5a" stroke="#4c8a52" stroke-width="2"/></g>' +
+      '<g class="sway" style="animation-delay:-1s"><path d="M268 126c2-24-2-50-14-70" stroke="#4c8a52" stroke-width="3" fill="none"/><ellipse cx="252" cy="52" rx="16" ry="9" fill="#7bb36b"/><ellipse cx="276" cy="78" rx="18" ry="8" fill="#5f9e5a"/><ellipse cx="248" cy="96" rx="16" ry="8" fill="#7bb36b"/><circle cx="262" cy="64" r="4" fill="#3b2a4a"/><circle cx="268" cy="70" r="4" fill="#3b2a4a"/><circle cx="258" cy="72" r="4" fill="#4b3568"/></g>' +
+      snail(166, 128, 1.15) + '</svg>',
+    rain: '<svg viewBox="0 0 340 220" role="img" aria-label="森林裡突然下起大雨"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9bedb"/><stop offset="1" stop-color="#e6e2ee"/></linearGradient></defs>' +
+      '<rect width="340" height="220" fill="url(#g1)"/><g fill="#8c93b5"><ellipse cx="70" cy="22" rx="70" ry="26"/><ellipse cx="170" cy="14" rx="80" ry="24"/><ellipse cx="280" cy="22" rx="80" ry="28"/></g>' +
+      tree(60, 150, 1.1, '#4c8a52') + tree(270, 146, 1.2, '#5f9e5a') + tree(180, 160, .8, '#7bb36b') +
+      '<path d="M0 178q90-18 170-4t170-6v52H0z" fill="#8fbf7c"/>' + rain() + snail(140, 186, .9) + '</svg>',
+    fork: '<svg viewBox="0 0 340 220" role="img" aria-label="雨停了，前面有一條平坦大路和一條蜿蜒小徑"><rect width="340" height="220" fill="#fde9d9"/>' +
+      '<g class="spin"><circle cx="286" cy="40" r="20" fill="#f6b74a"/><g stroke="#f6b74a" stroke-width="4" stroke-linecap="round"><path d="M286 6v-6M286 74v6M252 40h-6M320 40h6M262 16l-4-4M310 64l4 4M262 64l-4 4M310 16l4-4"/></g></g>' +
+      '<path d="M0 120q80-22 170-6t170-8v114H0z" fill="#b9dc9c"/><path d="M0 150q90-14 170 0t170-4v74H0z" fill="#9ccb83"/>' +
+      '<path d="M150 220L120 130h22l30 90z" fill="#ead6ad"/><path d="M128 128L104 96h12l26 32z" fill="#ead6ad" opacity=".7"/>' +
+      '<path d="M190 220c10-20 50-20 40-44s-40-12-26-34 46-10 40-32" fill="none" stroke="#b98b5a" stroke-width="5" stroke-dasharray="2 9" stroke-linecap="round"/>' +
+      '<g transform="translate(170 150)"><rect x="-3" y="-34" width="6" height="40" fill="#7a5235"/><path d="M-4-32h-44l-8 7 8 7h44z" fill="#a8774f"/><path d="M4-20h44l8 7-8 7H4z" fill="#a8774f"/>' +
+      '<text x="-28" y="-21" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" font-family="sans-serif">大路</text><text x="28" y="-9" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" font-family="sans-serif">小徑</text></g>' +
+      '<ellipse cx="96" cy="196" rx="22" ry="5" fill="#a9c6e6" opacity=".8"/>' + snail(170, 204, .8) + '</svg>',
+    bird: '<svg viewBox="0 0 340 220" role="img" aria-label="路上有一隻受傷的小鳥"><rect width="340" height="220" fill="#eef5e6"/>' +
+      '<path d="M0 140q90-16 170-2t170-8v90H0z" fill="#b5d99c"/>' +
+      '<g fill="#7bb36b"><path d="M30 160l6-22 6 22zM48 162l5-16 5 16zM290 158l6-24 6 24zM306 160l5-16 5 16z"/></g>' +
+      '<path class="leaf" d="M60 0c8 4 10 12 6 18-8-2-10-10-6-18z" fill="#c9a35a"/><path class="leaf" style="animation-delay:-2.4s" d="M220 0c8 4 10 12 6 18-8-2-10-10-6-18z" fill="#9ccb83"/>' +
+      '<g transform="translate(206 150)"><g class="shake"><ellipse cx="0" cy="0" rx="30" ry="22" fill="#7fa7d6"/><circle cx="24" cy="-18" r="15" fill="#8fb4de"/><path d="M38-20l14 4-14 5z" fill="#f0a640"/><circle cx="28" cy="-21" r="2.6" fill="#3d2b28"/>' +
+      '<path d="M-28 2l-16 6 14 2z" fill="#6a93c4"/><path d="M6 20l-2 10M-6 20l-3 10" stroke="#e08a3a" stroke-width="3" stroke-linecap="round"/></g>' +
+      '<path class="flap" d="M-6-6c-18 6-30 22-30 36 14-4 26-16 32-30z" fill="#5f88bb"/></g>' +
+      '<g fill="#d2552c" font-family="sans-serif" font-weight="900" font-size="18"><text x="244" y="112" class="tw">!</text></g>' + snail(92, 184, .85) + '</svg>',
+    log: '<svg viewBox="0 0 340 220" role="img" aria-label="倒下的樹木擋住了路"><rect width="340" height="220" fill="#e9f3f6"/>' +
+      '<path d="M200 140q40-90 90-96 30 4 50 30v86z" fill="#b5d99c"/><path d="M220 120q30-50 70-62" fill="none" stroke="#7d625d" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/><path d="M288 56v-20l14 6-14 6" fill="#d2552c"/>' +
+      '<path d="M0 150q90-20 170-4t170-6v80H0z" fill="#9ccb83"/><path d="M110 220l40-80h40l40 80z" fill="#ead6ad"/>' +
+      '<g transform="translate(170 158) rotate(-6)"><rect x="-110" y="-16" width="220" height="32" rx="16" fill="#8a5a3b"/><path d="M-90-6h60M-10 4h70M30-8h50" stroke="#6c4429" stroke-width="3" stroke-linecap="round"/>' +
+      '<ellipse cx="110" cy="0" rx="10" ry="16" fill="#c79a6b"/><ellipse cx="110" cy="0" rx="5" ry="9" fill="none" stroke="#8a5a3b" stroke-width="2"/>' +
+      '<path d="M-60-14l-14-30M-74-44l-12-6M-74-44l4-14M20-14l10-34M30-48l12-8" stroke="#7a5235" stroke-width="5" stroke-linecap="round" fill="none"/></g>' +
+      snail(150, 208, .8) + '<text x="160" y="176" font-size="22" font-weight="900" fill="#d2552c" font-family="sans-serif" class="tw">?</text></svg>',
+    pack: '<svg viewBox="0 0 340 220" role="img" aria-label="打開背包，裡面有防蟲噴劑和行程規劃筆記本"><rect width="340" height="220" fill="#fbe7ef"/>' +
+      '<circle cx="80" cy="60" r="60" fill="#f5c7d8" opacity=".7"/><circle cx="270" cy="160" r="70" fill="#f5c7d8" opacity=".6"/>' +
+      '<g class="bobA"><g transform="translate(128 70)"><rect x="-14" y="-6" width="28" height="64" rx="6" fill="#6aa6d8"/><rect x="-8" y="-18" width="16" height="14" rx="3" fill="#3d5f86"/><rect x="-3" y="-24" width="10" height="6" fill="#3d5f86"/>' +
+      '<path d="M-6 22c6-10 14-8 12 4-4 8-12 6-12-4z" fill="#7bb36b"/><text x="0" y="48" font-size="9" fill="#fff" text-anchor="middle" font-family="sans-serif" font-weight="700">防蟲</text></g></g>' +
+      '<g class="bobB"><g transform="translate(208 64) rotate(8)"><rect x="-30" y="-6" width="60" height="74" rx="4" fill="#f3e6c4" stroke="#b39b6a" stroke-width="2"/><path d="M-30-6v74" stroke="#d2552c" stroke-width="5"/>' +
+      '<path d="M-18 14h40M-18 26h36M-18 38h40" stroke="#c9b48a" stroke-width="2"/><path d="M-14 56c10-8 18 4 26-4s12-6 16-2" fill="none" stroke="#7d625d" stroke-width="2" stroke-dasharray="2 4"/><circle cx="28" cy="52" r="3" fill="#d2552c"/></g></g>' +
+      '<g transform="translate(170 160)"><path d="M-74-30h148l-6 84h-136z" fill="#5d8c5a"/><path d="M-74-30c20-26 128-26 148 0" fill="#4a744a"/><path d="M-62-30c4 18 120 18 124 0" fill="#3f6440"/>' +
+      '<rect x="-34" y="10" width="68" height="34" rx="6" fill="#4a744a"/><rect x="-6" y="16" width="12" height="8" rx="2" fill="#e6c27a"/><path d="M-80-10c-10 20-6 44 4 56M80-10c10 20 6 44-4 56" stroke="#3f6440" stroke-width="6" fill="none" stroke-linecap="round"/></g></svg>',
+    fruit: '<svg viewBox="0 0 340 220" role="img" aria-label="樹上掛著不認識的果實"><rect width="340" height="220" fill="#e6f6ee"/>' +
+      '<path d="M0 186q90-14 170-2t170-6v42H0z" fill="#9ccb83"/>' +
+      '<g class="sway" style="transform-origin:0 0"><path d="M-10 30c80 0 150 20 230 60" stroke="#7a5235" stroke-width="10" fill="none" stroke-linecap="round"/>' +
+      '<g fill="#5f9e5a"><ellipse cx="60" cy="24" rx="26" ry="11" transform="rotate(-20 60 24)"/><ellipse cx="120" cy="30" rx="26" ry="11" transform="rotate(16 120 30)"/><ellipse cx="190" cy="62" rx="28" ry="12" transform="rotate(-10 190 62)"/><ellipse cx="96" cy="58" rx="22" ry="10" transform="rotate(30 96 58)" fill="#7bb36b"/></g>' +
+      '<path d="M150 56v26M150 82l-10 10M150 82l10 10M150 82v14" stroke="#4c8a52" stroke-width="2"/>' +
+      '<g><circle cx="140" cy="96" r="7" fill="#3b2a4a"/><circle cx="160" cy="96" r="7" fill="#4b3568"/><circle cx="150" cy="104" r="7" fill="#3b2a4a"/><circle cx="150" cy="90" r="6" fill="#8fbf6a"/><circle cx="138" cy="92" r="2" fill="#fff" opacity=".6"/><circle cx="158" cy="92" r="2" fill="#fff" opacity=".6"/></g>' +
+      '<path d="M220 88v22M220 110l-8 8M220 110l8 8" stroke="#4c8a52" stroke-width="2"/><circle cx="212" cy="122" r="6" fill="#4b3568"/><circle cx="228" cy="122" r="6" fill="#3b2a4a"/><circle cx="220" cy="128" r="6" fill="#8fbf6a"/></g>' +
+      '<g class="tw"><circle cx="252" cy="128" r="18" fill="#fff" stroke="#7d625d" stroke-width="2"/><path d="M240 142l-8 12 16-8z" fill="#fff" stroke="#7d625d" stroke-width="2"/><text x="252" y="136" font-size="22" font-weight="900" fill="#d2552c" text-anchor="middle" font-family="sans-serif">?</text></g>' +
+      snail(200, 196, .85) + '</svg>',
+    camp: '<svg viewBox="0 0 340 220" role="img" aria-label="在森林裡露營：帳篷、營火和野花"><defs><linearGradient id="g7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f3b69"/><stop offset="1" stop-color="#b48aa8"/></linearGradient></defs>' +
+      '<rect width="340" height="220" fill="url(#g7)"/><g fill="#fff8d6"><circle class="tw" cx="40" cy="30" r="2"/><circle class="tw" style="animation-delay:-.7s" cx="120" cy="18" r="1.6"/><circle class="tw" style="animation-delay:-1.3s" cx="210" cy="36" r="2"/><circle class="tw" style="animation-delay:-.4s" cx="300" cy="22" r="1.8"/><circle cx="270" cy="48" r="10" fill="#fff3c4"/></g>' +
+      '<g fill="#2f4a3a"><path d="M0 150l30-70 30 70zM40 150l26-56 26 56zM270 150l30-76 30 76zM300 150l24-50 24 50z"/></g>' +
+      '<path d="M0 150q90-12 170-2t170-4v76H0z" fill="#5a7d4f"/>' +
+      '<g transform="translate(108 176)"><path d="M-62 0l62-78 62 78z" fill="#f08a3c"/><path d="M0-78l-16 78h32z" fill="#c4612a"/><path d="M-62 0h124" stroke="#7a3d1c" stroke-width="3"/></g>' +
+      '<g transform="translate(222 182)"><path d="M-22 6l44-12M-22-6l44 12" stroke="#7a5235" stroke-width="6" stroke-linecap="round"/>' +
+      '<path class="flick" d="M0-40c10 14 16 22 14 32-2 8-26 8-28 0-2-10 6-18 14-32z" fill="#ffb23f"/><path class="flick" style="animation-delay:-.2s" d="M0-24c6 8 9 12 8 18-1 5-15 5-16 0-1-6 3-10 8-18z" fill="#ff6a3d"/></g>' +
+      '<g><path d="M290 196v-22M304 198v-16M276 198v-14" stroke="#4c8a52" stroke-width="2"/><circle cx="290" cy="172" r="6" fill="#f5a3c7"/><circle cx="304" cy="180" r="5" fill="#c9a0e6"/><circle cx="276" cy="182" r="5" fill="#f7d36b"/></g>' +
+      snail(178, 204, .7) + '</svg>'
+  };
+
+  /* ---- state ---- */
+  var $ = function (id) { return document.getElementById(id); };
+  var cur = 'q1', depth = 0, last = null, tt = null, au = null, rk = null;
+  function show(id) { ['intro', 'quiz', 'result', 'all'].forEach(function (k) { $(k).hidden = k !== id; }); window.scrollTo(0, 0); stopVoice(); }
+  function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function ask() {
+    var q = Q[cur];
+    $('q-step').textContent = '第 ' + (depth + 1) + ' 題';
+    [].forEach.call($('q-trail').children, function (li, i) { li.className = i <= depth ? 'on' : ''; });
+    $('q-scene').innerHTML = SC[q[2]]; $('q-scene').className = 'scene fade-in';
+    var t = $('q-text'); t.textContent = q[0]; t.style.background = 'var(' + q[3] + ')';
+    $('q-opts').innerHTML = q[1].map(function (o, i) { return '<button class="opt" type="button" data-i="' + i + '">' + esc(o[0]) + '</button>'; }).join('');
+  }
+  function start() { cur = 'q1'; depth = 0; last = null; show('quiz'); ask(); }
+  function result(k, fromQuiz) {
+    var r = R[k]; rk = k; show('result');
+    $('r-label').textContent = fromQuiz ? '你的野菜是' : '野菜精靈的人格特質';
+    $('r-img').src = A + 'sp_' + k + '.jpg'; $('r-img').alt = '孩子畫的 ' + r[2] + ' ' + r[0] + '精靈';
+    $('r-amis').textContent = r[2]; $('r-type').textContent = r[0] + '・' + r[1]; $('r-desc').textContent = r[3];
+    $('r-elder').hidden = !(fromQuiz && last === 'q6');
+    var c = $('r-card'); c.classList.remove('fade-in'); void c.offsetWidth; c.classList.add('fade-in');
+    var three = $('r-three'), v = $('r-voice');
+    three.hidden = v.hidden = !HAS3D[k];
+    if (!HAS3D[k]) return;
+    v.innerHTML = '▶ 聽 <span class="am">' + esc(r[2]) + '</span> 說話 <small>孩子錄音</small>';
+    three.classList.add('loading');
+    loadModel('sp_' + k, A, function (m) {
+      if (rk !== k) return;
+      var o = { start: 4.71, dist: 3.6, tilt: 0.1 };
+      if (!tt) tt = turntable($('r-canvas'), m, o); else tt.set(m, o);
+      three.classList.remove('loading');
+    });
+  }
+  function stopVoice() { if (au) au.pause(); var v = $('r-voice'); if (v.getAttribute('aria-pressed') === 'true') { v.setAttribute('aria-pressed', 'false'); v.innerHTML = '▶ 聽 <span class="am">' + esc(R[rk][2]) + '</span> 說話 <small>孩子錄音</small>'; } }
+  $('r-voice').addEventListener('click', function () {
+    var v = this;
+    if (au && !au.paused) return stopVoice();
+    if (!au || au.dataset.k !== rk) { if (au) au.pause(); au = new Audio(A + 'vo_' + rk + '.mp3'); au.dataset.k = rk; au.onended = stopVoice; }
+    au.play().then(function () { v.setAttribute('aria-pressed', 'true'); v.textContent = '❚❚ 暫停'; }).catch(stopVoice);
+  });
+  $('q-opts').addEventListener('click', function (e) {
+    var b = e.target.closest('.opt'); if (!b || b.disabled) return;
+    [].forEach.call(this.children, function (x) { x.disabled = true; }); b.classList.add('picked');
+    var nx = Q[cur][1][+b.dataset.i][1];
+    setTimeout(function () { last = cur; cur = nx; depth++; if (Q[cur]) ask(); else result(cur, true); }, 280);
+  });
+  $('all-grid').innerHTML = Object.keys(R).map(function (k) {
+    return '<button type="button" data-k="' + k + '"><img src="' + A + 'sp_' + k + '.jpg" alt="' + R[k][2] + ' ' + R[k][0] + '精靈" loading="lazy"><span class="am">' + R[k][2] + '</span><span>' + R[k][0] + '</span></button>';
+  }).join('');
+  $('all-grid').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) result(b.dataset.k, false); });
+  document.addEventListener('click', function (e) {
+    var g = e.target.closest('[data-go]'); if (!g) return;
+    if (g.dataset.go === 'start') start(); else show('all');
+  });
+  $('intro-art').innerHTML = SC.intro;
+  document.addEventListener('visibilitychange', function () { if (document.hidden) stopVoice(); });
+})();
+</script>
+</body>
+</html>
