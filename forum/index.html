@@ -400,7 +400,7 @@ a.url{display:block;text-decoration:none}
 /* ---------- presenter UI ---------- */
 #timer{position:fixed;z-index:30;top:calc(10px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:baseline;gap:12px;padding:8px 14px;background:var(--panel);border:1px solid var(--rule-ink);border-radius:8px;font:400 15px var(--mono);color:var(--on-ink-2)}
 #timer .t{font:700 26px var(--mono);font-variant-numeric:tabular-nums;color:var(--neon)}
-#reload{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(64px + env(safe-area-inset-bottom,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);cursor:pointer;opacity:.55;transition:opacity .2s}
+#reload{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right,0px));top:calc(64px + env(safe-area-inset-top,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);cursor:pointer;opacity:.55;transition:opacity .2s}
 #reload:hover,#reload:focus-visible{opacity:1}
 #timer[data-state="late"] .t{color:var(--amber)}
 #timer[data-state="over"] .t{color:var(--rust)}
