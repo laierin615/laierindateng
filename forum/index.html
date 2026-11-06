@@ -454,8 +454,9 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 /* 08 two columns, 09 picture book */
 .s8.s8-two{grid-template-columns:1fr 1fr}
 .s8-two .s8-spirit>.ph:first-child{inset:0}
-#sp-rot .sp-stack{background:#32968e;border-color:#32968e}
-.s8-spirit .sp-stack figcaption{z-index:1}
+.s8-cards{position:relative}
+.s8-cards>.ph{position:absolute;inset:0;background:var(--paper);border:1px solid var(--rule-paper)}
+.s8-cards figcaption{z-index:1}
 .sp-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .bk{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:28px}
 .bk-col{display:flex;flex-direction:column;min-width:0}
@@ -487,7 +488,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 .fb-top{display:flex;align-items:flex-start;gap:28px}
 .fb-meta{display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
 .fb-card{margin:0}
-.fb-card .ph{width:250px;height:177px;background:var(--paper);box-shadow:0 10px 26px var(--shadow)}
+.fb-card .ph{width:250px;height:190px;background:var(--paper);box-shadow:0 10px 26px var(--shadow)}
 .fb-card figcaption{margin-top:8px}
 .fb-card-stack img{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .8s ease}
 .fb-card-stack img.on{opacity:1}
@@ -935,8 +936,8 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
         <p>Google 我的地圖：每種野菜一個圖層，地標寫阿美語和中文，附照片與辨識特徵。</p>
       </article>
       <article class="s8-col">
-        <div class="s8-img s8-spirit" id="sp-rot"><figure class="ph sp-stack"><canvas class="sp-canvas" aria-hidden="true"></canvas><img hidden src="assets/sp_tana.jpg" alt="學生手繪的刺蔥精靈" data-am="Tana'" data-zh="刺蔥" data-role="勇敢的冒險家"><img hidden src="assets/sp_tatokem.jpg" alt="學生手繪的龍葵精靈" data-am="Tatokem" data-zh="龍葵" data-role="溫柔的守界者"><img hidden src="assets/sp_lokot.jpg" alt="學生手繪的山蘇精靈" data-am="Lokot" data-zh="山蘇" data-role="機智的行動者"><img hidden src="assets/sp_rorang.jpg" alt="學生手繪的構樹精靈" data-am="Rorang" data-zh="構樹" data-role="智慧的謀士"><img hidden src="assets/sp_kadawangay.jpg" alt="學生手繪的紫背草精靈" data-am="Kadawangay" data-zh="紫背草" data-role="神秘的觀察者"><img hidden src="assets/sp_kafotolay.jpg" alt="學生手繪的野莧精靈" data-am="Kafotolay" data-zh="野莧" data-role="堅毅的守護者"><img hidden src="assets/sp_lengac.jpg" alt="學生手繪的月桃精靈" data-am="Lengac" data-zh="月桃" data-role="創意的安慰者"><figcaption><span class="am" id="sp-am">Tana'</span> <span id="sp-zh">刺蔥</span>・<span id="sp-role">勇敢的冒險家</span></figcaption></figure></div>
-        <h3>野菜精靈</h3>
+        <div class="s8-img s8-cards"><figure class="ph contain fb-card-stack" id="fb-card"><img class="on" src="assets/card.jpg" alt="學生手寫的月桃知識卡" data-am="lengac" data-zh="月桃"><img src="assets/card_tana.jpg" alt="學生手寫的刺蔥知識卡" data-am="tana'" data-zh="刺蔥"><img src="assets/card_lokot.jpg" alt="學生手寫的山蘇知識卡" data-am="lokot" data-zh="山蘇"><img src="assets/card_tatokem.jpg" alt="學生手寫的龍葵知識卡" data-am="tatokem" data-zh="龍葵"><img src="assets/card_kafotolay.jpg" alt="學生手寫的野莧知識卡" data-am="kafotolay" data-zh="野莧"><figcaption>學生知識卡｜<span class="am" id="fb-card-am">lengac</span> <span id="fb-card-zh">月桃</span></figcaption></figure></div>
+        <h3>知識卡・野菜精靈</h3>
         <table class="spirits">
           <tr><td><span class="am">tana'</span> 刺蔥</td><td>全身帶刺</td><td>勇敢的冒險家</td></tr>
           <tr><td><span class="am">tatokem</span> 龍葵</td><td>需小心處理</td><td>溫柔的守界者</td></tr>
@@ -949,7 +950,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 </section>
 
 <!-- 09 繪本翻頁 -->
-<section class="slide paper" id="s9" data-title="案例四｜Misolap ci Awos to dateng 翻開繪本" data-steps="4" data-free data-cue="師生共編繪本《Misolap ci Awos to dateng》，全書 30 頁｜側欄：繪本從知識卡長出來｜點書頁＝跳到下一個重點頁：主角 Awos→刺蔥 Tana'→野莧圖鑑→遊戲盤｜‹ › 一頁一頁翻（會後可翻整本）｜翻頁器下一頁直接進第 11 頁">
+<section class="slide paper" id="s9" data-title="案例四｜Misolap ci Awos to dateng 翻開繪本" data-steps="4" data-free data-cue="師生共編繪本《Misolap ci Awos to dateng》，全書 30 頁｜側欄：收進繪本的孩子手繪，精靈和植物先畫線稿再上色｜點書頁＝跳到下一個重點頁：主角 Awos→刺蔥 Tana'→野莧圖鑑→遊戲盤｜‹ › 一頁一頁翻（會後可翻整本）｜翻頁器下一頁直接進第 11 頁">
   <div class="pad">
     <div class="kicker">CASE 04 · 繪本</div>
     <div class="head-row"><h2 class="title"><span class="am">Misolap ci Awos to dateng</span></h2><p class="claim">翻開繪本</p></div>
@@ -987,7 +988,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
       </div>
       <div class="fb-side">
         <div class="fb-top">
-        <figure class="fb-card" id="fb-card"><div class="ph contain fb-card-stack"><img class="on" src="assets/card.jpg" alt="學生手寫的月桃知識卡" data-am="lengac" data-zh="月桃"><img src="assets/card_tana.jpg" alt="學生手寫的刺蔥知識卡" data-am="tana'" data-zh="刺蔥"><img src="assets/card_lokot.jpg" alt="學生手寫的山蘇知識卡" data-am="lokot" data-zh="山蘇"><img src="assets/card_tatokem.jpg" alt="學生手寫的龍葵知識卡" data-am="tatokem" data-zh="龍葵"><img src="assets/card_kafotolay.jpg" alt="學生手寫的野莧知識卡" data-am="kafotolay" data-zh="野莧"></div><figcaption class="cap">繪本從<b>知識卡</b>長出來<br>學生知識卡｜<span class="am" id="fb-card-am">lengac</span> <span id="fb-card-zh">月桃</span></figcaption></figure>
+        <figure class="fb-card" id="sp-rot"><div class="ph sp-stack"><canvas class="sp-canvas" aria-hidden="true"></canvas><img hidden src="assets/draw_tana_clean.jpg" data-line="assets/draw_line_tana.png" alt="孩子手繪的刺蔥" data-am="tana'" data-zh="刺蔥" data-role="手繪植物"><img hidden src="assets/sp_cut_tana.png" data-line="assets/sp_line_tana.png" alt="孩子手繪的刺蔥精靈" data-am="Tana'" data-zh="刺蔥" data-role="勇敢的冒險家"><img hidden src="assets/draw_tatokem_big.jpg" data-line="assets/draw_line_tatokem.png" alt="孩子手繪的龍葵" data-am="tatokem" data-zh="龍葵" data-role="手繪植物"><img hidden src="assets/sp_cut_tatokem.png" data-line="assets/sp_line_tatokem.png" alt="孩子手繪的龍葵精靈" data-am="Tatokem" data-zh="龍葵" data-role="溫柔的守界者"><img hidden src="assets/sp_cut_lokot.png" data-line="assets/sp_line_lokot.png" alt="孩子手繪的山蘇精靈" data-am="Lokot" data-zh="山蘇" data-role="機智的行動者"><img hidden src="assets/sp_cut_rorang.png" data-line="assets/sp_line_rorang.png" alt="孩子手繪的構樹精靈" data-am="Rorang" data-zh="構樹" data-role="智慧的謀士"><img hidden src="assets/sp_cut_kadawangay.png" data-line="assets/sp_line_kadawangay.png" alt="孩子手繪的紫背草精靈" data-am="Kadawangay" data-zh="紫背草" data-role="神秘的觀察者"><img hidden src="assets/sp_cut_kafotolay.png" data-line="assets/sp_line_kafotolay.png" alt="孩子手繪的野莧精靈" data-am="Kafotolay" data-zh="野莧" data-role="堅毅的守護者"><img hidden src="assets/sp_cut_lengac.png" data-line="assets/sp_line_lengac.png" alt="孩子手繪的月桃精靈" data-am="Lengac" data-zh="月桃" data-role="創意的安慰者"></div><figcaption class="cap">收進繪本的孩子手繪<br><span class="am" id="sp-am">tana'</span> <span id="sp-zh">刺蔥</span>・<span id="sp-role">手繪植物</span></figcaption></figure>
         <div class="fb-meta">
         <p class="fb-no">師生共編繪本・全書 30 頁</p>
         <p class="fb-count"><b id="fb-n">1</b> / 30</p>
@@ -1739,7 +1740,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   var box = document.getElementById('sp-rot'); if (!box) return;
   var canvas = box.querySelector('.sp-canvas'), ctx = canvas.getContext('2d');
   var imgs = [].slice.call(box.querySelectorAll('.sp-stack img'));
-  var lines = imgs.map(function (img) { var l = new Image(); l.src = img.getAttribute('src').replace('sp_', 'sp_line_').replace('.jpg', '.png'); return l; });
+  var lines = imgs.map(function (img) { var l = new Image(); l.src = img.dataset.line; return l; });
   var am = document.getElementById('sp-am'), zh = document.getElementById('sp-zh'), role = document.getElementById('sp-role');
   var mask = document.createElement('canvas'), mctx = mask.getContext('2d');
   var layer = document.createElement('canvas'), lctx = layer.getContext('2d');
@@ -1803,7 +1804,12 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     am.textContent = img.dataset.am; zh.textContent = img.dataset.zh; role.textContent = img.dataset.role;
     size(); fit = fitImage(img); linePlan = plan(fit, 14, true); colorPlan = plan(fit, 7, false); started = performance.now();
   }
+  var slide = box.closest('.slide'), wasOn = false;
   function frame(now) {
+    // start again from the first drawing every time the slide comes on screen
+    var on = slide.classList.contains('on');
+    if (on && !wasOn) begin(0);
+    wasOn = on;
     if (now - started >= CYCLE) begin((cur + 1) % imgs.length);
     paint(now - started);
     requestAnimationFrame(frame);
