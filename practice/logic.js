@@ -96,6 +96,23 @@ export function shuffle(items, random = Math.random) {
   return copy;
 }
 
+/* ---------- script versions ---------- */
+
+/**
+ * Swap in an alternative wording for some pages (e.g. the stand-up version of 8–17).
+ * Pages the version does not cover keep the final transcript.
+ * @template {{n: number, paragraphs: string[]}} T
+ * @param {T[]} pages
+ * @param {{pages: Record<string, string[]>} | null} version
+ * @returns {(T & {version: boolean})[]}
+ */
+export function applyVersion(pages, version) {
+  return pages.map((page) => {
+    const paragraphs = version?.pages?.[page.n];
+    return paragraphs ? { ...page, paragraphs, version: true } : { ...page, version: false };
+  });
+}
+
 /* ---------- on-device edits ---------- */
 
 /**

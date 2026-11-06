@@ -121,3 +121,19 @@ test('exportText lists only edited pages', () => {
   assert.equal(exportText(pages, {}), '');
   assert.equal(exportText(pages, { 2: { paragraphs: ['甲', '乙'], at: 0 } }), '第 2 頁｜問題\n\n甲\n\n乙');
 });
+
+import { applyVersion } from './logic.js';
+
+test('applyVersion swaps only the pages it covers', () => {
+  const pages = [{ n: 7, paragraphs: ['定稿七'] }, { n: 8, paragraphs: ['定稿八'] }];
+  const out = applyVersion(pages, { pages: { 8: ['脫口秀八'] } });
+  assert.deepEqual(out.map((p) => [p.paragraphs[0], p.version]), [['定稿七', false], ['脫口秀八', true]]);
+  assert.deepEqual(applyVersion(pages, null).map((p) => p.paragraphs[0]), ['定稿七', '定稿八']);
+});
+
+test('stand-up version covers 8–17 with no cues or star markers', () => {
+  const standup = JSON.parse(readFileSync(new URL('./standup.json', import.meta.url), 'utf8'));
+  assert.deepEqual(Object.keys(standup.pages).map(Number), [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+  const all = Object.values(standup.pages).flat().join('');
+  assert.ok(!/[〔〕★]/.test(all));
+});

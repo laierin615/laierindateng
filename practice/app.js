@@ -1,4 +1,4 @@
-import { formatTime, pageTarget, filterPages, splitStage, summarizeRun, timeState, shuffle, applyEdits, textToParagraphs, exportText } from './logic.js';
+import { formatTime, pageTarget, filterPages, splitStage, summarizeRun, timeState, shuffle, applyEdits, applyVersion, textToParagraphs, exportText } from './logic.js';
 import { recordingSupported, loadRecording, saveRecording, deleteRecording, clearRecordings, startRecording } from './recorder.js';
 import { LEVELS, PASS_RATIO, ttsSupported, speakSentences, stopSpeaking, recognitionSupported, listen, spokenSentences, renderCloze, renderMissed, scoreAttempt } from './memo.js';
 
@@ -33,6 +33,8 @@ const state = {
   memoBest: store.get('memoBest', {}),
   listening: null,
   edits: store.get('edits', {}),
+  standup: null,
+  version: store.get('version', 'standup'),
   editing: null,
 };
 
@@ -70,7 +72,8 @@ function renderAnswer(container, lines) {
   }));
 }
 
-const visiblePages = () => filterPages(applyEdits(state.data.pages, state.edits), state.speaker);
+const versionPages = () => applyVersion(state.data.pages, state.version === 'standup' ? state.standup : null);
+const visiblePages = () => filterPages(applyEdits(versionPages(), state.edits), state.speaker);
 const clampIndex = (index, length) => Math.min(Math.max(index, 0), Math.max(length - 1, 0));
 
 /* ---------- recording widget ---------- */
@@ -311,7 +314,7 @@ function openEditor(page) {
 function saveEditor() {
   const n = state.editing;
   const paragraphs = textToParagraphs($('#edit-text').value);
-  const original = state.data.pages.find((p) => p.n === n);
+  const original = versionPages().find((p) => p.n === n);
   if (!paragraphs.length) { alert('講稿不能是空的。'); return; }
   if (paragraphs.join('\n') === original.paragraphs.join('\n')) delete state.edits[n];
   else state.edits[n] = { paragraphs, at: Date.now() };
@@ -533,6 +536,8 @@ function render() {
   $$('nav.tabs button').forEach((button) => button.toggleAttribute('aria-current', button.dataset.view === state.view));
   $$('nav.tabs button').forEach((button) => { if (button.dataset.view === state.view) button.setAttribute('aria-current', 'page'); });
   $$('#speaker button').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.speaker === state.speaker)));
+  $$('#version button').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.version === state.version)));
+  $('#version').hidden = !state.standup;
   if (state.view === 'read') renderRead();
   if (state.view === 'recall') renderRecall();
   if (state.view === 'timer' && !state.timer) renderTimerIdle();
@@ -601,6 +606,14 @@ function bindEvents() {
     state.readIndex = 0;
     state.recallIndex = 0;
     state.memoIndex = 0;
+    render();
+  }));
+  $$('#version button').forEach((button) => button.addEventListener('click', async () => {
+    if (state.timer) return;
+    await stopActiveRecording();
+    stopMemoAudio();
+    state.version = button.dataset.version;
+    store.set('version', state.version);
     render();
   }));
   $$('[data-step]').forEach((button) => button.addEventListener('click', () => step(Number(button.dataset.step))));
@@ -691,6 +704,12 @@ async function init() {
     const response = await fetch('data.json');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     state.data = await response.json();
+    try {
+      const standup = await fetch('standup.json');
+      if (standup.ok) state.standup = await standup.json();
+    } catch (error) {
+      console.warn('脫口秀版讀不到，只顯示定稿', error);
+    }
   } catch (error) {
     document.querySelector('main').innerHTML = `<div class="card"><p class="q">讀不到逐字稿資料</p><p class="note">${escapeHtml(String(error.message ?? error))}。請連上網路後重新整理一次，之後就能離線使用。</p></div>`;
     return;

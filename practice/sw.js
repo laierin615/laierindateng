@@ -1,7 +1,7 @@
 /* Offline cache for the rehearsal app: app shell, transcript snapshot and the 17 slide shots. */
-const CACHE = 'dateng-practice-v3';
+const CACHE = 'dateng-practice-v4';
 const SHOTS = Array.from({ length: 17 }, (_, i) => `../forum/shots/s${String(i + 1).padStart(2, '0')}.jpg`);
-const ASSETS = ['./', 'index.html', 'app.js', 'logic.js', 'recorder.js', 'memo.js', 'data.json', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png', ...SHOTS];
+const ASSETS = ['./', 'index.html', 'app.js', 'logic.js', 'recorder.js', 'memo.js', 'data.json', 'standup.json', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png', ...SHOTS];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
