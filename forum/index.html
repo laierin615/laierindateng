@@ -1737,16 +1737,19 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   s.addEventListener('page', function (e) { show(e.detail); });
   show(KEY[+(s.dataset.at || 0)] || 0, true);
 })();
-/* ---- spirits on slide 9: each one is painted in stroke by stroke, held, then the next ---- */
+/* ---- spirits on slide 9: black line art is traced first, then coloured in stroke by stroke ---- */
 (function () {
   var box = document.getElementById('sp-rot'); if (!box) return;
   var canvas = box.querySelector('.sp-canvas'), ctx = canvas.getContext('2d');
   var imgs = [].slice.call(box.querySelectorAll('.sp-stack img'));
+  var lines = imgs.map(function (img) { var l = new Image(); l.src = img.getAttribute('src').replace('sp_', 'sp_line_').replace('.jpg', '.png'); return l; });
   var am = document.getElementById('sp-am'), zh = document.getElementById('sp-zh'), role = document.getElementById('sp-role');
   var mask = document.createElement('canvas'), mctx = mask.getContext('2d');
   var layer = document.createElement('canvas'), lctx = layer.getContext('2d');
   var STILL = window.__still || /[?&]shot/.test(location.search) || matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var DRAW_MS = 2600, HOLD_MS = 1600, cur = 0, strokes = [], fit = null, started = 0;
+  var LINE_MS = 1800, COLOR_MS = 2200, FADE_MS = 500, HOLD_MS = 1300;
+  var CYCLE = LINE_MS + COLOR_MS + FADE_MS + HOLD_MS;
+  var cur = 0, fit = null, linePlan = null, colorPlan = null, started = 0;
 
   function size() {
     var r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1758,21 +1761,20 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     var w = img.naturalWidth * s, h = img.naturalHeight * s;
     return { x: (canvas.width - w) / 2, y: (canvas.height - h) / 2, w: w, h: h };
   }
-  function planStrokes(f) {
-    // zigzag "colouring" strokes over the drawing, like a child filling it in row by row
-    var lw = f.h / 7, rows = Math.ceil(f.h / (lw * 0.55)) + 1, list = [];
+  function plan(f, rowsWanted, vertical) {
+    // back-and-forth strokes across the drawing; vertical sweeps for the pencil, horizontal for colouring
+    var span = vertical ? f.w : f.h, lw = span / rowsWanted * 1.8, rows = Math.ceil(span / (lw * 0.55)) + 1, list = [], steps = 8;
     for (var r = 0; r < rows; r++) {
-      var y = f.y + r * lw * 0.55, pts = [], steps = 8;
+      var pos = (vertical ? f.x : f.y) + r * lw * 0.55, pts = [];
       for (var i = 0; i <= steps; i++) {
-        var t = r % 2 ? 1 - i / steps : i / steps;
-        pts.push([f.x + t * f.w, y + (Math.random() - 0.5) * lw * 0.5]);
+        var t = r % 2 ? 1 - i / steps : i / steps, jitter = (Math.random() - 0.5) * lw * 0.5;
+        pts.push(vertical ? [pos + jitter, f.y + t * f.h] : [f.x + t * f.w, pos + jitter]);
       }
       list.push(pts);
     }
-    return { lw: lw, list: list, total: rows * 8 };
+    return { lw: lw, list: list, total: rows * steps };
   }
-  function paint(progress) {
-    var img = imgs[cur];
+  function reveal(source, strokes, progress, alpha) {
     mctx.clearRect(0, 0, mask.width, mask.height);
     mctx.lineCap = 'round'; mctx.lineJoin = 'round'; mctx.lineWidth = strokes.lw; mctx.strokeStyle = '#000';
     var budget = progress * strokes.total;
@@ -1780,8 +1782,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
       if (budget <= 0) return;
       mctx.beginPath(); mctx.moveTo(pts[0][0], pts[0][1]);
       for (var i = 1; i < pts.length && budget > 0; i++) {
-        var part = Math.min(1, budget); budget -= 1;
-        var a = pts[i - 1], b = pts[i];
+        var part = Math.min(1, budget), a = pts[i - 1], b = pts[i]; budget -= 1;
         mctx.lineTo(a[0] + (b[0] - a[0]) * part, a[1] + (b[1] - a[1]) * part);
       }
       mctx.stroke();
@@ -1790,26 +1791,31 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     lctx.clearRect(0, 0, layer.width, layer.height);
     lctx.drawImage(mask, 0, 0);
     lctx.globalCompositeOperation = 'source-in';
-    lctx.drawImage(img, fit.x, fit.y, fit.w, fit.h);
+    lctx.drawImage(source, fit.x, fit.y, fit.w, fit.h);
+    ctx.globalAlpha = alpha; ctx.drawImage(layer, 0, 0); ctx.globalAlpha = 1;
+  }
+  function paint(elapsed) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(layer, 0, 0);
+    var colour = Math.max(0, Math.min(1, (elapsed - LINE_MS) / COLOR_MS));
+    var lineAlpha = 1 - Math.max(0, Math.min(1, (elapsed - LINE_MS - COLOR_MS) / FADE_MS));
+    if (colour > 0) reveal(imgs[cur], colorPlan, colour, 1);
+    if (lineAlpha > 0) reveal(lines[cur], linePlan, Math.min(1, elapsed / LINE_MS), lineAlpha);
   }
   function begin(index) {
     cur = index; var img = imgs[cur];
     am.textContent = img.dataset.am; zh.textContent = img.dataset.zh; role.textContent = img.dataset.role;
-    size(); fit = fitImage(img); strokes = planStrokes(fit); started = performance.now();
+    size(); fit = fitImage(img); linePlan = plan(fit, 14, true); colorPlan = plan(fit, 7, false); started = performance.now();
   }
   function frame(now) {
-    var elapsed = now - started;
-    if (elapsed >= DRAW_MS + HOLD_MS) { begin((cur + 1) % imgs.length); elapsed = 0; }
-    paint(Math.min(1, elapsed / DRAW_MS));
+    if (now - started >= CYCLE) begin((cur + 1) % imgs.length);
+    paint(now - started);
     requestAnimationFrame(frame);
   }
   function ready(img) { return img.complete && img.naturalWidth > 0; }
   function start() {
-    if (!imgs.every(ready)) return setTimeout(start, 100);
+    if (!imgs.every(ready) || !lines.every(ready)) return setTimeout(start, 100);
     begin(0);
-    if (STILL) { paint(1); return; }
+    if (STILL) { paint(CYCLE - 1); return; }
     requestAnimationFrame(frame);
   }
   start();
