@@ -395,10 +395,12 @@ a.url{display:block;text-decoration:none}
 /* ---------- presenter UI ---------- */
 #timer{position:fixed;z-index:30;top:calc(10px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:baseline;gap:12px;padding:8px 14px;background:var(--panel);border:1px solid var(--rule-ink);border-radius:8px;font:400 15px var(--mono);color:var(--on-ink-2)}
 #timer .t{font:700 26px var(--mono);font-variant-numeric:tabular-nums;color:var(--neon)}
-#reload{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);cursor:pointer;opacity:.55;transition:opacity .2s}
-#reload:hover,#reload:focus-visible{opacity:1}
-#pdf-dl{position:fixed;z-index:30;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);text-decoration:none;opacity:.55;transition:opacity .2s}
-#pdf-dl:hover,#pdf-dl:focus-visible{opacity:1}
+#reload,#pdf-dl{position:fixed;z-index:30;display:none;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:1px solid var(--rule-ink);border-radius:50%;background:var(--panel);color:var(--on-ink);font:700 20px/1 var(--sans);text-decoration:none;cursor:pointer;opacity:.6;transition:opacity .2s}
+body.on-last #reload,body.on-last #pdf-dl{display:flex}
+#reload:hover,#reload:focus-visible,#pdf-dl:hover,#pdf-dl:focus-visible{opacity:1}
+#reload{right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px))}
+#pdf-dl{left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+@media print{#reload,#pdf-dl{display:none!important}}
 #timer[data-state="late"] .t{color:var(--amber)}
 #timer[data-state="over"] .t{color:var(--rust)}
 #timer[data-state="paused"] .t{color:var(--on-ink-2)}
@@ -1487,6 +1489,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     $('#pageno').textContent = backup ? '備用 ' + s.dataset.label : label(cur) + ' / ' + String(MAIN).padStart(2, '0');
     $('#progress').style.width = (backup ? 100 : (cur + 1) / MAIN * 100) + '%';
     try { history.replaceState(null, '', '#' + s.id); } catch (e) { /* sandboxed */ }
+    document.body.classList.toggle('on-last', cur === MAIN - 1);
     $$('.ov-grid button').forEach((b, k) => b.classList.toggle('now', k === cur));
     renderCues(); renderScript(); renderTimer();
   }
@@ -2310,8 +2313,8 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   addEventListener('blur', function () { setTimeout(function () { if (document.activeElement === f) { f.blur(); window.focus(); } }, 150); });
 })();
 </script>
-<button id="reload" type="button" title="載入最新版，停在目前這一頁">↻ 重新整理</button>
-<a id="pdf-dl" href="Dateng_forum_20261107.pdf" download="Dateng野菜探險家_2026原住民族教育論壇.pdf" title="下載整份簡報（17 頁 PDF）">⬇ 下載簡報 PDF</a>
+<button id="reload" type="button" title="重新整理：載入最新版" aria-label="重新整理，載入最新版">↻</button>
+<a id="pdf-dl" href="Dateng_forum_20261107.pdf" download="Dateng野菜探險家_2026原住民族教育論壇.pdf" title="下載簡報 PDF（17 頁）" aria-label="下載簡報 PDF">⬇</a>
 <script>
 // reload button: fetch the newest page (cache-busting query) and stay on the current slide
 document.getElementById('pdf-dl').addEventListener('click', function (e) { e.stopPropagation(); });
