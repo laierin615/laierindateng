@@ -221,6 +221,8 @@ figure{margin:0}
 .spirits td{padding:7px 0;border-bottom:1px solid var(--rule-paper);vertical-align:baseline}
 .spirits td:last-child{font-weight:700;text-align:right}
 .spirits .am{font-size:23px}
+.card-fields td:first-child{width:96px;font-weight:700;color:var(--rust)}
+.card-fields td:last-child{font-weight:400;text-align:left}
 .book{display:grid;place-items:center;background:var(--sand)}
 .book-cover{position:relative;width:200px;height:250px;box-sizing:border-box;padding:24px 18px 18px 30px;display:flex;flex-direction:column;justify-content:space-between;background:var(--ink);color:var(--on-ink);box-shadow:10px 14px 0 var(--warm)}
 .book-cover::before{content:"";position:absolute;left:10px;top:0;bottom:0;width:3px;background:var(--neon)}
@@ -926,12 +928,13 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
       </article>
       <article class="s8-col">
         <div class="s8-img s8-cards"><figure class="ph contain fb-card-stack" id="fb-card"><img class="on" src="assets/card.jpg" alt="學生手寫的月桃知識卡" data-am="lengac" data-zh="月桃"><img src="assets/card_tana.jpg" alt="學生手寫的刺蔥知識卡" data-am="tana'" data-zh="刺蔥"><img src="assets/card_lokot.jpg" alt="學生手寫的山蘇知識卡" data-am="lokot" data-zh="山蘇"><img src="assets/card_tatokem.jpg" alt="學生手寫的龍葵知識卡" data-am="tatokem" data-zh="龍葵"><img src="assets/card_kafotolay.jpg" alt="學生手寫的野莧知識卡" data-am="kafotolay" data-zh="野莧"><figcaption>學生知識卡｜<span class="am" id="fb-card-am">lengac</span> <span id="fb-card-zh">月桃</span></figcaption></figure></div>
-        <h3>知識卡・野菜精靈</h3>
-        <table class="spirits">
-          <tr><td><span class="am">tana'</span> 刺蔥</td><td>全身帶刺</td><td>勇敢的冒險家</td></tr>
-          <tr><td><span class="am">tatokem</span> 龍葵</td><td>需小心處理</td><td>溫柔的守界者</td></tr>
+        <h3>知識卡</h3>
+        <table class="spirits card-fields">
+          <tr><td>認得</td><td>中文名稱、族語名稱、野菜素描、辨識特徵</td></tr>
+          <tr><td>用得上</td><td>採集知識、風味、料理方式、功效與營養價值</td></tr>
+          <tr><td>說得出</td><td>文化故事與傳說、擬人想像</td></tr>
         </table>
-        <p class="cap">第一人稱自傳・錄下自己的聲音</p>
+        <p class="cap">「擬人想像」那一格，就是野菜精靈的起點</p>
       </article>
     </div>
     <p class="s8-foot"><span class="hl">精靈的個性</span>是孩子的創作；<span class="hl">植物的特徵和用途</span>要有來源。作品上分開標示。</p>
