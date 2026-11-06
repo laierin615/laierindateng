@@ -1,5 +1,6 @@
-import { formatTime, pageTarget, filterPages, splitStage, summarizeRun, timeState, shuffle } from './logic.js';
+import { formatTime, pageTarget, filterPages, splitStage, summarizeRun, timeState, shuffle, applyEdits, textToParagraphs, exportText } from './logic.js';
 import { recordingSupported, loadRecording, saveRecording, deleteRecording, clearRecordings, startRecording } from './recorder.js';
+import { LEVELS, PASS_RATIO, ttsSupported, speakSentences, stopSpeaking, recognitionSupported, listen, spokenSentences, renderCloze, renderMissed, scoreAttempt } from './memo.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -27,6 +28,12 @@ const state = {
   quizIndex: 0,
   quizMarks: store.get('quizMarks', {}),
   timer: null,
+  memoIndex: store.get('memoIndex', 0),
+  memoLevel: store.get('memoLevel', 1),
+  memoBest: store.get('memoBest', {}),
+  listening: null,
+  edits: store.get('edits', {}),
+  editing: null,
 };
 
 /* ---------- rendering helpers ---------- */
@@ -63,7 +70,7 @@ function renderAnswer(container, lines) {
   }));
 }
 
-const visiblePages = () => filterPages(state.data.pages, state.speaker);
+const visiblePages = () => filterPages(applyEdits(state.data.pages, state.edits), state.speaker);
 const clampIndex = (index, length) => Math.min(Math.max(index, 0), Math.max(length - 1, 0));
 
 /* ---------- recording widget ---------- */
@@ -145,9 +152,197 @@ function renderRead() {
   $('#read-speaker').className = `chip ${page.speaker}`;
   $('#read-target').textContent = `目標 ${formatTime(pageTarget(page))}`;
   $('#read-title').textContent = page.title;
+  $('#read-edited').hidden = !page.edited;
   $('#read-count').textContent = `${state.readIndex + 1} / ${pages.length}`;
   renderScript($('#read-script'), page);
   mountRecorder($('[data-rec="read"]'), `page-${page.n}`);
+}
+
+/* ---------- 🧠 背稿 ---------- */
+function memoPage() {
+  const pages = visiblePages();
+  state.memoIndex = clampIndex(state.memoIndex, pages.length);
+  return pages[state.memoIndex];
+}
+
+function stopMemoAudio() {
+  stopSpeaking();
+  $('#memo-tts').textContent = '🔊 朗讀';
+  $$('#memo-script .sent.speaking').forEach((el) => el.classList.remove('speaking'));
+  if (state.listening) {
+    const { session } = state.listening;
+    state.listening = null;
+    session.stop().catch(() => {});
+    $('#memo-listen').textContent = '🎙 說說看・對稿';
+    $('#memo-live').hidden = true;
+  }
+}
+
+function renderMemo() {
+  const pages = visiblePages();
+  const page = memoPage();
+  store.set('memoIndex', state.memoIndex);
+  $('#memo-img').src = shot(page.n);
+  $('#memo-img').alt = `第 ${page.n} 頁投影片`;
+  $('#memo-no').textContent = `第 ${page.n} 頁・${page.speakerLabel}`;
+  const best = state.memoBest[page.n];
+  $('#memo-best').textContent = best === undefined ? '還沒通過' : `已通過 L${best}`;
+  $('#memo-best').className = `chip ${best === undefined ? '' : 'yiyun'}`;
+  $('#memo-edited').hidden = !page.edited;
+  $('#memo-title').textContent = page.title;
+  $('#memo-count').textContent = `${state.memoIndex + 1} / ${pages.length}`;
+  $('#memo-levels').replaceChildren(...LEVELS.map((label, level) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.innerHTML = `<small>L${level}</small>${label}`;
+    button.setAttribute('aria-pressed', String(level === state.memoLevel));
+    button.addEventListener('click', () => { stopMemoAudio(); state.memoLevel = level; store.set('memoLevel', level); renderMemo(); });
+    return button;
+  }));
+  $('#memo-level-note').textContent = [
+    '先把整頁讀熟，可以按「朗讀」用聽的。',
+    '每個分句只留前半，後半自己接上。',
+    '每個分句只留前兩個字當提示。',
+    '每個分句只剩第一個字。',
+    '全部藏起來，只剩標點。點灰色空格可以偷看。',
+  ][state.memoLevel];
+  $('#memo-result').hidden = true;
+  $('#memo-pass').textContent = `✓ L${state.memoLevel} 講順了`;
+  renderCloze($('#memo-script'), page, state.memoLevel);
+  $('#memo-tts').disabled = !ttsSupported();
+  if (!recognitionSupported()) { $('#memo-listen').disabled = true; $('#memo-listen').textContent = '🎙 此瀏覽器不支援對稿'; }
+  $('#memo-dots').replaceChildren(...pages.map((p) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    const level = state.memoBest[p.n];
+    dot.textContent = p.n;
+    dot.title = level === undefined ? '還沒通過' : `已通過 L${level}`;
+    if (level !== undefined) dot.classList.add(level >= 3 ? 'ok' : 'bad');
+    if (p.n === page.n) dot.setAttribute('aria-current', 'true');
+    dot.addEventListener('click', () => { stopMemoAudio(); state.memoIndex = pages.findIndex((x) => x.n === p.n); renderMemo(); });
+    return dot;
+  }));
+}
+
+function markMemoPassed(page, level) {
+  const best = state.memoBest[page.n];
+  if (best === undefined || level > best) {
+    state.memoBest[page.n] = level;
+    store.set('memoBest', state.memoBest);
+  }
+}
+
+function showMemoResult(page, result) {
+  const box = $('#memo-result');
+  const percent = Math.round(result.ratio * 100);
+  const nextLevel = Math.min(state.memoLevel + 1, LEVELS.length - 1);
+  box.innerHTML = `<div class="score ${result.passed ? 'pass' : 'fail'}">${percent}%</div>
+    <p class="note">${result.passed ? `講到 ${percent}%，L${state.memoLevel} 通過！` : `差一點，${Math.round(PASS_RATIO * 100)}% 才算通過。下面紅色是沒講到的地方。`}</p>`;
+  if (result.passed && state.memoLevel < LEVELS.length - 1) {
+    const up = document.createElement('button');
+    up.type = 'button'; up.className = 'primary'; up.textContent = `挑戰 L${nextLevel}（${LEVELS[nextLevel]}）`;
+    up.addEventListener('click', () => { state.memoLevel = nextLevel; store.set('memoLevel', nextLevel); renderMemo(); });
+    box.append(up);
+  }
+  const again = document.createElement('button');
+  again.type = 'button'; again.className = 'ghost'; again.textContent = '回到挖空畫面'; again.style.marginLeft = '8px';
+  again.addEventListener('click', renderMemo);
+  box.append(again);
+  box.hidden = false;
+  if (result.passed) markMemoPassed(page, state.memoLevel);
+  renderMissed($('#memo-script'), page, result.matched);
+  $('#memo-best').textContent = state.memoBest[page.n] === undefined ? '還沒通過' : `已通過 L${state.memoBest[page.n]}`;
+}
+
+function toggleSpeak() {
+  if ($('#memo-tts').textContent.startsWith('■')) { stopMemoAudio(); return; }
+  stopMemoAudio();
+  const page = memoPage();
+  const rate = Number($('#memo-rate').value);
+  $('#memo-tts').textContent = '■ 停止朗讀';
+  speakSentences(spokenSentences(page), rate, (index) => {
+    $$('#memo-script .sent').forEach((el) => el.classList.toggle('speaking', el.dataset.i === String(index)));
+    $(`#memo-script .sent[data-i="${index}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, () => stopMemoAudio());
+}
+
+async function toggleListen() {
+  const page = memoPage();
+  if (state.listening) {
+    const { session } = state.listening;
+    state.listening = null;
+    $('#memo-listen').textContent = '🎙 說說看・對稿';
+    $('#memo-live').textContent = '比對中…';
+    const spoken = await session.stop();
+    $('#memo-live').hidden = true;
+    if (!spoken.trim()) { alert('沒有聽到聲音，請再試一次，講話時靠近手機一點。'); return; }
+    showMemoResult(page, scoreAttempt(page, spoken));
+    return;
+  }
+  stopSpeaking();
+  try {
+    const session = listen((finalText, interim) => {
+      $('#memo-live').textContent = `${finalText}${interim}` || '在聽了，請開始講…';
+    }, (error) => {
+      const tips = { 'not-allowed': '麥克風沒有開權限', network: '對稿需要網路連線', 'service-not-allowed': '這個瀏覽器不允許語音辨識' };
+      alert(`對稿停止：${tips[error] ?? error}`);
+      stopMemoAudio();
+    });
+    state.listening = { session };
+    $('#memo-listen').textContent = '■ 講完了，對稿';
+    $('#memo-live').textContent = '在聽了，請開始講…';
+    $('#memo-live').hidden = false;
+    $('#memo-result').hidden = true;
+  } catch (error) {
+    alert(`無法開始對稿：${error.message ?? error}`);
+  }
+}
+
+/* ---------- ✏️ 修稿 (edits stay on this device until exported) ---------- */
+function openEditor(page) {
+  stopMemoAudio();
+  state.editing = page.n;
+  $('#edit-title').textContent = `修稿｜第 ${page.n} 頁 ${page.title}`;
+  $('#edit-text').value = page.paragraphs.join('\n\n');
+  $('#edit-restore').hidden = !page.edited;
+  $('#editor').showModal();
+}
+
+function saveEditor() {
+  const n = state.editing;
+  const paragraphs = textToParagraphs($('#edit-text').value);
+  const original = state.data.pages.find((p) => p.n === n);
+  if (!paragraphs.length) { alert('講稿不能是空的。'); return; }
+  if (paragraphs.join('\n') === original.paragraphs.join('\n')) delete state.edits[n];
+  else state.edits[n] = { paragraphs, at: Date.now() };
+  store.set('edits', state.edits);
+  $('#editor').close();
+  render();
+}
+
+function restoreEditor() {
+  if (!confirm('放棄這頁的修改，回到定稿？')) return;
+  delete state.edits[state.editing];
+  store.set('edits', state.edits);
+  $('#editor').close();
+  render();
+}
+
+async function exportEdits() {
+  const text = exportText(state.data.pages, state.edits);
+  if (!text) { alert('還沒有修改過任何一頁。'); return; }
+  try {
+    if (navigator.share) { await navigator.share({ title: 'Dateng 修稿', text }); return; }
+  } catch (error) {
+    if (error?.name === 'AbortError') return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    alert(`已複製 ${Object.keys(state.edits).length} 頁修稿，可以直接貼到 Google 文件。`);
+  } catch {
+    $('#export-text').value = text;
+    $('#export').showModal();
+  }
 }
 
 /* ---------- ② 提詞回想 ---------- */
@@ -342,13 +537,17 @@ function render() {
   if (state.view === 'recall') renderRecall();
   if (state.view === 'timer' && !state.timer) renderTimerIdle();
   if (state.view === 'quiz') renderQuiz();
-  if (state.view === 'read' || state.view === 'recall') requestWakeLock();
+  if (state.view === 'memo') renderMemo();
+  if (state.view !== 'quiz') requestWakeLock();
+  const edited = Object.keys(state.edits).length;
+  $('#export-btn').textContent = edited ? `匯出修稿（${edited} 頁）` : '匯出修稿（還沒有修改）';
 }
 
 async function switchView(view) {
   if (state.timer && view !== 'timer' && !confirm('計時進行中，要結束這次計時嗎？')) return;
   if (state.timer && view !== 'timer') finishTimer();
   await stopActiveRecording();
+  stopMemoAudio();
   state.view = view;
   store.set('view', view);
   render();
@@ -359,6 +558,7 @@ async function step(delta) {
   await stopActiveRecording();
   if (state.view === 'read') { state.readIndex += delta; renderRead(); }
   if (state.view === 'recall') { state.recallIndex += delta; renderRecall(); }
+  if (state.view === 'memo') { stopMemoAudio(); state.memoIndex += delta; renderMemo(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -397,8 +597,10 @@ function bindEvents() {
     await stopActiveRecording();
     state.speaker = button.dataset.speaker;
     store.set('speaker', state.speaker);
+    stopMemoAudio();
     state.readIndex = 0;
     state.recallIndex = 0;
+    state.memoIndex = 0;
     render();
   }));
   $$('[data-step]').forEach((button) => button.addEventListener('click', () => step(Number(button.dataset.step))));
@@ -432,6 +634,23 @@ function bindEvents() {
     renderRecall();
   });
 
+  $('#memo-tts').addEventListener('click', toggleSpeak);
+  $('#memo-listen').addEventListener('click', toggleListen);
+  $('#memo-rate').value = String(store.get('memoRate', 1));
+  $('#memo-rate').addEventListener('change', (event) => store.set('memoRate', Number(event.target.value)));
+  $('#memo-pass').addEventListener('click', () => {
+    const page = memoPage();
+    markMemoPassed(page, state.memoLevel);
+    if (state.memoLevel < LEVELS.length - 1) { state.memoLevel += 1; store.set('memoLevel', state.memoLevel); }
+    renderMemo();
+  });
+  $('#memo-edit').addEventListener('click', () => openEditor(memoPage()));
+  $('#read-edit').addEventListener('click', () => openEditor(visiblePages()[clampIndex(state.readIndex, visiblePages().length)]));
+  $('#edit-save').addEventListener('click', saveEditor);
+  $('#edit-restore').addEventListener('click', restoreEditor);
+  $('#edit-cancel').addEventListener('click', () => $('#editor').close());
+  $('#export-btn').addEventListener('click', exportEdits);
+  $('#export-copy').addEventListener('click', () => { $('#export-text').select(); try { document.execCommand('copy'); } catch { /* user can copy manually */ } });
   $('#timer-start').addEventListener('click', startTimer);
   $('#timer-next').addEventListener('click', nextTimerPage);
   $('#timer-pause').addEventListener('click', togglePause);

@@ -59,3 +59,65 @@ test('snapshot matches the final transcript', () => {
   assert.equal(data.qa.length, 7);
   assert.ok(data.pages.every((p) => p.paragraphs.length > 0));
 });
+
+import { splitSentences, maskSentence, normalise, compareSpeech, missedRuns } from './logic.js';
+
+test('splitSentences keeps stage directions and splits on 。！？；', () => {
+  assert.deepEqual(splitSentences('第一句。第二句！〔停一拍〕第三句'), [
+    { type: 'text', text: '第一句。' }, { type: 'text', text: '第二句！' },
+    { type: 'stage', text: '〔停一拍〕' }, { type: 'text', text: '第三句' },
+  ]);
+});
+
+const visible = (tokens) => tokens.filter((t) => !t.hidden).map((t) => t.text).join('');
+const hidden = (tokens) => tokens.filter((t) => t.hidden).map((t) => t.text).join('');
+
+test('maskSentence fades a sentence level by level', () => {
+  const s = '野菜苦苦的，為什麼煮成湯卻很好喝？';
+  assert.equal(visible(maskSentence(s, 0)), s);
+  assert.equal(visible(maskSentence(s, 1)), '野菜苦，為什麼煮成？');
+  assert.equal(visible(maskSentence(s, 2)), '野菜，為什？');
+  assert.equal(visible(maskSentence(s, 3)), '野，為？');
+  assert.equal(visible(maskSentence(s, 4)), '，？');
+  assert.equal(visible(maskSentence(s, 4)) + hidden(maskSentence(s, 4)), '，？野菜苦苦的為什麼煮成湯卻很好喝');
+});
+
+test('maskSentence never hides punctuation or quotes', () => {
+  const tokens = maskSentence('老師只問一句：「你說的苦，一樣嗎？」', 4);
+  assert.equal(visible(tokens), '：「，？」');
+});
+
+test('normalise drops punctuation, spaces and stage directions', () => {
+  assert.equal(normalise('Aray，謝謝 大家。〔停一拍〕'), 'aray謝謝大家');
+});
+
+test('compareSpeech scores coverage and finds the missed part', () => {
+  const script = '土地養野菜，野菜養孩子，孩子把知識傳下去。';
+  const full = compareSpeech(script, '土地養野菜 野菜養孩子 孩子把知識傳下去');
+  assert.equal(full.ratio, 1);
+  const partial = compareSpeech(script, '土地養野菜，孩子把知識傳下去');
+  assert.ok(partial.ratio > 0.6 && partial.ratio < 0.8);
+  // repeated words make the exact split ambiguous; the number of missed characters is not
+  assert.equal(missedRuns(partial.chars, partial.matched, 1).join('').length, 5);
+  assert.equal(partial.matched.filter((hit) => !hit).length, 5);
+});
+
+import { applyEdits, textToParagraphs, exportText } from './logic.js';
+
+test('applyEdits overlays edited pages without touching the snapshot', () => {
+  const pages = [{ n: 1, title: 'a', paragraphs: ['原稿'] }, { n: 2, title: 'b', paragraphs: ['二'] }];
+  const out = applyEdits(pages, { 1: { paragraphs: ['新稿'], at: 0 } });
+  assert.deepEqual(out.map((p) => [p.paragraphs[0], p.edited]), [['新稿', true], ['二', false]]);
+  assert.equal(pages[0].paragraphs[0], '原稿');
+});
+
+test('textToParagraphs splits on blank lines', () => {
+  assert.deepEqual(textToParagraphs('第一段\n接著\n\n\n第二段\r\n'), ['第一段 接著', '第二段']);
+  assert.deepEqual(textToParagraphs('   \n\n  '), []);
+});
+
+test('exportText lists only edited pages', () => {
+  const pages = [{ n: 1, title: '封面' }, { n: 2, title: '問題' }];
+  assert.equal(exportText(pages, {}), '');
+  assert.equal(exportText(pages, { 2: { paragraphs: ['甲', '乙'], at: 0 } }), '第 2 頁｜問題\n\n甲\n\n乙');
+});

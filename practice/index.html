@@ -105,6 +105,28 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 dialog label{display:block;margin:12px 0 4px;font-weight:700}
 input[type=range]{width:100%}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.chip.edited{background:rgba(212,138,6,.18);color:var(--amber)}
+#read-edit{margin-top:4px}
+dialog.editor{width:min(640px,94vw);max-width:none}
+dialog textarea{width:100%;margin:10px 0;padding:10px;border:1px solid var(--rule);border-radius:10px;background:var(--bg);color:var(--text);font:400 16px/1.7 var(--font);resize:vertical}
+.memo-head{display:flex;gap:12px;align-items:flex-start}
+.memo-head .slide{flex:none;width:44%}
+.memo-meta{margin:0;flex:1}
+.memo-meta h2{font-size:calc(var(--fs) + 1px)}
+.levels{margin:12px 0 2px}
+.levels button{font-size:13px;padding:6px 0;line-height:1.25}
+.levels button small{display:block;font:600 11px var(--mono);opacity:.75}
+.tools{align-items:center;margin:8px 0}
+.tools select{flex:none;width:auto;border:1px solid var(--rule);border-radius:12px;padding:10px 8px;background:var(--card);color:var(--text);font:inherit;font-size:15px}
+.memo .sent{border-radius:4px;transition:background .2s}
+.memo .sent.speaking{background:rgba(223,255,0,.45)}
+.gap{color:transparent;background:var(--sand);border-radius:3px;cursor:pointer;text-decoration:none}
+.gap.peek{color:var(--text-2);background:none;text-decoration:underline dotted}
+.miss{color:#c62828;background:rgba(198,40,40,.12);border-radius:3px;text-decoration:underline}
+.listen-live{margin:6px 0;padding:10px 12px;border-radius:12px;background:var(--sand);font-size:15px;color:var(--text-2)}
+.memo-result .score{font:700 40px/1.1 var(--mono)}
+.memo-result .score.pass{color:var(--sage)}
+.memo-result .score.fail{color:var(--amber)}
 </style>
 </head>
 <body>
@@ -125,10 +147,33 @@ input[type=range]{width:100%}
     <!-- ① 逐頁讀稿 -->
     <section class="view" id="view-read" aria-label="逐頁讀稿">
       <div class="slide" data-swipe><img id="read-img" alt=""></div>
-      <div class="meta"><span class="no" id="read-no"></span><span class="chip" id="read-speaker"></span><span class="chip" id="read-target"></span><h2 id="read-title"></h2></div>
+      <div class="meta"><span class="no" id="read-no"></span><span class="chip" id="read-speaker"></span><span class="chip" id="read-target"></span><span class="chip edited" id="read-edited" hidden>已修稿</span><h2 id="read-title"></h2></div>
       <div class="rec" data-rec="read"></div>
       <div class="script" id="read-script"></div>
+      <button class="ghost" type="button" id="read-edit" style="width:100%">✏️ 修稿</button>
       <div class="pager"><button type="button" data-step="-1">‹ 上一頁</button><span class="count" id="read-count"></span><button type="button" data-step="1">下一頁 ›</button></div>
+    </section>
+
+    <!-- 🧠 背稿 -->
+    <section class="view" id="view-memo" aria-label="背稿" hidden>
+      <div class="memo-head">
+        <div class="slide" data-swipe><img id="memo-img" alt=""></div>
+        <div class="meta memo-meta"><span class="no" id="memo-no"></span><span class="chip" id="memo-best"></span><span class="chip edited" id="memo-edited" hidden>已修稿</span><h2 id="memo-title"></h2></div>
+      </div>
+      <div class="seg levels" id="memo-levels" role="group" aria-label="挖空程度"></div>
+      <p class="note" id="memo-level-note"></p>
+      <div class="row tools">
+        <button class="ghost" type="button" id="memo-tts">🔊 朗讀</button>
+        <select id="memo-rate" aria-label="朗讀速度"><option value="0.8">慢</option><option value="1">正常</option><option value="1.2">快</option></select>
+        <button class="ghost" type="button" id="memo-listen">🎙 說說看・對稿</button>
+      </div>
+      <div class="listen-live" id="memo-live" hidden></div>
+      <div class="card memo-result" id="memo-result" hidden></div>
+      <div class="script memo" id="memo-script"></div>
+      <div class="row"><button class="ghost" type="button" id="memo-pass">✓ 這一級講順了</button><button class="ghost" type="button" id="memo-edit">✏️ 修稿</button></div>
+      <p class="note" style="margin-top:14px">每頁背到第幾級（L0–L4），點數字跳頁：</p>
+      <div class="dots" id="memo-dots"></div>
+      <div class="pager"><button type="button" data-step="-1">‹ 上一頁</button><span class="count" id="memo-count"></span><button type="button" data-step="1">下一頁 ›</button></div>
     </section>
 
     <!-- ② 提詞回想 -->
@@ -190,6 +235,7 @@ input[type=range]{width:100%}
 
 <nav class="tabs" aria-label="模式"><div>
   <button type="button" data-view="read" aria-current="page"><b>📖</b>讀稿</button>
+  <button type="button" data-view="memo"><b>🧠</b>背稿</button>
   <button type="button" data-view="recall"><b>🙈</b>回想</button>
   <button type="button" data-view="timer"><b>⏱</b>計時</button>
   <button type="button" data-view="quiz"><b>❓</b>抽考</button>
@@ -204,11 +250,29 @@ input[type=range]{width:100%}
     <div class="seg" id="theme" role="group" aria-label="外觀">
       <button type="button" data-theme="auto">跟隨系統</button><button type="button" data-theme="light">淺色</button><button type="button" data-theme="dark">深色</button>
     </div>
+    <label>修稿</label>
+    <button class="ghost" type="button" id="export-btn" style="width:100%">匯出修稿</button>
+    <p class="note">修過的稿只存在這支手機。匯出後貼回 Google 文件，就會變成正式版本。</p>
     <label>錄音</label>
     <button class="ghost" type="button" id="rec-clear" style="width:100%">刪除所有錄音</button>
     <p class="note" id="data-note"></p>
     <button class="primary" value="close" style="width:100%;margin-top:10px">完成</button>
   </form>
+</dialog>
+
+<dialog id="editor" class="editor">
+  <strong id="edit-title"></strong>
+  <p class="note">空一行＝分段。〔〕裡的字是舞台提示，不會被朗讀或對稿。</p>
+  <textarea id="edit-text" rows="14" aria-label="講稿內容"></textarea>
+  <div class="row"><button class="primary" type="button" id="edit-save">儲存</button><button class="ghost" type="button" id="edit-cancel">取消</button></div>
+  <button class="ghost" type="button" id="edit-restore" style="width:100%;margin-top:8px">放棄修改，回到定稿</button>
+</dialog>
+
+<dialog id="export">
+  <strong>匯出修稿</strong>
+  <p class="note">全選複製，再貼到 Google 文件對應的頁面。</p>
+  <textarea id="export-text" rows="14" readonly aria-label="修稿內容"></textarea>
+  <form method="dialog" class="row"><button class="ghost" type="button" id="export-copy">全選複製</button><button class="primary">關閉</button></form>
 </dialog>
 
 <script type="module" src="app.js"></script>
