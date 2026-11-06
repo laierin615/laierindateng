@@ -452,6 +452,9 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 /* 08 two columns, 09 picture book */
 .s8.s8-two{grid-template-columns:1fr 1fr}
 .s8-two .s8-spirit>.ph:first-child{inset:0}
+#sp-rot .sp-stack{background:#32968e;border-color:#32968e}
+.s8-spirit .sp-stack figcaption{z-index:1}
+.sp-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .bk{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:28px}
 .bk-col{display:flex;flex-direction:column;min-width:0}
 .bk-col h3{margin:18px 0 8px;font:700 32px/1.2 var(--serif)}
@@ -930,7 +933,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
         <p>Google 我的地圖：每種野菜一個圖層，地標寫阿美語和中文，附照片與辨識特徵。</p>
       </article>
       <article class="s8-col">
-        <div class="s8-img s8-spirit"><figure class="ph"><img src="assets/spirit.jpg" alt="學生手繪的刺蔥精靈"></figure></div>
+        <div class="s8-img s8-spirit" id="sp-rot"><figure class="ph sp-stack"><canvas class="sp-canvas" aria-hidden="true"></canvas><img hidden src="assets/sp_tana.jpg" alt="學生手繪的刺蔥精靈" data-am="Tana'" data-zh="刺蔥" data-role="勇敢的冒險家"><img hidden src="assets/sp_tatokem.jpg" alt="學生手繪的龍葵精靈" data-am="Tatokem" data-zh="龍葵" data-role="溫柔的守界者"><img hidden src="assets/sp_lokot.jpg" alt="學生手繪的山蘇精靈" data-am="Lokot" data-zh="山蘇" data-role="機智的行動者"><img hidden src="assets/sp_rorang.jpg" alt="學生手繪的構樹精靈" data-am="Rorang" data-zh="構樹" data-role="智慧的謀士"><img hidden src="assets/sp_kadawangay.jpg" alt="學生手繪的紫背草精靈" data-am="Kadawangay" data-zh="紫背草" data-role="神秘的觀察者"><img hidden src="assets/sp_kafotolay.jpg" alt="學生手繪的野莧精靈" data-am="Kafotolay" data-zh="野莧" data-role="堅毅的守護者"><img hidden src="assets/sp_lengac.jpg" alt="學生手繪的月桃精靈" data-am="Lengac" data-zh="月桃" data-role="創意的安慰者"><figcaption><span class="am" id="sp-am">Tana'</span> <span id="sp-zh">刺蔥</span>・<span id="sp-role">勇敢的冒險家</span></figcaption></figure></div>
         <h3>野菜精靈</h3>
         <table class="spirits">
           <tr><td><span class="am">tana'</span> 刺蔥</td><td>全身帶刺</td><td>勇敢的冒險家</td></tr>
@@ -1733,6 +1736,83 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   s.addEventListener('step', function (e) { show(KEY[e.detail] || 0); });
   s.addEventListener('page', function (e) { show(e.detail); });
   show(KEY[+(s.dataset.at || 0)] || 0, true);
+})();
+/* ---- spirits on slide 9: each one is painted in stroke by stroke, held, then the next ---- */
+(function () {
+  var box = document.getElementById('sp-rot'); if (!box) return;
+  var canvas = box.querySelector('.sp-canvas'), ctx = canvas.getContext('2d');
+  var imgs = [].slice.call(box.querySelectorAll('.sp-stack img'));
+  var am = document.getElementById('sp-am'), zh = document.getElementById('sp-zh'), role = document.getElementById('sp-role');
+  var mask = document.createElement('canvas'), mctx = mask.getContext('2d');
+  var layer = document.createElement('canvas'), lctx = layer.getContext('2d');
+  var STILL = window.__still || /[?&]shot/.test(location.search) || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DRAW_MS = 2600, HOLD_MS = 1600, cur = 0, strokes = [], fit = null, started = 0;
+
+  function size() {
+    var r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    [canvas, mask, layer].forEach(function (c) { if (c.width !== w || c.height !== h) { c.width = w; c.height = h; } });
+  }
+  function fitImage(img) {
+    var s = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+    var w = img.naturalWidth * s, h = img.naturalHeight * s;
+    return { x: (canvas.width - w) / 2, y: (canvas.height - h) / 2, w: w, h: h };
+  }
+  function planStrokes(f) {
+    // zigzag "colouring" strokes over the drawing, like a child filling it in row by row
+    var lw = f.h / 7, rows = Math.ceil(f.h / (lw * 0.55)) + 1, list = [];
+    for (var r = 0; r < rows; r++) {
+      var y = f.y + r * lw * 0.55, pts = [], steps = 8;
+      for (var i = 0; i <= steps; i++) {
+        var t = r % 2 ? 1 - i / steps : i / steps;
+        pts.push([f.x + t * f.w, y + (Math.random() - 0.5) * lw * 0.5]);
+      }
+      list.push(pts);
+    }
+    return { lw: lw, list: list, total: rows * 8 };
+  }
+  function paint(progress) {
+    var img = imgs[cur];
+    mctx.clearRect(0, 0, mask.width, mask.height);
+    mctx.lineCap = 'round'; mctx.lineJoin = 'round'; mctx.lineWidth = strokes.lw; mctx.strokeStyle = '#000';
+    var budget = progress * strokes.total;
+    strokes.list.forEach(function (pts) {
+      if (budget <= 0) return;
+      mctx.beginPath(); mctx.moveTo(pts[0][0], pts[0][1]);
+      for (var i = 1; i < pts.length && budget > 0; i++) {
+        var part = Math.min(1, budget); budget -= 1;
+        var a = pts[i - 1], b = pts[i];
+        mctx.lineTo(a[0] + (b[0] - a[0]) * part, a[1] + (b[1] - a[1]) * part);
+      }
+      mctx.stroke();
+    });
+    lctx.globalCompositeOperation = 'source-over';
+    lctx.clearRect(0, 0, layer.width, layer.height);
+    lctx.drawImage(mask, 0, 0);
+    lctx.globalCompositeOperation = 'source-in';
+    lctx.drawImage(img, fit.x, fit.y, fit.w, fit.h);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(layer, 0, 0);
+  }
+  function begin(index) {
+    cur = index; var img = imgs[cur];
+    am.textContent = img.dataset.am; zh.textContent = img.dataset.zh; role.textContent = img.dataset.role;
+    size(); fit = fitImage(img); strokes = planStrokes(fit); started = performance.now();
+  }
+  function frame(now) {
+    var elapsed = now - started;
+    if (elapsed >= DRAW_MS + HOLD_MS) { begin((cur + 1) % imgs.length); elapsed = 0; }
+    paint(Math.min(1, elapsed / DRAW_MS));
+    requestAnimationFrame(frame);
+  }
+  function ready(img) { return img.complete && img.naturalWidth > 0; }
+  function start() {
+    if (!imgs.every(ready)) return setTimeout(start, 100);
+    begin(0);
+    if (STILL) { paint(1); return; }
+    requestAnimationFrame(frame);
+  }
+  start();
 })();
 /* ---- knowledge cards on the picture-book slide: cross-fade every few seconds ---- */
 (function () {
