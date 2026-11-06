@@ -928,7 +928,6 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     <div class="fb">
       <div class="fb-book" id="fb-book" title="點書頁跳到下一個重點頁；‹ › 一頁一頁翻">
         <figure class="fb-pg"><img src="assets/book01.jpg" alt="繪本第 1 頁：《Misolap ci Awos to dateng》"></figure>
-        <figure class="fb-pg"><img src="assets/book02.jpg" alt="繪本第 2 頁"></figure>
         <figure class="fb-pg"><img src="assets/book03.jpg" alt="繪本第 3 頁：'aos"></figure>
         <figure class="fb-pg"><img src="assets/book04.jpg" alt="繪本第 4 頁：小蝸牛 Awos"></figure>
         <figure class="fb-pg"><img src="assets/book05.jpg" alt="繪本第 5 頁：Awos 遇見刺蔥 Tana'"></figure>
@@ -1690,7 +1689,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 (function () {
   var book = document.getElementById('fb-book'); if (!book) return;
   var s = book.closest('.slide'), pg = [].slice.call(book.children), N = pg.length, cur = 0;
-  var KEY = [0, 3, 4, 7, 21], CAP = [["封面", "《Misolap ci Awos to dateng》", "Awos 的野菜探險記，師生共編。", ""], ["扉頁", "", "", ""], ["書名頁", "'aos", "小蝸牛，小螺。", ""], ["主角", "小蝸牛 Awos", "活潑、喜歡自己去探險。族語在上，孩子手寫的中文在下。", ""], ["故事", "Awos 遇見刺蔥 Tana'", "「我能趕走討厭的蟲子，但要小心，我的葉子有刺喔～」", ""], ["圖鑑", "Tana' 刺蔥", "辨識特徵、採集知識，還有海鹽爺爺教的刺蔥海鹽。", ""], ["故事", "Awos 遇見野莧 Kafotolay", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Kafotolay 野莧", "辨識特徵、採集知識、孩子的風味圖和料理。", ""], ["故事", "Awos 遇見龍葵 Tatokem", "一串小小的黑色果實，Awos 張嘴就想咬下去。", ""], ["圖鑑", "Tatokem 龍葵", "辨識特徵、採集知識，還有孩子做的龍葵泡麵。", ""], ["故事", "Awos 遇見山蘇 Lokot", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Lokot 山蘇", "辨識特徵、採集知識、山蘇抓餅，還有孢子怎麼長成新山蘇。", ""], ["故事", "Awos 遇見紫背草 Kadawangay", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Kadawangay 紫背草", "辨識特徵、採集知識，還有飛魚八菜一湯。", ""], ["故事", "Awos 遇見月桃 Lengac", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Lengac 月桃", "辨識特徵、採集知識，還有月桃茶葉蛋。", ""], ["故事", "Awos 在構樹 Rorang 下", "最後 Awos 在構樹下遇到了同伴，回到家囉。", ""], ["圖鑑", "Rorang 構樹", "辨識特徵、採集知識，還有構樹茶泡飯。", ""], ["篇章頁", "dateng", "野菜。", ""], ["故事全文", "七段故事・族語與中文（一）", "Awos、刺蔥、野莧、龍葵。", ""], ["故事全文", "七段故事・族語與中文（二）", "山蘇、紫背草、月桃、構樹。", ""], ["遊戲盤", "'Aos 蝸牛知識大探索", "書末的蝸牛知識遊戲盤，邊玩邊認識 Awos 的世界。", ""], ["遊戲盤", "第 11–20 格與遊戲規則", "擲骰子前進，落在格子上就完成任務。", ""], ["心理測驗", "你是哪一種野菜？", "七個題目，走到七種野菜精靈。", ""], ["心理測驗", "七種野菜精靈", "山蘇、刺蔥、構樹、紫背草、野莧、龍葵、月桃。", ""], ["謝誌", "謝謝教我們的人", "部落的 ina、faki、老師和店家。", ""], ["創作團隊", "創作團隊", "寧埔國小的孩子和老師。", ""], ["蝴蝶頁", "", "", ""], ["蝴蝶頁", "", "", ""], ["封底", "《Misolap ci Awos to dateng》", "", ""]];
+  var KEY = [0, 2, 3, 6, 20], CAP = [["封面", "《Misolap ci Awos to dateng》", "Awos 的野菜探險記，師生共編。", ""], ["書名頁", "'aos", "小蝸牛，小螺。", ""], ["主角", "小蝸牛 Awos", "活潑、喜歡自己去探險。族語在上，孩子手寫的中文在下。", ""], ["故事", "Awos 遇見刺蔥 Tana'", "「我能趕走討厭的蟲子，但要小心，我的葉子有刺喔～」", ""], ["圖鑑", "Tana' 刺蔥", "辨識特徵、採集知識，還有海鹽爺爺教的刺蔥海鹽。", ""], ["故事", "Awos 遇見野莧 Kafotolay", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Kafotolay 野莧", "辨識特徵、採集知識、孩子的風味圖和料理。", ""], ["故事", "Awos 遇見龍葵 Tatokem", "一串小小的黑色果實，Awos 張嘴就想咬下去。", ""], ["圖鑑", "Tatokem 龍葵", "辨識特徵、採集知識，還有孩子做的龍葵泡麵。", ""], ["故事", "Awos 遇見山蘇 Lokot", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Lokot 山蘇", "辨識特徵、採集知識、山蘇抓餅，還有孢子怎麼長成新山蘇。", ""], ["故事", "Awos 遇見紫背草 Kadawangay", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Kadawangay 紫背草", "辨識特徵、採集知識，還有飛魚八菜一湯。", ""], ["故事", "Awos 遇見月桃 Lengac", "族語故事，配孩子手寫的中文。", ""], ["圖鑑", "Lengac 月桃", "辨識特徵、採集知識，還有月桃茶葉蛋。", ""], ["故事", "Awos 在構樹 Rorang 下", "最後 Awos 在構樹下遇到了同伴，回到家囉。", ""], ["圖鑑", "Rorang 構樹", "辨識特徵、採集知識，還有構樹茶泡飯。", ""], ["篇章頁", "dateng", "野菜。", ""], ["故事全文", "七段故事・族語與中文（一）", "Awos、刺蔥、野莧、龍葵。", ""], ["故事全文", "七段故事・族語與中文（二）", "山蘇、紫背草、月桃、構樹。", ""], ["遊戲盤", "'Aos 蝸牛知識大探索", "書末的蝸牛知識遊戲盤，邊玩邊認識 Awos 的世界。", ""], ["遊戲盤", "第 11–20 格與遊戲規則", "擲骰子前進，落在格子上就完成任務。", ""], ["心理測驗", "你是哪一種野菜？", "七個題目，走到七種野菜精靈。", ""], ["心理測驗", "七種野菜精靈", "山蘇、刺蔥、構樹、紫背草、野莧、龍葵、月桃。", ""], ["謝誌", "謝謝教我們的人", "部落的 ina、faki、老師和店家。", ""], ["創作團隊", "創作團隊", "寧埔國小的孩子和老師。", ""], ["蝴蝶頁", "", "", ""], ["蝴蝶頁", "", "", ""], ["封底", "《Misolap ci Awos to dateng》", "", ""]];
   var EASE = 'cubic-bezier(.45,.05,.25,1)', n = document.getElementById('fb-n'), bar = document.getElementById('fb-bar'), cap = document.getElementById('fb-cap');
   function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   pg.forEach(function (p, i) { p.style.zIndex = N - i; });
@@ -1704,7 +1703,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
       p.classList.toggle('turned', t);
     });
     cur = to; var c = CAP[cur];
-    n.textContent = cur + 1; bar.style.width = (cur + 1) / N * 100 + '%';
+    n.textContent = +pg[cur].querySelector('img').getAttribute('src').match(/book(\d+)/)[1]; bar.style.width = (cur + 1) / N * 100 + '%';
     cap.innerHTML = '<p class="fb-no">' + esc(c[0]) + '</p>' + (c[1] ? '<h3>' + esc(c[1]) + '</h3>' : '') + (c[2] ? '<p>' + esc(c[2]) + '</p>' : '') + (c[3] ? '<span class="cap">' + esc(c[3]) + '</span>' : '');
   }
   book.addEventListener('click', function () { var k = KEY.filter(function (x) { return x > cur; })[0]; show(k != null ? k : cur + 1); });
@@ -2098,7 +2097,7 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   document.getElementById('qz-book').addEventListener('click', function (e) {
     e.stopPropagation(); this.blur(); var s9 = document.getElementById('s9'); if (!s9 || !window.__deck) return;
     __deck.go([].indexOf.call(document.querySelectorAll('.slide'), s9), +s9.dataset.steps);
-    setTimeout(function () { s9.dispatchEvent(new CustomEvent('page', { detail: 23 })); }, 60);
+    setTimeout(function () { s9.dispatchEvent(new CustomEvent('page', { detail: 22 })); }, 60);
   });
   grid.innerHTML = Object.keys(R).map(function (k) { return '<figure data-r="' + k + '" role="button" tabindex="0" title="看人格特質"><img src="assets/sp_' + k + '.jpg" alt="' + R[k][2] + ' ' + R[k][0] + '精靈"><figcaption><span class="am">' + R[k][2] + '</span>' + R[k][0] + '</figcaption></figure>'; }).join('');
   var qt = document.getElementById('qz-qr-t'); if (qt) grid.appendChild(qt.content.cloneNode(true));
