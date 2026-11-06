@@ -396,6 +396,8 @@ a.url{display:block;text-decoration:none}
 #timer .t{font:700 26px var(--mono);font-variant-numeric:tabular-nums;color:var(--neon)}
 #reload{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);cursor:pointer;opacity:.55;transition:opacity .2s}
 #reload:hover,#reload:focus-visible{opacity:1}
+#pdf-dl{position:fixed;z-index:30;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);text-decoration:none;opacity:.55;transition:opacity .2s}
+#pdf-dl:hover,#pdf-dl:focus-visible{opacity:1}
 #timer[data-state="late"] .t{color:var(--amber)}
 #timer[data-state="over"] .t{color:var(--rust)}
 #timer[data-state="paused"] .t{color:var(--on-ink-2)}
@@ -2308,8 +2310,10 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 })();
 </script>
 <button id="reload" type="button" title="載入最新版，停在目前這一頁">↻ 重新整理</button>
+<a id="pdf-dl" href="Dateng_forum_20261107.pdf" download="Dateng野菜探險家_2026原住民族教育論壇.pdf" title="下載整份簡報（17 頁 PDF）">⬇ 下載簡報 PDF</a>
 <script>
 // reload button: fetch the newest page (cache-busting query) and stay on the current slide
+document.getElementById('pdf-dl').addEventListener('click', function (e) { e.stopPropagation(); });
 document.getElementById('reload').addEventListener('click', function (e) {
   e.stopPropagation();
   location.replace(location.pathname + '?r=' + Date.now() + location.hash);
