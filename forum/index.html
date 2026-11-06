@@ -138,6 +138,17 @@ figure{margin:0}
 .phases .ph{height:270px;box-shadow:0 10px 24px var(--shadow)}
 .phases h3{margin:18px 0 4px;font:700 40px/1.2 var(--serif)}
 .phases p{margin:0;font:400 25px/1.45 var(--sans);color:var(--on-paper-2)}
+.phases .ph-radar{background:var(--paper)}
+.rr{display:block;width:100%;height:100%}
+.rr .rr-grid{fill:none;stroke:var(--on-paper);stroke-opacity:.16;stroke-width:1}
+.rr .rr-axis{font:700 15px var(--sans);fill:var(--on-paper-2);text-anchor:middle;dominant-baseline:middle}
+.rr .rr-raw{fill:var(--rust);fill-opacity:.25;stroke:var(--rust);stroke-width:3;stroke-linejoin:round}
+.rr .rr-cooked{fill:var(--sage);fill-opacity:.25;stroke:var(--sage);stroke-width:3;stroke-dasharray:7 5;stroke-linejoin:round}
+.rr-legend text{font:500 13px var(--sans);fill:var(--on-paper-2);dominant-baseline:middle}
+.phases .ph-spirit{background:#fff}
+.phases .ph-spirit img{object-fit:contain;transform-origin:50% 90%;animation:spirit-walk 1.8s ease-in-out infinite}
+@keyframes spirit-walk{0%,100%{transform:translateY(0) rotate(-3deg) scale(1,1)}25%{transform:translateY(-14px) rotate(0) scale(.97,1.04)}50%{transform:translateY(0) rotate(3deg) scale(1.03,.97)}75%{transform:translateY(-14px) rotate(0) scale(.97,1.04)}}
+@media (prefers-reduced-motion:reduce){.phases .ph-spirit img{animation:none}}
 .s4-foot{margin:auto 0 0;padding-left:20px;border-left:6px solid var(--rust);font:500 30px/1.4 var(--sans)}
 
 /* ---------- 05 identify ---------- */
@@ -765,8 +776,8 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     </dl>
     <ol class="phases">
       <li><figure class="ph"><video class="loop" src="assets/loop_c1.mp4" poster="assets/loop_c1.jpg" muted loop autoplay playsinline preload="auto" aria-label="影片循環：孩子跟著長輩辨識、記錄野菜"></video><figcaption>先請教，再採集</figcaption></figure><h3>採集</h3><p>照片、田野筆記、繪圖</p></li>
-      <li><figure class="ph"><img src="assets/ph2.jpg" alt="黑板上的酸甜苦辣香澀評分"></figure><h3>實驗</h3><p>風味紀錄、AI 測試</p></li>
-      <li><figure class="ph"><img src="assets/ph3.jpg" alt="學生畫的刺蔥精靈"></figure><h3>創作</h3><p>地圖、精靈、繪本</p></li>
+      <li><figure class="ph ph-radar"><svg class="rr" viewBox="0 0 304 270" role="img" aria-label="風味雷達圖動畫：先畫出生吃，再疊上熟食"><polygon points="152.0,101.3 176.0,112.9 181.9,138.8 165.3,159.6 138.7,159.6 122.1,138.8 128.0,112.9" class="rr-grid"/><polygon points="152.0,70.7 200.0,93.8 211.8,145.6 178.6,187.3 125.4,187.3 92.2,145.6 104.0,93.8" class="rr-grid"/><polygon points="152.0,40.0 223.9,74.6 241.7,152.5 191.9,214.9 112.1,214.9 62.3,152.5 80.1,74.6" class="rr-grid"/><line x1="152" y1="132" x2="152.0" y2="40.0" class="rr-grid"/><line x1="152" y1="132" x2="223.9" y2="74.6" class="rr-grid"/><line x1="152" y1="132" x2="241.7" y2="152.5" class="rr-grid"/><line x1="152" y1="132" x2="191.9" y2="214.9" class="rr-grid"/><line x1="152" y1="132" x2="112.1" y2="214.9" class="rr-grid"/><line x1="152" y1="132" x2="62.3" y2="152.5" class="rr-grid"/><line x1="152" y1="132" x2="80.1" y2="74.6" class="rr-grid"/><text x="152.0" y="21.6" class="rr-axis">酸</text><text x="238.3" y="63.2" class="rr-axis">甜</text><text x="259.6" y="156.6" class="rr-axis">苦</text><text x="199.9" y="231.5" class="rr-axis">辣</text><text x="104.1" y="231.5" class="rr-axis">甘</text><text x="44.4" y="156.6" class="rr-axis">香</text><text x="65.7" y="63.2" class="rr-axis">澀</text><polygon class="rr-raw" points="152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0"><animate attributeName="points" dur="9s" repeatCount="indefinite" keyTimes="0;0.08;0.2;0.88;1" values="152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0;152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0;152.0,101.3 200.0,93.8 211.8,145.6 152.0,132.0 138.7,159.6 62.3,152.5 80.1,74.6;152.0,101.3 200.0,93.8 211.8,145.6 152.0,132.0 138.7,159.6 62.3,152.5 80.1,74.6;152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0" calcMode="spline" keySplines="0 0 1 1;.3 0 .2 1;0 0 1 1;.5 0 .5 1"/></polygon><polygon class="rr-cooked" points="152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0"><animate attributeName="points" dur="9s" repeatCount="indefinite" keyTimes="0;0.42;0.56;0.88;1" values="152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0;152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0;152.0,132.0 176.0,112.9 181.9,138.8 152.0,132.0 125.4,187.3 152.0,132.0 104.0,93.8;152.0,132.0 176.0,112.9 181.9,138.8 152.0,132.0 125.4,187.3 152.0,132.0 104.0,93.8;152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0 152.0,132.0" calcMode="spline" keySplines="0 0 1 1;.3 0 .2 1;0 0 1 1;.5 0 .5 1"/></polygon><g class="rr-legend"><rect x="10" y="244" width="16" height="10" class="rr-raw"/><text x="31" y="253">生吃</text><rect x="76" y="244" width="16" height="10" class="rr-cooked"/><text x="97" y="253">熟食</text></g></svg></figure><h3>實驗</h3><p>風味紀錄、AI 測試</p></li>
+      <li><figure class="ph ph-spirit"><img src="assets/ph3.jpg" alt="學生畫的刺蔥精靈，動畫中左右搖擺、跳動"></figure><h3>創作</h3><p>地圖、精靈、繪本</p></li>
       <li><figure class="ph"><img src="assets/ph4.jpg" alt="學生上台發表"></figure><h3>分享</h3><p>發表、訪談、走讀</p></li>
     </ol>
     <p class="s4-foot">從土地走到科技：前一段留下的照片和筆記，就是下一段的材料。</p>
