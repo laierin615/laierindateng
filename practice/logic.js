@@ -4,7 +4,7 @@
  */
 
 /** Speaker filter keys used across the app. */
-export const SPEAKERS = Object.freeze({ all: '全部', ciping: '慧麗 1–7', yiyun: '奕芸 8–17' });
+export const SPEAKERS = Object.freeze({ all: '全部', ciping: '慧麗 1–7', yiyun: '奕芸 8–16' });
 
 /**
  * Format seconds as m:ss (negative values get a leading minus).
@@ -99,7 +99,7 @@ export function shuffle(items, random = Math.random) {
 /* ---------- script versions ---------- */
 
 /**
- * Swap in an alternative wording for some pages (e.g. the stand-up version of 8–17).
+ * Swap in an alternative wording for some pages (e.g. the stand-up version of 8–16).
  * Pages the version does not cover keep the final transcript.
  * @template {{n: number, paragraphs: string[]}} T
  * @param {T[]} pages

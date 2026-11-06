@@ -18,7 +18,7 @@ test('pageTarget uses the transcript window', () => {
 });
 
 test('filterPages splits the two speakers', () => {
-  assert.equal(filterPages(data.pages, 'all').length, 17);
+  assert.equal(filterPages(data.pages, 'all').length, 16);
   assert.deepEqual(filterPages(data.pages, 'ciping').map((p) => p.n), [1, 2, 3, 4, 5, 6, 7]);
   assert.equal(filterPages(data.pages, 'yiyun')[0].n, 8);
 });
@@ -131,9 +131,9 @@ test('applyVersion swaps only the pages it covers', () => {
   assert.deepEqual(applyVersion(pages, null).map((p) => p.paragraphs[0]), ['定稿七', '定稿八']);
 });
 
-test('stand-up version covers 8–17 with no cues or star markers', () => {
+test('stand-up version covers 8–16 with no cues or star markers', () => {
   const standup = JSON.parse(readFileSync(new URL('./standup.json', import.meta.url), 'utf8'));
-  assert.deepEqual(Object.keys(standup.pages).map(Number), [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+  assert.deepEqual(Object.keys(standup.pages).map(Number), [8, 9, 10, 11, 12, 13, 14, 15, 16]);
   const all = Object.values(standup.pages).flat().join('');
   assert.ok(!/[〔〕★]/.test(all));
 });
