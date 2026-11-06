@@ -400,7 +400,7 @@ a.url{display:block;text-decoration:none}
 /* ---------- presenter UI ---------- */
 #timer{position:fixed;z-index:30;top:calc(10px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:baseline;gap:12px;padding:8px 14px;background:var(--panel);border:1px solid var(--rule-ink);border-radius:8px;font:400 15px var(--mono);color:var(--on-ink-2)}
 #timer .t{font:700 26px var(--mono);font-variant-numeric:tabular-nums;color:var(--neon)}
-#reload{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right,0px));top:calc(64px + env(safe-area-inset-top,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);cursor:pointer;opacity:.55;transition:opacity .2s}
+#reload{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));padding:8px 14px;border:1px solid var(--rule-ink);border-radius:8px;background:var(--panel);color:var(--on-ink);font:700 15px var(--sans);cursor:pointer;opacity:.55;transition:opacity .2s}
 #reload:hover,#reload:focus-visible{opacity:1}
 #timer[data-state="late"] .t{color:var(--amber)}
 #timer[data-state="over"] .t{color:var(--rust)}
@@ -1264,7 +1264,6 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
     <dt>空白鍵</dt><dd>下一頁</dd>
     <dt>F</dt><dd>全螢幕（再按一次離開）</dd>
     <dt>F5</dt><dd>進入全螢幕，不會重新整理（簡報筆放映鍵）</dd>
-    <dt>T</dt><dd>開始／暫停計時，Shift+T 歸零</dd>
     <dt>P</dt><dd>提示列（重點、本頁時間、下一頁）</dd>
     <dt>S</dt><dd>講稿</dd>
     <dt>O</dt><dd>總覽與備用頁</dd>
@@ -1514,14 +1513,9 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
   }
 
   const KEY = 'dateng-forum-timer';
-  let T = Object.assign({ acc: 0, start: null, running: false, shown: false }, store.get(KEY) || {});
+  // the on-screen timer is switched off for this talk; an old saved state must not bring it back
+  let T = Object.assign({ acc: 0, start: null, running: false }, store.get(KEY) || {}, { shown: false });
   const elapsed = () => T.acc + (T.running && T.start ? (Date.now() - T.start) / 1000 : 0);
-  function toggleTimer() {
-    if (T.running) { T.acc = elapsed(); T.running = false; T.start = null; }
-    else { T.start = Date.now(); T.running = true; T.shown = true; }
-    store.set(KEY, T); renderTimer();
-  }
-  function resetTimer() { T = { acc: 0, start: null, running: false, shown: false }; store.set(KEY, T); renderTimer(); }
   function renderTimer() {
     const el = $('#timer'); el.hidden = !T.shown; if (!T.shown) return;
     const t = elapsed(), w = (DATA.slides[cur] || {}).win;
@@ -1588,7 +1582,6 @@ button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
       case 'Home': go(0); break;
       case 'End': go(MAIN - 1, stepsOf(slides[MAIN - 1])); break;
       case 'f': case 'F': toggleFS(); break;
-      case 't': case 'T': if (e.shiftKey) resetTimer(); else toggleTimer(); break;
       case 'p': case 'P': toggle('cues'); break;
       case 's': case 'S': toggle('script'); break;
       case 'o': case 'O': case 'g': case 'G': toggle('overview'); break;
